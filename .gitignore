@@ -1,0 +1,15 @@
+target/
+build/
+dist/
+nbproject/private/
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.rar
+*.tmp
+.idea/
+.vscode/

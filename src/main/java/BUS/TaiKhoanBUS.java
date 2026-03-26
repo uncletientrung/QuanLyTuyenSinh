@@ -65,10 +65,13 @@ public class TaiKhoanBUS {
             return false;
         }
 
-        tk.setTendangnhap(tendangnhap);
+       tk.setMatkhau(matkhau);
+        tk.setMaphanquyen(maphanquyen);
+        tk.setTrangthai(trangthai);       tk.setTendangnhap(tendangnhap);
         tk.setMatkhau(matkhau);
         tk.setMaphanquyen(maphanquyen);
         tk.setTrangthai(trangthai);
+        
 
         return taiKhoanDAO.update(tk);
     }

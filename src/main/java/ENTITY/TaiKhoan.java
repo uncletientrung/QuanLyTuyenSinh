@@ -1,14 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ENTITY;
+
 import jakarta.persistence.*;
 
-/**
- *
- * @author DELL
- */
 @Entity
 @Table(name = "taikhoan")
 public class TaiKhoan {
@@ -43,7 +36,7 @@ public class TaiKhoan {
         this.trangthai = trangthai;
     }
 
-    // Constructor không có ID (dùng insert)
+    // Constructor không có ID
     public TaiKhoan(String tendangnhap, String matkhau, int maphanquyen, int trangthai) {
         this.tendangnhap = tendangnhap;
         this.matkhau = matkhau;
@@ -51,6 +44,7 @@ public class TaiKhoan {
         this.trangthai = trangthai;
     }
 
+    // Getter và Setter
     public int getMatk() {
         return matk;
     }
@@ -91,6 +85,7 @@ public class TaiKhoan {
         this.trangthai = trangthai;
     }
 
+    // toString
     @Override
     public String toString() {
         return "TaiKhoan{" +

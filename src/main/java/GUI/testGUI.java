@@ -17,7 +17,6 @@ public class testGUI {
         TaiKhoanBUS taiKhoanBUS = new TaiKhoanBUS();
 
         List<TaiKhoan> list = taiKhoanBUS.getAllTaiKhoan();
-
         System.out.println("===== DANH SACH TAI KHOAN =====");
 
         for (TaiKhoan tk : list) {

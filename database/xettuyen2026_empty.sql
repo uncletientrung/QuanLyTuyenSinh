@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 25, 2026 lúc 03:24 PM
+-- Thời gian đã tạo: Th3 26, 2026 lúc 08:07 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -173,6 +173,30 @@ INSERT INTO `xt_diemthixettuyen` (`iddiemthi`, `cccd`, `sobaodanh`, `d_phuongthu
 (4, '079201000004', 'BD004', 'THPT', 6.80, 6.40, 6.20, 7.00, 8.60, 8.75, 8.90, 7.50, 7.50, 0.00, 0.00, 6.50, 8.10, 760.00, NULL, NULL),
 (5, '079201000005', 'BD005', 'THPT', 7.25, 7.00, 8.20, 8.40, 5.80, 6.10, 6.70, 6.95, 6.95, 0.00, 0.00, 7.80, 6.00, 700.00, NULL, NULL),
 (6, '079201000006', 'BD006', 'THPT', 8.10, 7.50, 7.40, 7.30, 8.20, 8.00, 8.60, 8.85, 8.85, 0.00, 0.00, 7.20, 8.30, 845.00, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `xt_khuvuc`
+--
+
+CREATE TABLE `xt_khuvuc` (
+  `idkhuvuc` int(11) NOT NULL,
+  `makv` varchar(45) NOT NULL,
+  `tenkhuvuc` varchar(100) NOT NULL,
+  `diemuutien` decimal(8,2) NOT NULL,
+  `trangthai` tinyint(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `xt_khuvuc`
+--
+
+INSERT INTO `xt_khuvuc` (`idkhuvuc`, `makv`, `tenkhuvuc`, `diemuutien`, `trangthai`) VALUES
+(1, 'KV1', 'Khu vực 1', 0.75, 1),
+(2, 'KV2', 'Khu vực 2', 0.25, 1),
+(3, 'KV2NT', 'KV2 nông thôn', 0.50, 1),
+(4, 'KV3', 'Khu vực 3', 0.00, 1);
 
 -- --------------------------------------------------------
 
@@ -419,6 +443,12 @@ ALTER TABLE `xt_diemthixettuyen`
   ADD UNIQUE KEY `cccd_UNIQUE` (`cccd`);
 
 --
+-- Chỉ mục cho bảng `xt_khuvuc`
+--
+ALTER TABLE `xt_khuvuc`
+  ADD PRIMARY KEY (`idkhuvuc`);
+
+--
 -- Chỉ mục cho bảng `xt_nganh`
 --
 ALTER TABLE `xt_nganh`
@@ -491,6 +521,12 @@ ALTER TABLE `xt_diemcongxetuyen`
 --
 ALTER TABLE `xt_diemthixettuyen`
   MODIFY `iddiemthi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT cho bảng `xt_khuvuc`
+--
+ALTER TABLE `xt_khuvuc`
+  MODIFY `idkhuvuc` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT cho bảng `xt_nganh`

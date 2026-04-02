@@ -1,0 +1,26 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package GUI.Panel;
+import java.awt.*;
+import javax.swing.*;
+/**
+ *
+ * @author DELL
+ */
+public class ThiSinhPanel extends JPanel{
+    public ThiSinhPanel(){
+        setLayout(new BorderLayout());
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        JLabel welcomeLabel = new JLabel("THÍ SINH", SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("Roboto", Font.BOLD, 28));
+        welcomeLabel.setForeground(Color.WHITE);
+        welcomeLabel.setBackground(new Color(60, 63, 65, 200));
+        welcomeLabel.setOpaque(true);
+        welcomeLabel.setPreferredSize(new Dimension(0, 80));
+        centerPanel.add(welcomeLabel, BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
+    }
+}

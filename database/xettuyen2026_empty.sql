@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 26, 2026 lúc 08:07 AM
+-- Thời gian đã tạo: Th4 02, 2026 lúc 11:09 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -72,6 +72,13 @@ CREATE TABLE `taikhoan` (
   `trangthai` tinyint(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Đang đổ dữ liệu cho bảng `taikhoan`
+--
+
+INSERT INTO `taikhoan` (`matk`, `tendangnhap`, `matkhau`, `maphanquyen`, `trangthai`) VALUES
+(1, 'admin', '123', 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -83,10 +90,10 @@ CREATE TABLE `xt_bangquydoi` (
   `d_phuongthuc` varchar(45) DEFAULT NULL COMMENT 'phương thức xét tuyển',
   `d_tohop` varchar(45) DEFAULT NULL COMMENT 'tổ hợp xét tuyển',
   `d_mon` varchar(45) DEFAULT NULL COMMENT 'Ví dụ: TO, DI, N1',
-  `d_diema` decimal(6,2) DEFAULT NULL COMMENT 'mốc điểm quy đổi',
+  `d_diema` decimal(6,2) DEFAULT NULL COMMENT 'mốc điểm quy đổi (Khoảng điểm bắt đầu)',
   `d_diemb` decimal(6,2) DEFAULT NULL COMMENT 'mốc điểm quy đổi',
   `d_diemc` decimal(6,2) DEFAULT NULL COMMENT 'mốc điểm quy đổi',
-  `d_diemd` decimal(6,2) DEFAULT NULL COMMENT 'mốc điểm quy đổi',
+  `d_diemd` decimal(6,2) DEFAULT NULL COMMENT 'mốc điểm quy đổi (Khoảng điểm kết thúc)',
   `d_maquydoi` varchar(45) DEFAULT NULL COMMENT 'mã của dòng quy đổi để phân biệt từng quy tắc quy đổi',
   `d_phanvi` varchar(45) DEFAULT NULL COMMENT 'Điểm này ở mức cao hơn khoảng bao nhiêu % thí sinh'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -261,7 +268,7 @@ CREATE TABLE `xt_nganh_tohop` (
   `TI` tinyint(1) DEFAULT NULL,
   `KHAC` tinyint(1) DEFAULT NULL,
   `KTPL` tinyint(1) DEFAULT NULL,
-  `dolech` decimal(6,2) DEFAULT 0.00
+  `dolech` decimal(6,2) DEFAULT 0.00 COMMENT 'Nhập tay chứ không phải thiết kế hệ thống'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -293,7 +300,7 @@ CREATE TABLE `xt_nguyenvongxettuyen` (
   `nn_cccd` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `nv_manganh` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `nv_tt` int(11) NOT NULL COMMENT 'Nguyện vọng thứ tự',
-  `diem_thxt` decimal(10,5) DEFAULT NULL COMMENT 'đã cộng điểm môn chính',
+  `diem_thxt` decimal(10,5) DEFAULT NULL COMMENT 'đã cộng điểm môn chính (điểm tổ hợp xét tuyển)',
   `diem_utqd` decimal(10,5) DEFAULT NULL COMMENT 'Điểm UTQD theo tổ họp sẽ khác nhau.',
   `diem_cong` decimal(6,2) DEFAULT NULL COMMENT 'Tong 3 mon chua tinh mon chinh + diem uu tien\\\\\\\\n',
   `diem_xettuyen` decimal(10,5) DEFAULT NULL COMMENT 'đã cộng điểm ưu tiên',
@@ -502,7 +509,7 @@ ALTER TABLE `phanquyen`
 -- AUTO_INCREMENT cho bảng `taikhoan`
 --
 ALTER TABLE `taikhoan`
-  MODIFY `matk` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `matk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT cho bảng `xt_bangquydoi`

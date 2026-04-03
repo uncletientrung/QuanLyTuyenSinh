@@ -114,7 +114,7 @@ public class MenuTaskbar extends JPanel{
                             main.setPanel(new ThiSinhPanel());
                             break;
                         case 10:
-                            main.setPanel(new TaiKhoanPanel());
+                            main.setPanel(new TaiKhoanPanel(main));
                             break;
                     }
                 }
@@ -123,6 +123,10 @@ public class MenuTaskbar extends JPanel{
         listItem[0].isSelected = true;
         listItem[0].setBackground(new Color(187, 222, 251));
         listItem[0].setForeground(new Color(0, 0, 0));
+         for (int i = 1; i < ArrMenu.length; i++) {
+             listItem[i].setBackground(DefaultColor);
+             listItem[i].setForeground(new Color(96, 125, 139));
+         }
     }
     
     public void pnlMenuTaskbarMousePress(MouseEvent evt) {

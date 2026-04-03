@@ -18,7 +18,7 @@ public class TaiKhoanBUS {
     // ===================== Lấy danh sách =====================
 
     public List<TaiKhoan> getAllTaiKhoan() {
-        return taiKhoanDAO.getAll();
+        return listTaiKhoan;
     }
 
     // ===================== Thêm tài khoản =====================

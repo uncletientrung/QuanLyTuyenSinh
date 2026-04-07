@@ -8,6 +8,7 @@ import GUI.Main;
 import GUI.Panel.TaiKhoanPanel;
 import GUI.Panel.ThiSinhPanel;
 import GUI.Panel.TrangChuPanel;
+import GUI.Panel.testPanel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -24,7 +25,7 @@ public class MenuTaskbar extends JPanel{
     {"Thí sinh", "home.svg", "thiSinh"},
     {"Điểm thi", "home.svg", "diemThi"},
     {"Nguyện vọng", "home.svg", "nguyenVong"},
-    {"Khu vực", "home.svg", "khuvuc"},
+    {"Khu vực", "home.svg", "khuVuc"},
     {"Môn", "home.svg", "mon"},
     {"Ngành", "home.svg", "nganh"},
     {"Ngành - Tổ hợp", "home.svg", "nganhToHop"},
@@ -111,7 +112,10 @@ public class MenuTaskbar extends JPanel{
                             main.setPanel(new TrangChuPanel());
                             break;
                         case 1:
-                            main.setPanel(new ThiSinhPanel());
+                            main.setPanel(new ThiSinhPanel(main));
+                            break;
+                        case 2:
+                            main.setPanel(new testPanel(main));
                             break;
                         case 10:
                             main.setPanel(new TaiKhoanPanel(main));

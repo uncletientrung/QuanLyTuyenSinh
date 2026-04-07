@@ -4,8 +4,10 @@
  */
 package GUI;
 import BUS.TaiKhoanBUS;
-import ENTITY.TaiKhoan;
+import BUS.XtThisinhXetTuyen25BUS;
 import java.util.List;
+import ENTITY.TaiKhoan;
+import ENTITY.XtThisinhXetTuyen25;
 
 /**
  *
@@ -15,18 +17,14 @@ public class testGUI {
     public static void main(String[] args) {
 
         TaiKhoanBUS taiKhoanBUS = new TaiKhoanBUS();
-
-        List<TaiKhoan> list = taiKhoanBUS.getAllTaiKhoan();
+        XtThisinhXetTuyen25BUS TSBUS =  new XtThisinhXetTuyen25BUS();
+        List<XtThisinhXetTuyen25> list = TSBUS.getAllThiSinh();
         System.out.println("===== DANH SACH TAI KHOAN =====");
 
-        for (TaiKhoan tk : list) {
+        for (XtThisinhXetTuyen25 tk : list) {
 
             System.out.println(
-                    "MaTK: " + tk.getMatk()
-                    + " | Username: " + tk.getTendangnhap()
-                    + " | Password: " + tk.getMatkhau()
-                    + " | MaPhanQuyen: " + tk.getMaphanquyen()
-                    + " | TrangThai: " + tk.getTrangthai()
+                    tk.toString()
             );
         }
 

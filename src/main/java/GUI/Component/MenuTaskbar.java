@@ -5,6 +5,7 @@
 package GUI.Component;
 
 import GUI.Main;
+import GUI.Panel.NguyenVongPanel;
 import GUI.Panel.TaiKhoanPanel;
 import GUI.Panel.ThiSinhPanel;
 import GUI.Panel.TrangChuPanel;
@@ -114,8 +115,8 @@ public class MenuTaskbar extends JPanel{
                         case 1:
                             main.setPanel(new ThiSinhPanel(main));
                             break;
-                        case 2:
-                            main.setPanel(new testPanel(main));
+                        case 3:
+                            main.setPanel(new NguyenVongPanel(main));
                             break;
                         case 10:
                             main.setPanel(new TaiKhoanPanel(main));

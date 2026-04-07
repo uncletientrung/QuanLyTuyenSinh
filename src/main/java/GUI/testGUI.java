@@ -4,9 +4,11 @@
  */
 package GUI;
 import BUS.TaiKhoanBUS;
+import BUS.XtNguyenVongXetTuyenBUS;
 import BUS.XtThisinhXetTuyen25BUS;
 import java.util.List;
 import ENTITY.TaiKhoan;
+import ENTITY.XtNguyenVongXetTuyen;
 import ENTITY.XtThisinhXetTuyen25;
 
 /**
@@ -18,13 +20,15 @@ public class testGUI {
 
         TaiKhoanBUS taiKhoanBUS = new TaiKhoanBUS();
         XtThisinhXetTuyen25BUS TSBUS =  new XtThisinhXetTuyen25BUS();
+        XtNguyenVongXetTuyenBUS NVBUS = new XtNguyenVongXetTuyenBUS();
         List<XtThisinhXetTuyen25> list = TSBUS.getAllThiSinh();
+        List<XtNguyenVongXetTuyen> list2 = NVBUS.getAllNguyenVong();
         System.out.println("===== DANH SACH TAI KHOAN =====");
 
-        for (XtThisinhXetTuyen25 tk : list) {
+        for (XtNguyenVongXetTuyen nv : list2) {
 
             System.out.println(
-                    tk.toString()
+                    nv.toString()
             );
         }
 

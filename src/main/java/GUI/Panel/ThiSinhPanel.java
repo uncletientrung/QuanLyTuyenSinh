@@ -68,7 +68,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                     }
                 };
                 // Table Header
-                String[] header = new String[]{"Mã thí sinh", "CCCD", "SBD", "Họ", "Tên","Giới tính","Ngày sinh","Khu vực","Đối tượng"};
+                String[] header = new String[]{"ID", "CCCD", "SBD", "Họ", "Tên","Giới tính","Ngày sinh","SĐT","Email","Nơi sinh","Khu vực","Đối tượng"};
                 tblModel.setColumnIdentifiers(header);
                 tableThiSinh.setModel(tblModel);
                 tableThiSinh.setFocusable(false);
@@ -152,8 +152,8 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
 
         private void loadDataTable(List<XtThisinhXetTuyen25> listTS) {
                 tblModel.setRowCount(0);
-    //            DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    //            DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 for (XtThisinhXetTuyen25 ts : listTS) {
                     tblModel.addRow(new Object[]{
                         "TS-" + ts.getIdthisinh(),
@@ -162,7 +162,10 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                         ts.getHo(),
                         ts.getTen(),
                         ts.getGioiTinh(),
-                         ts.getGioiTinh(),
+                        LocalDate.parse(ts.getNgaySinh(), inputFormat).format(outputFormat),
+                        ts.getDienThoai(),
+                        ts.getEmail(),
+                        ts.getNoiSinh(),
                         ts.getKhuVuc(),
                         ts.getDoiTuong()
                     });

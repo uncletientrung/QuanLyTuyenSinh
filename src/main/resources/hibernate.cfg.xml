@@ -33,6 +33,7 @@
 
         <mapping class="ENTITY.TaiKhoan"/>
         <mapping class="ENTITY.XtThisinhXetTuyen25"/>
+         <mapping class="ENTITY.XtNguyenVongXetTuyen"/>
 
     </session-factory>
 

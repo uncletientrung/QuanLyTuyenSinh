@@ -11,6 +11,7 @@ import GUI.Component.MainFunction;
 import javax.swing.*;
 import GUI.Component.PanelBorderRadius;
 import GUI.Component.TableSorter;
+import GUI.Dialog.testDialog;
 import GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -179,8 +180,12 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from
-                                                                       // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this); // Lấy Frame cha
+        Object source = e.getSource();
+        if(source == mainFunction.btn.get("create") ){
+            System.err.println("chạy");
+            new testDialog(owner);
+        }
     }
 
     @Override

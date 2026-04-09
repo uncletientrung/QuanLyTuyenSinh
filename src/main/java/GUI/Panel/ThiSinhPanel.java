@@ -11,6 +11,7 @@ import GUI.Component.MainFunction;
 import javax.swing.*;
 import GUI.Component.PanelBorderRadius;
 import GUI.Component.TableSorter;
+import GUI.Dialog.ThiSinh.ThemThiSinhDialog;
 import GUI.Dialog.testDialog;
 import GUI.Main;
 import java.awt.BorderLayout;
@@ -184,7 +185,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         Object source = e.getSource();
         if(source == mainFunction.btn.get("create") ){
             System.err.println("chạy");
-            new testDialog(owner);
+            new ThemThiSinhDialog(this, owner, "THÊM THÍ SINH", "create",true);
         }
     }
 

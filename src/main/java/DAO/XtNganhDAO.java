@@ -47,4 +47,14 @@ public class XtNganhDAO {
             return List.of();//tra ve danh sach rong neu loi
         }
     }
+    
+    public boolean checkTrungMaNganh(String manganh) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Long count = session.createQuery(
+                    "SELECT COUNT(n) FROM XtNganh n WHERE n.manganh = :ma", Long.class)
+                    .setParameter("ma", manganh)
+                    .uniqueResult();
+            return count != null && count > 0;
+        }
+    }
 }

@@ -5,6 +5,7 @@ import ENTITY.XtNganh;
 import GUI.Component.IntegratedSearch;
 import GUI.Component.MainFunction;
 import GUI.Component.PanelBorderRadius;
+import GUI.Dialog.NganhDialog;
 import GUI.Main;
 import java.awt.*;
 import java.awt.event.*;
@@ -163,7 +164,7 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
     }
 
     // load dl
-    private void loadDataTable(List<XtNganh> list) {
+    public void loadDataTable(List<XtNganh> list) {
         tblModel.setRowCount(0);
         for (XtNganh ng : list) {
             tblModel.addRow(new Object[]{
@@ -222,10 +223,10 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
     // cac chuc nang crud chua lam 
     @Override
     public void actionPerformed(ActionEvent e) {
+        JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this);
         Object source = e.getSource();
         if (source == mainFunction.btn.get("create")) {
-            JOptionPane.showMessageDialog(this, "chua lam", 
-                                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            new NganhDialog(this, owner, "Thêm ngành mới", true, "create", null);
         } 
         else if (source == mainFunction.btn.get("update")) {
             JOptionPane.showMessageDialog(this, "chua lam", 

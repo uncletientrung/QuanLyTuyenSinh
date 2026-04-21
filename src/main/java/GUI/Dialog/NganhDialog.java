@@ -196,6 +196,17 @@ public class NganhDialog extends JDialog {
                 parent.loadDataTable(bus.getAllNganh());
                 dispose();
             }
+        }else {
+            try {
+                nganh.setIdnganh(currentNganh.getIdnganh());// lay id de thoa dieu kien ben bus
+                if (bus.updateNganh(nganh)) {
+                    JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
+                    parent.loadDataTable(bus.getAllNganh());
+                    dispose();
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 

@@ -32,7 +32,7 @@ public class XtNganhBUS {
         if (nganh.getManganh().length() > 45) {
             return "Mã ngành không được vượt quá 45 ký tự!";
         }
-        if (nganhDAO.checkTrungMaNganh(nganh.getManganh())) {
+        if (nganhDAO.checkTrungMaNganh(nganh.getManganh(), nganh.getIdnganh())) {
             return "Mã ngành '" + nganh.getManganh() + "' đã tồn tại!";
         }
         
@@ -111,5 +111,88 @@ public class XtNganhBUS {
     }
     public List<XtNganh> getAllNganh() {
         return nganhDAO.getAll();
+    }
+    
+    public boolean updateNganh(XtNganh nganh) {
+
+    if (nganh == null || nganh.getIdnganh() <= 0) {
+        throw new RuntimeException("Dữ liệu ngành không hợp lệ!");
+    }
+
+    if (nganh.getManganh() == null || nganh.getManganh().trim().isEmpty()) {
+        throw new RuntimeException("Mã ngành không được để trống!");
+    }
+    if (nganh.getManganh().length() > 45) {
+        throw new RuntimeException("Mã ngành không được vượt quá 45 ký tự!");
+    }
+
+    if (nganhDAO.checkTrungMaNganh(nganh.getManganh(), nganh.getIdnganh())) {
+        throw new RuntimeException("Mã ngành '" + nganh.getManganh() + "' đã tồn tại!");
+    }
+
+    if (nganh.getTennganh() == null || nganh.getTennganh().trim().isEmpty()) {
+        throw new RuntimeException("Tên ngành không được để trống!");
+    }
+    if (nganh.getTennganh().length() > 100) {
+        throw new RuntimeException("Tên ngành không được vượt quá 100 ký tự!");
+    }
+
+    if (nganh.getNTohopgoc() != null && nganh.getNTohopgoc().length() > 3) {
+        throw new RuntimeException("Tổ hợp gốc không hợp lệ (VD: A00, D01...)!");
+    }
+
+    if (nganh.getNChitieu() <= 0) {
+        throw new RuntimeException("Chỉ tiêu phải lớn hơn 0!");
+    }
+
+    if (nganh.getNDiemsan() != null && nganh.getNDiemsan().compareTo(BigDecimal.ZERO) < 0) {
+        throw new RuntimeException("Điểm sàn không được âm!");
+    }
+    if (nganh.getNDiemtrungtuyen() != null && nganh.getNDiemtrungtuyen().compareTo(BigDecimal.ZERO) < 0) {
+        throw new RuntimeException("Điểm trúng tuyển không được âm!");
+    }
+    if (nganh.getNDiemsan() != null && nganh.getNDiemtrungtuyen() != null &&
+        nganh.getNDiemtrungtuyen().compareTo(nganh.getNDiemsan()) < 0) {
+        throw new RuntimeException("Điểm trúng tuyển không được nhỏ hơn điểm sàn!");
+    }
+
+    if (!isValidFlag(nganh.getNTuyenthang())) {
+        throw new RuntimeException("Chọn Tuyển thẳng (Có/Không)!");
+    }
+    if (!isValidFlag(nganh.getNDgnl())) {
+        throw new RuntimeException("Chọn ĐGNL (Có/Không)!");
+    }
+    if (!isValidFlag(nganh.getNThpt())) {
+        throw new RuntimeException("Chọn THPT (Có/Không)!");
+    }
+    if (!isValidFlag(nganh.getNVsat())) {
+        throw new RuntimeException("Chọn VSAT (Có/Không)!");
+    }
+
+    if (nganh.getSlXtt() != null && nganh.getSlXtt() < 0) {
+        throw new RuntimeException("SL Tuyển thẳng phải >= 0!");
+    }
+    if (nganh.getSlDgnl() != null && nganh.getSlDgnl() < 0) {
+        throw new RuntimeException("SL ĐGNL phải >= 0!");
+    }
+    if (nganh.getSlVsat() != null && nganh.getSlVsat() < 0) {
+        throw new RuntimeException("SL VSAT phải >= 0!");
+    }
+
+    if (nganh.getSlThpt() != null && nganh.getSlThpt().length() > 45) {
+        throw new RuntimeException("SL THPT không hợp lệ!");
+    }
+
+    boolean result = nganhDAO.update(nganh);
+
+    if (!result) {
+        throw new RuntimeException("Cập nhật thất bại!");
+    }
+
+    return true;
+}
+    
+    public XtNganh getNganhById(int id){
+        return nganhDAO.getNganhById(id);
     }
 }

@@ -39,6 +39,22 @@ public class XtNganhDAO {
         }
     }
     
+    public boolean update(XtNganh nganh){
+        Transaction transaction = null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            session.merge(nganh);
+            transaction.commit();
+            return true;
+        }catch (Exception e){
+            if(transaction != null){
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     public  List<XtNganh> getAll(){
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             return session.createQuery("FROM XtNganh", XtNganh.class).list();
@@ -48,13 +64,24 @@ public class XtNganhDAO {
         }
     }
     
-    public boolean checkTrungMaNganh(String manganh) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Long count = session.createQuery(
-                    "SELECT COUNT(n) FROM XtNganh n WHERE n.manganh = :ma", Long.class)
-                    .setParameter("ma", manganh)
-                    .uniqueResult();
-            return count != null && count > 0;
+   public XtNganh getNganhById(int id){
+    try(Session session = HibernateUtil.getSessionFactory().openSession()){
+        return session.get(XtNganh.class, id);
+    }catch(Exception e){
+        e.printStackTrace();
+        return null;
+    }
+}
+    
+    
+    public boolean checkTrungMaNganh(String manganh, int id) {
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            String hql = "FROM XtNganh WHERE manganh = :manganh AND idnganh != :id";
+            return !session.createQuery(hql, XtNganh.class)
+                    .setParameter("manganh", manganh)
+                    .setParameter("id", id)
+                    .list()
+                    .isEmpty();
         }
     }
 }

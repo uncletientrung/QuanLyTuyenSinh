@@ -228,14 +228,24 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
         if (source == mainFunction.btn.get("create")) {
             new NganhDialog(this, owner, "Thêm ngành mới", true, "create", null);
         } 
-        else if (source == mainFunction.btn.get("update")) {
-            JOptionPane.showMessageDialog(this, "chua lam", 
-                                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        else if (source == mainFunction.btn.get("update") ||
+                 source == mainFunction.btn.get("delete") || 
+                 source == mainFunction.btn.get("detail")) {
+            // lay doi tuong dang duoc chon trong bangr ra
+            
+            int index = tableNganh.getSelectedRow();
+            if(index == -1){
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngành để thao tác!");
+                return;
+            }
+            String maStr = tableNganh.getValueAt(index, 0).toString();
+            int manganh = Integer.parseInt(maStr.replace("NG-", ""));
+            XtNganh selected = nganhBUS.getNganhById(manganh);
+            if (source == mainFunction.btn.get("update")) {
+                new NganhDialog(this, owner, "Chỉnh sửa ngành", true, "update", selected);
+            }
         } 
-        else if (source == mainFunction.btn.get("delete")) {
-            JOptionPane.showMessageDialog(this, "chua lam", 
-                                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        }
+        
     }
 
     @Override

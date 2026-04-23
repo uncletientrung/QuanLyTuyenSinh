@@ -55,6 +55,48 @@ public class XtNganhDAO {
         }
     }
     
+    public boolean delete(int id){
+        Transaction transaction = null;
+
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+
+            // lấy ngành
+            XtNganh nganh = session.get(XtNganh.class, id);
+            if (nganh == null) return false;
+
+            String maNganh = nganh.getManganh();
+
+            Long count1 = session.createQuery(
+                "SELECT COUNT(dc) FROM XtDiemCongXetTuyen dc WHERE dc.maNganh = :ma",
+                Long.class
+            )
+            .setParameter("ma", maNganh)
+            .getSingleResult();
+
+            Long count2 = session.createQuery(
+                "SELECT COUNT(nt) FROM XtNganhToHop nt WHERE nt.manganh = :ma",
+                Long.class
+            )
+            .setParameter("ma", maNganh)
+            .getSingleResult();
+
+            if (count1 > 0 || count2 > 0) {
+                return false;
+            }
+
+            session.remove(nganh);
+
+            transaction.commit();
+            return true;
+
+        }catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+            return false;
+        }
+}
+    
     public  List<XtNganh> getAll(){
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             return session.createQuery("FROM XtNganh", XtNganh.class).list();

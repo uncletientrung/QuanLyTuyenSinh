@@ -195,4 +195,20 @@ public class XtNganhBUS {
     public XtNganh getNganhById(int id){
         return nganhDAO.getNganhById(id);
     }
+    
+    public String deleteNganh(int idnganh) {
+        if (idnganh <= 0) {
+            return "ID ngành không hợp lệ!";
+        }
+
+   
+
+        boolean result = nganhDAO.delete(idnganh);
+        
+        if (result) {
+            return "Xóa ngành thành công!";
+        } else {
+            return "Xóa ngành thất bại! Ngành có thể đang được sử dụng.";
+        }
+    }
 }

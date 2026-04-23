@@ -243,6 +243,21 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
             XtNganh selected = nganhBUS.getNganhById(manganh);
             if (source == mainFunction.btn.get("update")) {
                 new NganhDialog(this, owner, "Chỉnh sửa ngành", true, "update", selected);
+            }else if (source == mainFunction.btn.get("delete")) {
+                if (JOptionPane.showConfirmDialog(
+                        this,
+                        "Xóa ngành " + selected.getTennganh() + "?",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION
+                ) == JOptionPane.YES_OPTION) {
+
+                    String message = nganhBUS.deleteNganh(selected.getIdnganh());
+                    JOptionPane.showMessageDialog(this, message);
+                    if (message.contains("thành công")) {
+                        listNganh = nganhBUS.getAllNganh();
+                        loadDataTable(listNganh);
+                    }
+                }
             }
         } 
         

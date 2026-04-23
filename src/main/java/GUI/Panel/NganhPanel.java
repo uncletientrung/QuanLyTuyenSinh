@@ -246,7 +246,7 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
             }else if (source == mainFunction.btn.get("delete")) {
                 if (JOptionPane.showConfirmDialog(
                         this,
-                        "Xóa ngành " + selected.getTennganh() + "?",
+                        "Xóa ngành " + selected.getTennganh() + " ?",
                         "Xác nhận",
                         JOptionPane.YES_NO_OPTION
                 ) == JOptionPane.YES_OPTION) {

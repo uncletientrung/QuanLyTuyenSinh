@@ -243,6 +243,8 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
             XtNganh selected = nganhBUS.getNganhById(manganh);
             if (source == mainFunction.btn.get("update")) {
                 new NganhDialog(this, owner, "Chỉnh sửa ngành", true, "update", selected);
+            }else if(source== mainFunction.btn.get("detail")){
+                new NganhDialog(this, owner, "Thông tin chi tiết ngành", true, "view", selected);
             }else if (source == mainFunction.btn.get("delete")) {
                 if (JOptionPane.showConfirmDialog(
                         this,

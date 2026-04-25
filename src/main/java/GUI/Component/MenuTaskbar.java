@@ -24,18 +24,18 @@ import javax.swing.border.EmptyBorder;
 public class MenuTaskbar extends JPanel{
     String[][] ArrMenu = {
     {"Trang chủ", "home.svg", "trangChu"},
-    {"Thí sinh", "home.svg", "thiSinh"},
-    {"Điểm thi", "home.svg", "diemThi"},
-    {"Nguyện vọng", "home.svg", "nguyenVong"},
-    {"Khu vực", "home.svg", "khuVuc"},
-    {"Môn", "home.svg", "mon"},
-    {"Ngành", "home.svg", "nganh"},
-    {"Ngành - Tổ hợp", "home.svg", "nganhToHop"},
-    {"Bảng quy đổi", "home.svg", "bangQuyDoi"},
-    {"Điểm cộng", "home.svg", "diemCong"},
-    {"Người dùng", "home.svg", "nguoiDung"},
-    {"Nhóm quyền", "home.svg", "nhomQuyen"},
-    {"Thống kê", "home.svg", "thongKe"},
+    {"Thí sinh", "students.svg", "thiSinh"},
+    {"Điểm thi", "diemthi.svg", "diemThi"},
+    {"Nguyện vọng", "nguyenvong.svg", "nguyenVong"},
+    {"Khu vực", "khuvuc.svg", "khuVuc"},
+    {"Môn", "subject.svg", "mon"},
+    {"Ngành", "nganh.svg", "nganh"},
+    {"Ngành - Tổ hợp", "tohop.svg", "nganhToHop"},
+    {"Bảng quy đổi", "quydoi.svg", "bangQuyDoi"},
+    {"Điểm cộng", "add.svg", "diemCong"},
+    {"Người dùng", "nguoidung.svg", "nguoiDung"},
+    {"Nhóm quyền", "nhomquyen.svg", "nhomQuyen"},
+    {"Thống kê", "thongke.svg", "thongKe"},
     {"Đăng xuất", "logout.svg", "dangXuat"}
     };
     private Main main;

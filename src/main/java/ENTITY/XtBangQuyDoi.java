@@ -12,13 +12,13 @@ public class XtBangQuyDoi {
     @Column(name = "idqd")
     private int idqd;
 
-    @Column(name = "d_phuongthuc")
+    @Column(name = "d_phuongthuc", length = 45)
     private String dPhuongthuc;
 
-    @Column(name = "d_tohop")
+    @Column(name = "d_tohop", length = 45)
     private String dTohop;
 
-    @Column(name = "d_mon")
+    @Column(name = "d_mon", length = 45)
     private String dMon;
 
     @Column(name = "d_diema", precision = 6, scale = 2)
@@ -33,10 +33,10 @@ public class XtBangQuyDoi {
     @Column(name = "d_diemd", precision = 6, scale = 2)
     private BigDecimal dDiemd;
 
-    @Column(name = "d_maquydoi")
+    @Column(name = "d_maquydoi", length = 45)
     private String dMaQuyDoi;
 
-    @Column(name = "d_phanvi")
+    @Column(name = "d_phanvi", length = 45)
     private String dPhanvi;
 
     public XtBangQuyDoi() {}

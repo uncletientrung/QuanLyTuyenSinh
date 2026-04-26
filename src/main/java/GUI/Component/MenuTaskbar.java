@@ -5,12 +5,7 @@
 package GUI.Component;
 
 import GUI.Main;
-import GUI.Panel.NganhPanel;
-import GUI.Panel.NguyenVongPanel;
-import GUI.Panel.TaiKhoanPanel;
-import GUI.Panel.ThiSinhPanel;
-import GUI.Panel.TrangChuPanel;
-import GUI.Panel.testPanel;
+import GUI.Panel.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -121,6 +116,9 @@ public class MenuTaskbar extends JPanel{
                             break;
                         case 6:
                             main.setPanel(new NganhPanel(main));
+                            break;
+                        case 8:
+                            main.setPanel(new XtBangQuyDoiPanel(main));
                             break;
                         case 10:
                             main.setPanel(new TaiKhoanPanel(main));

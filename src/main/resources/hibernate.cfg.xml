@@ -35,6 +35,7 @@
         <mapping class="ENTITY.XtThisinhXetTuyen25"/>
         <mapping class="ENTITY.XtNguyenVongXetTuyen"/>
         <mapping class="ENTITY.XtNganh"/>
+        <mapping class="ENTITY.XtBangQuyDoi"/>
 
     </session-factory>
 

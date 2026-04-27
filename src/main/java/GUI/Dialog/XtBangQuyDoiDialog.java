@@ -4,7 +4,6 @@ import BUS.XtBangQuyDoiBUS;
 import ENTITY.XtBangQuyDoi;
 import GUI.Component.ButtonCustom;
 import GUI.Component.InputForm;
-import GUI.Component.NumericDocumentFilter;
 import GUI.Component.SelectForm;
 import GUI.Panel.XtBangQuyDoiPanel;
 import java.awt.BorderLayout;
@@ -20,7 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.PlainDocument;
 
 public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
 
@@ -180,18 +178,28 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
             qd.setDPhuongthuc(cbxPhuongThuc.getValue());
             qd.setDTohop("VSAT".equals(cbxPhuongThuc.getValue()) ? null : txtToHopMon.getText().trim());
             qd.setDMon("VSAT".equals(cbxPhuongThuc.getValue()) ? txtToHopMon.getText().trim() : null);
-            qd.setDDiema(new BigDecimal(txtDiemA.getText().trim()));
-            qd.setDDiemb(new BigDecimal(txtDiemB.getText().trim()));
-            qd.setDDiemc(new BigDecimal(txtDiemC.getText().trim()));
-            qd.setDDiemd(new BigDecimal(txtDiemD.getText().trim()));
+            try {
+                qd.setDDiema(new BigDecimal(txtDiemA.getText().trim()));
+                qd.setDDiemb(new BigDecimal(txtDiemB.getText().trim()));
+                qd.setDDiemc(new BigDecimal(txtDiemC.getText().trim()));
+                qd.setDDiemd(new BigDecimal(txtDiemD.getText().trim()));
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Điểm số không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             qd.setDMaQuyDoi(txtMaQuyDoi.getText().trim());
             qd.setDPhanvi(txtPhanVi.getText().trim());
 
             boolean success;
-            if ("update".equals(currentType)) {
-                success = xtbangquydoiBUS.updateQuyDoi(qd);
-            } else {
-                success = xtbangquydoiBUS.addQuyDoi(qd);
+            try {
+                if ("update".equals(currentType)) {
+                    success = xtbangquydoiBUS.updateQuyDoi(qd);
+                } else {
+                    success = xtbangquydoiBUS.addQuyDoi(qd);
+                }
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Lỗi validate", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             if (success) {

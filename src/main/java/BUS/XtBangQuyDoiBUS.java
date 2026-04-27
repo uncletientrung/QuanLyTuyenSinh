@@ -6,6 +6,7 @@ package BUS;
 
 import DAO.XtBangQuyDoiDAO;
 import ENTITY.XtBangQuyDoi;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +83,7 @@ public class XtBangQuyDoiBUS {
     }
 
     public boolean addQuyDoi(XtBangQuyDoi qd) {
+        validateQuyDoi(qd);
         if (xtbangquydoiDAO.insert(qd)) {
             listQuyDoi.add(qd);
             return true;
@@ -90,6 +92,7 @@ public class XtBangQuyDoiBUS {
     }
 
     public boolean updateQuyDoi(XtBangQuyDoi qd) {
+        validateQuyDoi(qd);
         if (xtbangquydoiDAO.update(qd)) {
             for (int i = 0; i <= listQuyDoi.size(); i++) {
                 if (listQuyDoi.get(i).getIdqd() == qd.getIdqd()) {
@@ -101,12 +104,59 @@ public class XtBangQuyDoiBUS {
         }
         return false;
     }
-    
+
     public boolean deleteQuyDoi(int idqd) {
         if (xtbangquydoiDAO.delete(idqd)) {
             listQuyDoi.removeIf(qd -> qd.getIdqd() == idqd);
             return true;
         }
         return false;
+    }
+
+    // Validate
+    public void validateQuyDoi(XtBangQuyDoi qd) throws IllegalArgumentException {
+        // Kiểm tra Môn / Tổ hợp dựa theo Phương thức
+        if ("VSAT".equals(qd.getDPhuongthuc())) {
+            if (qd.getDMon() == null || qd.getDMon().trim().isEmpty()) {
+                throw new IllegalArgumentException("Môn không được để trống đối với phương thức VSAT.");
+            }
+        } else { // DGNL
+            if (qd.getDTohop() == null || qd.getDTohop().trim().isEmpty()) {
+                throw new IllegalArgumentException("Tổ hợp không được để trống đối với phương thức " + qd.getDPhuongthuc() + ".");
+            }
+        }
+
+        // Kiểm tra tính hợp lệ của Điểm
+        if (qd.getDDiema() == null || qd.getDDiemb() == null || qd.getDDiemc() == null || qd.getDDiemd() == null) {
+            throw new IllegalArgumentException("Các trường điểm số không được để trống.");
+        }
+
+        if (qd.getDDiema().compareTo(BigDecimal.ZERO) < 0 || qd.getDDiemc().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Điểm số không được là số âm.");
+        }
+
+        if (qd.getDDiemb().compareTo(qd.getDDiema()) < 0) {
+            throw new IllegalArgumentException("Điểm cao nhất (B) phải lớn hơn hoặc bằng điểm thấp nhất (A).");
+        }
+
+        if (qd.getDDiemd().compareTo(qd.getDDiemc()) < 0) {
+            throw new IllegalArgumentException("Điểm cao nhất THPT (D) phải lớn hơn hoặc bằng điểm thấp nhất THPT (C).");
+        }
+
+        // Kiểm tra phân vị và mã quy đổi
+        if (qd.getDPhanvi() == null || qd.getDPhanvi().trim().isEmpty()) {
+            throw new IllegalArgumentException("Phân vị không được để trống.");
+        }
+        if (qd.getDMaQuyDoi() == null || qd.getDMaQuyDoi().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã quy đổi không được để trống.");
+        }
+
+        // Kiểm tra trùng lặp Mã quy đổi
+        boolean isDuplicate = listQuyDoi.stream().anyMatch(existing
+                -> existing.getDMaQuyDoi().equalsIgnoreCase(qd.getDMaQuyDoi()) && existing.getIdqd() != qd.getIdqd()
+        );
+        if (isDuplicate) {
+            throw new IllegalArgumentException("Mã quy đổi '" + qd.getDMaQuyDoi() + "' đã tồn tại trong hệ thống.");
+        }
     }
 }

@@ -80,4 +80,12 @@ public class XtBangQuyDoiBUS {
                         .collect(Collectors.toList());
         }
     }
+    
+    public boolean addQuyDoi(XtBangQuyDoi qd) {
+        if (xtbangquydoiDAO.insert(qd)) {
+            listQuyDoi.add(qd);
+            return true;
+        }
+        return false;
+    }
 }

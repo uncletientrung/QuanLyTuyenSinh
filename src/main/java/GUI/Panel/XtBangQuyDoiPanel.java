@@ -11,6 +11,7 @@ import GUI.Component.MainFunction;
 import GUI.Component.PaginatedTable;
 import GUI.Component.PanelBorderRadius;
 import GUI.Component.TableSorter;
+import GUI.Dialog.XtBangQuyDoiDialog;
 import GUI.Main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -75,7 +76,6 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        // Cấu hình Sorter cho cột ID (Integer)
         table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[10];
         comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
@@ -90,7 +90,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         comps[9] = TableSorter.STRING_COMPARATOR;      // Phân vị
         paginatedTable.enableFullDataSorting(comps);
 
-        // Tạo khung viền đệm (Padding)
+        // padding
         pnlBorder1 = new JPanel();
         pnlBorder1.setPreferredSize(new Dimension(0, 10));
         pnlBorder1.setBackground(BackgroundColor);
@@ -114,7 +114,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         contentCenter.setLayout(new BorderLayout(10, 10));
         this.add(contentCenter, BorderLayout.CENTER);
 
-        // Thanh công cụ (Function Bar)
+        // Function Bar
         functionBar = new PanelBorderRadius();
         functionBar.setPreferredSize(new Dimension(0, 100));
         functionBar.setLayout(new GridLayout(1, 2, 50, 0));
@@ -149,7 +149,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         contentCenter.add(pnlMain, BorderLayout.CENTER);
     }
 
-    private void loadDataTable(List<XtBangQuyDoi> list) {
+    public void loadDataTable(List<XtBangQuyDoi> list) {
         java.util.List<Object[]> data = new java.util.ArrayList<>();
 
         for (XtBangQuyDoi qd : list) {
@@ -179,7 +179,9 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (e.getSource() == mainFunction.btn.get("create")) {
+            XtBangQuyDoiDialog qdDialog = new XtBangQuyDoiDialog(this, mainFrame, "Thêm bảng quy đổi", true, "create");
+        }
     }
 
     @Override

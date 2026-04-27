@@ -8,6 +8,7 @@ import ENTITY.XtBangQuyDoi;
 import UTIL.HibernateUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
@@ -26,7 +27,7 @@ public class XtBangQuyDoiDAO {
                     "from XtBangQuyDoi",
                     XtBangQuyDoi.class
             ).list();
-            
+
             return list;
 
         } catch (Exception e) {
@@ -34,8 +35,24 @@ public class XtBangQuyDoiDAO {
             System.out.println("Hibernate error:");
             e.printStackTrace();
         }
-        
+
         return null;
+    }
+
+    public boolean insert(XtBangQuyDoi qd) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(qd);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

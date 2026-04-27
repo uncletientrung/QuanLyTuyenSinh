@@ -17,11 +17,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -53,7 +53,6 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         this.setLayout(new BorderLayout(0, 0));
         this.setOpaque(true);
 
-        // Header cho bảng quy đổi
         String[] header = new String[]{
             "ID", "Phương thức", "Tổ hợp", "Môn", "Điểm A", "Điểm B", "Điểm C", "Điểm D", "Mã quy đổi", "Phân vị"
         };
@@ -77,8 +76,19 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         }
 
         // Cấu hình Sorter cho cột ID (Integer)
-        table.setAutoCreateRowSorter(true);
-        TableSorter.configureTableColumnSorter(table, 0, TableSorter.INTEGER_COMPARATOR);
+        table.setAutoCreateRowSorter(false);
+        Comparator<Object>[] comps = new Comparator[10];
+        comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
+        comps[1] = TableSorter.STRING_COMPARATOR;      // Phương thức
+        comps[2] = TableSorter.STRING_COMPARATOR;      // Tổ hợp
+        comps[3] = TableSorter.STRING_COMPARATOR;      // Môn
+        comps[4] = TableSorter.BIG_DECIMAL_COMPARATOR; // Điểm A
+        comps[5] = TableSorter.BIG_DECIMAL_COMPARATOR; // Điểm B
+        comps[6] = TableSorter.BIG_DECIMAL_COMPARATOR; // Điểm C
+        comps[7] = TableSorter.BIG_DECIMAL_COMPARATOR; // Điểm D
+        comps[8] = TableSorter.STRING_COMPARATOR;      // Mã
+        comps[9] = TableSorter.STRING_COMPARATOR;      // Phân vị
+        paginatedTable.enableFullDataSorting(comps);
 
         // Tạo khung viền đệm (Padding)
         pnlBorder1 = new JPanel();
@@ -121,6 +131,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         // Thanh tìm kiếm
         search = new IntegratedSearch(new String[]{"Tất cả", "Mã", "Phương thức", "Tổ hợp", "Môn"});
         search.cbxChoose.addItemListener(this);
+        search.txtSearchForm.addActionListener(e -> performSearch());
         search.btnReset.addActionListener(e -> {
             search.txtSearchForm.setText("");
             search.cbxChoose.setSelectedIndex(0);
@@ -158,6 +169,14 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         paginatedTable.setData(data);
     }
 
+    private void performSearch() {
+        String keyword = search.txtSearchForm.getText();
+        String searchType = (String) search.cbxChoose.getSelectedItem();
+
+        List<XtBangQuyDoi> result = qdBUS.searchQuyDoi(searchType, keyword);
+        loadDataTable(result);
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -165,6 +184,8 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            performSearch();
+        }
     }
 }

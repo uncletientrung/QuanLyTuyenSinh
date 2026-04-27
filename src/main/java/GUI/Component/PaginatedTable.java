@@ -8,7 +8,11 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -29,6 +33,9 @@ public class PaginatedTable extends JPanel {
     private int totalPages = 1;
     private boolean updatingControls = false;
 
+    private int sortColumn = -1;
+    private boolean ascending = true;
+    
     public PaginatedTable(String[] columns) {
         setLayout(new BorderLayout(0, 10));
 
@@ -189,5 +196,58 @@ public class PaginatedTable extends JPanel {
 
     public int getSelectedRow() {
         return table.getSelectedRow();
+    }
+
+    // Sorting
+    public void enableFullDataSorting(Comparator<Object>[] columnComparators) {
+        table.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = table.columnAtPoint(e.getPoint());
+                if (col != -1 && columnComparators[col] != null) {
+                    // Nếu click vào cột cũ thì đảo chiều, cột mới thì mặc định tăng dần
+                    if (sortColumn == col) {
+                        ascending = !ascending;
+                    } else {
+                        sortColumn = col;
+                        ascending = true;
+                    }
+
+                    sortAllData(col, columnComparators[col]);
+                    goToPage(1);
+
+                    table.getTableHeader().repaint();
+                }
+            }
+        });
+
+        table.getTableHeader().setDefaultRenderer(new SortHeaderRenderer(table.getTableHeader().getDefaultRenderer()));
+    }
+
+    private void sortAllData(int colIndex, Comparator<Object> comp) {
+        Collections.sort(allData, (o1, o2) -> {
+            int result = comp.compare(o1[colIndex], o2[colIndex]);
+            return ascending ? result : -result;
+        });
+    }
+
+    private class SortHeaderRenderer implements javax.swing.table.TableCellRenderer {
+
+        private final javax.swing.table.TableCellRenderer base;
+
+        public SortHeaderRenderer(javax.swing.table.TableCellRenderer base) {
+            this.base = base;
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JLabel label = (JLabel) base.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (column == sortColumn) {
+                label.setIcon(ascending ? UIManager.getIcon("Table.ascendingSortIcon") : UIManager.getIcon("Table.descendingSortIcon"));
+            } else {
+                label.setIcon(null);
+            }
+            return label;
+        }
     }
 }

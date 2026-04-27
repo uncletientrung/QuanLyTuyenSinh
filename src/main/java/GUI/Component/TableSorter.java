@@ -3,64 +3,70 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package GUI.Component;
+
+import java.math.BigDecimal;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.util.Comparator;
 import java.util.Date;
+
 /**
  *
  * @author DELL
  */
 public class TableSorter {
 
-    public static final Comparator<Object> STRING_COMPARATOR = (Object o1, Object o2) -> {
-        String s1 = (String) o1;
-        String s2 = (String) o2;
-        return s1.compareTo(s2);
+    private static int nullCheck(Object o1, Object o2) {
+        if (o1 == o2) {
+            return 0;
+        }
+        if (o1 == null) {
+            return 1;
+        }
+        if (o2 == null) {
+            return -1;
+        }
+        return 2;
+    }
+
+    public static final Comparator<Object> STRING_COMPARATOR = (o1, o2) -> {
+        int res = nullCheck(o1, o2);
+        return (res != 2) ? res : o1.toString().compareToIgnoreCase(o2.toString());
     };
 
-    public static final Comparator<Object> DATE_COMPARATOR = (Object o1, Object o2) -> {
-        Date s1 = (Date) o1;
-        Date s2 = (Date) o2;
-        return s1.compareTo(s2);
+    public static final Comparator<Object> DATE_COMPARATOR = (o1, o2) -> {
+        int res = nullCheck(o1, o2);
+        return (res != 2) ? res : ((Date) o1).compareTo((Date) o2);
     };
 
-    public static final Comparator<Object> INTEGER_COMPARATOR = (Object o1, Object o2) -> {
+    public static final Comparator<Object> INTEGER_COMPARATOR = (o1, o2) -> {
+        int res = nullCheck(o1, o2);
+        if (res != 2) {
+            return res;
+        }
         try {
-            Integer i1 = Integer.valueOf(o1.toString());
-            Integer i2 = Integer.valueOf(o2.toString());
-            return i1.compareTo(i2);
+            return Integer.valueOf(o1.toString()).compareTo(Integer.valueOf(o2.toString()));
         } catch (Exception e) {
             return 0;
         }
     };
 
-    public static final Comparator<Object> DOUBLE_COMPARATOR = (Object o1, Object o2) -> {
-        Double d1 = (Double) o1;
-        Double d2 = (Double) o2;
-        return d1.compareTo(d2);
+    public static final Comparator<Object> DOUBLE_COMPARATOR = (o1, o2) -> {
+        int res = nullCheck(o1, o2);
+        return (res != 2) ? res : ((Double) o1).compareTo((Double) o2);
     };
 
-    public static final Comparator<Object> VND_CURRENCY_COMPARATOR = (Object o1, Object o2) -> {
-        String s1 = (String) o1;
-        String s2 = (String) o2;
-
-        String cleanO1 = s1.replaceAll("[^\\d]", "");
-        String cleanO2 = s2.replaceAll("[^\\d]", "");
-
-        if (cleanO1.isEmpty() && cleanO2.isEmpty()) {
-            return 0;
-        } else if (cleanO1.isEmpty()) {
-            return -1;
-        } else if (cleanO2.isEmpty()) {
-            return 1;
+    public static final Comparator<Object> BIG_DECIMAL_COMPARATOR = (o1, o2) -> {
+        int res = nullCheck(o1, o2);
+        if (res != 2) {
+            return res;
         }
-
-        Long n1 = Long.valueOf(cleanO1);
-        Long n2 = Long.valueOf(cleanO2);
-
-        return Long.compare(n1, n2);
+        try {
+            return new BigDecimal(o1.toString()).compareTo(new BigDecimal(o2.toString()));
+        } catch (Exception e) {
+            return 0;
+        }
     };
 
     public static void configureTableColumnSorter(JTable table, int columnIndex, Comparator<Object> comparator) {

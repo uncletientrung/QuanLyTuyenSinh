@@ -80,10 +80,31 @@ public class XtBangQuyDoiBUS {
                         .collect(Collectors.toList());
         }
     }
-    
+
     public boolean addQuyDoi(XtBangQuyDoi qd) {
         if (xtbangquydoiDAO.insert(qd)) {
             listQuyDoi.add(qd);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateQuyDoi(XtBangQuyDoi qd) {
+        if (xtbangquydoiDAO.update(qd)) {
+            for (int i = 0; i <= listQuyDoi.size(); i++) {
+                if (listQuyDoi.get(i).getIdqd() == qd.getIdqd()) {
+                    listQuyDoi.set(i, qd);
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean deleteQuyDoi(int idqd) {
+        if (xtbangquydoiDAO.delete(idqd)) {
+            listQuyDoi.removeIf(qd -> qd.getIdqd() == idqd);
             return true;
         }
         return false;

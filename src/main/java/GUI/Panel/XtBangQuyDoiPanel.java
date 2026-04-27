@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package GUI.Panel;
 
 import BUS.XtBangQuyDoiBUS;
@@ -150,6 +146,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
     }
 
     public void loadDataTable(List<XtBangQuyDoi> list) {
+        this.listQD = list;
         java.util.List<Object[]> data = new java.util.ArrayList<>();
 
         for (XtBangQuyDoi qd : list) {
@@ -177,10 +174,52 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         loadDataTable(result);
     }
 
+    private XtBangQuyDoi getSelectedQuyDoi() {
+        int row = paginatedTable.getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dòng trong bảng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);
+        int idqd = (int) paginatedTable.getTable().getModel().getValueAt(modelRow, 0);
+        for (XtBangQuyDoi qd : listQD) {
+            if (qd.getIdqd() == idqd) {
+                return qd;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == mainFunction.btn.get("create")) {
-            XtBangQuyDoiDialog qdDialog = new XtBangQuyDoiDialog(this, mainFrame, "Thêm bảng quy đổi", true, "create");
+            new XtBangQuyDoiDialog(this, mainFrame, "Thêm bảng quy đổi", true, "create");
+        } else if (e.getSource() == mainFunction.btn.get("update")) {
+            XtBangQuyDoi selected = getSelectedQuyDoi();
+            if (selected != null) {
+                new XtBangQuyDoiDialog(this, mainFrame, "Chỉnh sửa bảng quy đổi", true, "update", selected);
+            }
+        } else if (e.getSource() == mainFunction.btn.get("detail")) {
+            XtBangQuyDoi selected = getSelectedQuyDoi();
+            if (selected != null) {
+                new XtBangQuyDoiDialog(this, mainFrame, "Chi tiết bảng quy đổi", true, "detail", selected);
+            }
+        } else if (e.getSource() == mainFunction.btn.get("delete")) {
+            XtBangQuyDoi selected = getSelectedQuyDoi();
+            if (selected != null) {
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Xóa bảng quy đổi ID=" + selected.getIdqd() + "?",
+                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (qdBUS.deleteQuyDoi(selected.getIdqd())) {
+                        JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                        listQD = qdBUS.getAllQuyDoi();
+                        loadDataTable(listQD);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import BUS.XtBangQuyDoiBUS;
 import ENTITY.XtBangQuyDoi;
 import GUI.Component.IntegratedSearch;
 import GUI.Component.MainFunction;
+import GUI.Component.PaginatedTable;
 import GUI.Component.PanelBorderRadius;
 import GUI.Component.TableSorter;
 import GUI.Main;
@@ -31,11 +32,9 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
     private PanelBorderRadius pnlMain, functionBar;
     private Main mainFrame;
     private JPanel pnlBorder1, pnlBorder2, pnlBorder3, pnlBorder4, contentCenter;
-    private JTable tableQuyDoi;
-    private JScrollPane scrollTable;
     private MainFunction mainFunction;
     private IntegratedSearch search;
-    private DefaultTableModel tblModel;
+    private PaginatedTable paginatedTable;
 
     private XtBangQuyDoiBUS qdBUS;
     private List<XtBangQuyDoi> listQD;
@@ -54,50 +53,49 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         this.setLayout(new BorderLayout(0, 0));
         this.setOpaque(true);
 
-        tableQuyDoi = new JTable();
-        scrollTable = new JScrollPane();
-
-        tblModel = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
         // Header cho bảng quy đổi
         String[] header = new String[]{
             "ID", "Phương thức", "Tổ hợp", "Môn", "Điểm A", "Điểm B", "Điểm C", "Điểm D", "Mã quy đổi", "Phân vị"
         };
-        tblModel.setColumnIdentifiers(header);
-        tableQuyDoi.setModel(tblModel);
-        tableQuyDoi.setFocusable(false);
-        tableQuyDoi.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tableQuyDoi.getTableHeader().setPreferredSize(new Dimension(0, 40));
+
+        paginatedTable = new PaginatedTable(header);
+
+        JTable table = paginatedTable.getTable();
+        table.setFocusable(false);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
 
         // Căn giữa nội dung Header
-        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tableQuyDoi.getTableHeader().getDefaultRenderer();
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        scrollTable.setViewportView(tableQuyDoi);
 
         // Căn giữa nội dung các ô trong bảng
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 0; i < tableQuyDoi.getColumnCount(); i++) {
-            tableQuyDoi.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
         // Cấu hình Sorter cho cột ID (Integer)
-        tableQuyDoi.setAutoCreateRowSorter(true);
-        TableSorter.configureTableColumnSorter(tableQuyDoi, 0, TableSorter.INTEGER_COMPARATOR);
+        table.setAutoCreateRowSorter(true);
+        TableSorter.configureTableColumnSorter(table, 0, TableSorter.INTEGER_COMPARATOR);
 
         // Tạo khung viền đệm (Padding)
-        pnlBorder1 = new JPanel(); pnlBorder1.setPreferredSize(new Dimension(0, 10)); pnlBorder1.setBackground(BackgroundColor);
+        pnlBorder1 = new JPanel();
+        pnlBorder1.setPreferredSize(new Dimension(0, 10));
+        pnlBorder1.setBackground(BackgroundColor);
         this.add(pnlBorder1, BorderLayout.NORTH);
-        pnlBorder2 = new JPanel(); pnlBorder2.setPreferredSize(new Dimension(0, 10)); pnlBorder2.setBackground(BackgroundColor);
+        pnlBorder2 = new JPanel();
+        pnlBorder2.setPreferredSize(new Dimension(0, 10));
+        pnlBorder2.setBackground(BackgroundColor);
         this.add(pnlBorder2, BorderLayout.SOUTH);
-        pnlBorder3 = new JPanel(); pnlBorder3.setPreferredSize(new Dimension(10, 0)); pnlBorder3.setBackground(BackgroundColor);
+        pnlBorder3 = new JPanel();
+        pnlBorder3.setPreferredSize(new Dimension(10, 0));
+        pnlBorder3.setBackground(BackgroundColor);
         this.add(pnlBorder3, BorderLayout.EAST);
-        pnlBorder4 = new JPanel(); pnlBorder4.setPreferredSize(new Dimension(10, 0)); pnlBorder4.setBackground(BackgroundColor);
+        pnlBorder4 = new JPanel();
+        pnlBorder4.setPreferredSize(new Dimension(10, 0));
+        pnlBorder4.setBackground(BackgroundColor);
         this.add(pnlBorder4, BorderLayout.WEST);
 
         // Khu vực trung tâm
@@ -113,7 +111,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
         functionBar.setBackground(Color.WHITE);
 
-        String[] action = { "create", "update", "delete", "detail", "import", "export" };
+        String[] action = {"create", "update", "delete", "detail", "import", "export"};
         mainFunction = new MainFunction(1, "bangQuyDoi", action);
         for (String ac : action) {
             mainFunction.btn.get(ac).addActionListener(this);
@@ -136,14 +134,15 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         pnlMain = new PanelBorderRadius();
         pnlMain.setLayout(new BorderLayout());
         pnlMain.setBackground(Color.WHITE);
-        pnlMain.add(scrollTable, BorderLayout.CENTER);
+        pnlMain.add(paginatedTable, BorderLayout.CENTER);
         contentCenter.add(pnlMain, BorderLayout.CENTER);
     }
 
     private void loadDataTable(List<XtBangQuyDoi> list) {
-        tblModel.setRowCount(0);
+        java.util.List<Object[]> data = new java.util.ArrayList<>();
+
         for (XtBangQuyDoi qd : list) {
-            tblModel.addRow(new Object[]{
+            data.add(new Object[]{
                 qd.getIdqd(),
                 qd.getDPhuongthuc(),
                 qd.getDTohop(),
@@ -156,6 +155,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
                 qd.getDPhanvi()
             });
         }
+        paginatedTable.setData(data);
     }
 
     @Override

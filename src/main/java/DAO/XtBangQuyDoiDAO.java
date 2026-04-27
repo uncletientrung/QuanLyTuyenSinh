@@ -22,16 +22,11 @@ public class XtBangQuyDoiDAO {
     public List<XtBangQuyDoi> getAll() {
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
-            System.out.println("Session opened");
-
             List<XtBangQuyDoi> list = session.createQuery(
                     "from XtBangQuyDoi",
                     XtBangQuyDoi.class
             ).list();
-
-            System.out.println("Data size: " + list.size());
-
+            
             return list;
 
         } catch (Exception e) {

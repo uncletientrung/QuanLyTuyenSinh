@@ -28,10 +28,10 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
     private JPanel pnmain, pnbottom;
     private ButtonCustom btnLuu, btnHuyBo;
 
-    private SelectForm cbxCccd;
+    private SelectForm cbxCccd, cbxPhuongThuc;
     private InputForm txtMaNganh, txtMaToHop;
     private InputForm txtDiemCC, txtDiemUtxt, txtDiemTong;
-    private InputForm txtPhuongThuc, txtGhiChu, txtDcKeys;
+    private InputForm txtGhiChu, txtDcKeys;
 
     private XtDiemCongXetTuyenBUS diemCongBUS;
     private XtThisinhXetTuyen25BUS thiSinhBUS;
@@ -80,14 +80,15 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
         txtDiemTong.getTxtForm().setText("0.00");
 
         // Cột 3
-        txtPhuongThuc = new InputForm("Phương thức");
+        String[] listPT = {"THPT", "ĐGNL", "VSAT", "Tuyển thẳng"};
+        cbxPhuongThuc = new SelectForm("Phương thức", listPT);
         txtGhiChu = new InputForm("Ghi chú");
         txtDcKeys = new InputForm("DC Keys");
         txtDcKeys.setEditable(false);
 
         pnmain.add(cbxCccd);
         pnmain.add(txtDiemCC);
-        pnmain.add(txtPhuongThuc);
+        pnmain.add(cbxPhuongThuc);
         pnmain.add(txtMaNganh);
         pnmain.add(txtDiemUtxt);
         pnmain.add(txtGhiChu);
@@ -102,7 +103,7 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
             txtMaToHop.setDisable();
             txtDiemCC.setDisable();
             txtDiemUtxt.setDisable();
-            txtPhuongThuc.setDisable();
+            cbxPhuongThuc.setDisable();
             txtGhiChu.setDisable();
         } else {
             addAutoGenerateListener(txtMaNganh);
@@ -165,7 +166,13 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
                 ? String.format("%.2f", dc.getDiemUtxt()) : "");
         txtDiemTong.setText(dc.getDiemTong() != null
                 ? String.format("%.2f", dc.getDiemTong()) : "0.00");
-        txtPhuongThuc.setText(dc.getPhuongThuc() != null ? dc.getPhuongThuc() : "");
+
+        if (dc.getPhuongThuc() != null) {
+            cbxPhuongThuc.getCbb().setSelectedItem(dc.getPhuongThuc());
+        } else {
+            cbxPhuongThuc.getCbb().setSelectedItem("THPT"); // Default
+        }
+
         txtGhiChu.setText(dc.getGhiChu() != null ? dc.getGhiChu() : "");
         txtDcKeys.setText(dc.getDcKeys() != null ? dc.getDcKeys() : "");
     }
@@ -189,7 +196,7 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
             dc.setTsCccd((String) cbxCccd.getCbb().getSelectedItem());
             dc.setMaNganh(txtMaNganh.getText().trim());
             dc.setMaToHop(txtMaToHop.getText().trim());
-            dc.setPhuongThuc(txtPhuongThuc.getText().trim());
+            dc.setPhuongThuc(cbxPhuongThuc.getValue());
             dc.setGhiChu(txtGhiChu.getText().trim());
             dc.setDcKeys(txtDcKeys.getText().trim());
 

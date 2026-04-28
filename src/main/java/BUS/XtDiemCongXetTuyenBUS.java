@@ -115,25 +115,41 @@ public class XtDiemCongXetTuyenBUS {
         if (dc.getMaToHop() == null || dc.getMaToHop().trim().isEmpty()) {
             throw new IllegalArgumentException("Mã tổ hợp không được để trống.");
         }
-        if (dc.getPhuongThuc() == null || dc.getPhuongThuc().trim().isEmpty()) {
-            throw new IllegalArgumentException("Phương thức xét tuyển không được để trống.");
-        }
 
-        // Điểm không âm
-        if (dc.getDiemCC() != null && dc.getDiemCC().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Điểm CC không được là số âm.");
-        }
-        if (dc.getDiemUtxt() != null && dc.getDiemUtxt().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Điểm UTXT không được là số âm.");
-        }
-
-        // Tổng điểm cộng kh vượt quá 3
+        // Lấy điểm / điểm = null -> = 0
         BigDecimal diemCC = dc.getDiemCC() != null ? dc.getDiemCC() : BigDecimal.ZERO;
         BigDecimal diemUtxt = dc.getDiemUtxt() != null ? dc.getDiemUtxt() : BigDecimal.ZERO;
         BigDecimal tongDiem = diemCC.add(diemUtxt);
 
-        if (tongDiem.compareTo(new BigDecimal("3")) > 0) {
-            throw new IllegalArgumentException("Tổng điểm cộng không được vượt quá 3.0");
+        // Điểm không âm
+        if (diemCC.compareTo(BigDecimal.ZERO) < 0 || diemUtxt.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Điểm cộng không được là số âm.");
+        }
+
+        // Giới hạn (3đ cho thang 30)
+        String phuongThuc = (dc.getPhuongThuc() != null) ? dc.getPhuongThuc().toUpperCase() : "THPT";
+        BigDecimal maxLimit;
+
+        switch (phuongThuc) {
+            case "TUYỂN THẲNG":
+                if (tongDiem.compareTo(BigDecimal.ZERO) > 0) {
+                    throw new IllegalArgumentException("Phương thức 'Tuyển thẳng' không có điểm cộng.");
+                }
+                maxLimit = BigDecimal.ZERO;
+                break;
+
+            case "ĐGNL":
+                maxLimit = new BigDecimal("120"); // 10% của thang 1200
+                break;
+
+            case "VSAT":
+                maxLimit = new BigDecimal("45");  // 10% của thang 450
+                break;
+
+            case "THPT":
+            default:
+                maxLimit = new BigDecimal("3.0"); // Thang 30
+                break;
         }
 
         // Check Key trùng lặp

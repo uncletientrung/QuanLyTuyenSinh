@@ -51,8 +51,8 @@ public class XtNganh {
     @Column(name = "sl_vsat")
     private Integer slVsat;
 
-    @Column(name = "sl_thpt", length = 45)
-    private String slThpt;
+    @Column(name = "sl_thpt")
+    private Integer slThpt;
 
     public XtNganh() {}
 
@@ -100,8 +100,8 @@ public class XtNganh {
     public Integer getSlVsat() { return slVsat; }
     public void setSlVsat(Integer slVsat) { this.slVsat = slVsat; }
 
-    public String getSlThpt() { return slThpt; }
-    public void setSlThpt(String slThpt) { this.slThpt = slThpt; }
+    public Integer getSlThpt() { return slThpt; }
+    public void setSlThpt(Integer slThpt) { this.slThpt = slThpt; }
 
     @Override
     public String toString() {

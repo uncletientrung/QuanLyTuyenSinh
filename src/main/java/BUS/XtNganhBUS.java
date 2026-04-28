@@ -87,8 +87,8 @@ public class XtNganhBUS {
             return "Số lượng VSAT phải >= 0!";
         }
         
-        if (nganh.getSlThpt() != null && nganh.getSlThpt().length() > 45) {
-            return "Số lượng THPT không được vượt quá 45 ký tự!";
+        if (nganh.getSlThpt() != null && nganh.getSlThpt() < 0) {
+            return "Số lượng THPT phải >= 0!";
         }
 
         boolean result = nganhDAO.insert(nganh);
@@ -179,7 +179,7 @@ public class XtNganhBUS {
         throw new RuntimeException("SL VSAT phải >= 0!");
     }
 
-    if (nganh.getSlThpt() != null && nganh.getSlThpt().length() > 45) {
+    if (nganh.getSlThpt() != null && nganh.getSlThpt() < 0) {
         throw new RuntimeException("SL THPT không hợp lệ!");
     }
 
@@ -210,5 +210,26 @@ public class XtNganhBUS {
         } else {
             return "Xóa ngành thất bại! Ngành có thể đang được sử dụng.";
         }
+    }
+    public List<XtNganh> searchNganh(String keyword, String searchType) {
+        List<XtNganh> all = nganhDAO.getAll();
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return all;
+        }
+
+        String kw = keyword.trim().toLowerCase();
+
+        return all.stream()
+            .filter(ng -> switch (searchType) {
+                case "Mã"         -> ng.getManganh() != null && ng.getManganh().toLowerCase().contains(kw);
+                case "Tên ngành"  -> ng.getTennganh() != null && ng.getTennganh().toLowerCase().contains(kw);
+                case "Tổ hợp gốc" -> ng.getNTohopgoc() != null && ng.getNTohopgoc().toLowerCase().contains(kw);
+                default           -> // Tất cả
+                    (ng.getManganh()   != null && ng.getManganh().toLowerCase().contains(kw))   ||
+                    (ng.getTennganh()  != null && ng.getTennganh().toLowerCase().contains(kw))  ||
+                    (ng.getNTohopgoc() != null && ng.getNTohopgoc().toLowerCase().contains(kw));
+            })
+            .toList();
     }
 }

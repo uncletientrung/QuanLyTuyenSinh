@@ -27,15 +27,17 @@ public class VerticalComboBoxForm extends JPanel {
         this.add(lblTitle, BorderLayout.NORTH);
         this.add(cbbForm, BorderLayout.CENTER);
     }
-
+    public boolean isSelectedYes() {
+        return "1".equals(getSelectedValue());
+    }
 
     public String getSelectedValue() {
         String selected = (String) cbbForm.getSelectedItem();
         if ("Có".equals(selected)) return "1";
         if ("Không".equals(selected)) return "0";
-        return ""; 
+        return "0"; 
     }
-
+   
     public void setSelectedValue(String dbValue) {
         if ("1".equals(dbValue)) {
             cbbForm.setSelectedItem("Có");
@@ -53,4 +55,7 @@ public class VerticalComboBoxForm extends JPanel {
     public JLabel getLblTitle() {
         return lblTitle;
     }
+    public JComboBox<String> getComboBox() {
+        return cbbForm;
+}
 }

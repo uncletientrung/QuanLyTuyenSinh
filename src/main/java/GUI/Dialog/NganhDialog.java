@@ -82,7 +82,11 @@ public class NganhDialog extends JDialog {
         txtSlThpt = new VerticalInputForm("SL THPT");
 
         // Filter số
-        setNumericFilter(txtChiTieu, txtSlXtt, txtSlDgnl, txtSlVsat);
+        setNumericFilter(txtChiTieu, txtSlXtt, txtSlDgnl, txtSlVsat,txtSlThpt);
+        bindToggle(cbbTuyenThang, txtSlXtt);
+        bindToggle(cbbDgnl, txtSlDgnl);
+        bindToggle(cbbThpt, txtSlThpt);
+        bindToggle(cbbVsat, txtSlVsat);
 
         // Đổ dữ liệu nếu có
         if (currentNganh != null) {
@@ -99,7 +103,7 @@ public class NganhDialog extends JDialog {
             txtSlXtt.setText(currentNganh.getSlXtt() != null ? String.valueOf(currentNganh.getSlXtt()) : "");
             txtSlDgnl.setText(currentNganh.getSlDgnl() != null ? String.valueOf(currentNganh.getSlDgnl()) : "");
             txtSlVsat.setText(currentNganh.getSlVsat() != null ? String.valueOf(currentNganh.getSlVsat()) : "");
-            txtSlThpt.setText(currentNganh.getSlThpt() != null ? currentNganh.getSlThpt() : "");
+            txtSlThpt.setText(currentNganh.getSlThpt() != null ? String.valueOf(currentNganh.getSlVsat()) : "");
         }
 
         // cot trai
@@ -144,6 +148,17 @@ public class NganhDialog extends JDialog {
         cbbThpt.setDisable();
         cbbVsat.setDisable();
     }
+ private void bindToggle(VerticalComboBoxForm cbb, VerticalInputForm txt) {
+    cbb.getComboBox().addActionListener(e -> {
+        boolean enable = cbb.isSelectedYes();
+
+        txt.getTxtForm().setEnabled(enable); 
+
+        if (!enable) {
+            txt.setText("0");
+        }
+    });
+}
 
     private void initPnlButtons(String type) {
         pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
@@ -170,35 +185,49 @@ public class NganhDialog extends JDialog {
         }
         pnlButtons.add(btnHuy);
     }
+    
 
     private void luuNganh(String type) {
         XtNganh nganh = new XtNganh();
+
         nganh.setManganh(txtMaNganh.getText().trim());
         nganh.setTennganh(txtTenNganh.getText().trim());
         nganh.setNTohopgoc(txtToHopGoc.getText().trim());
         nganh.setNChitieu(Integer.parseInt(txtChiTieu.getText().trim()));
         nganh.setNDiemsan(parseBigDecimal(txtDiemSan.getText()));
         nganh.setNDiemtrungtuyen(parseBigDecimal(txtDiemTrungTuyen.getText()));
+
         nganh.setNTuyenthang(cbbTuyenThang.getSelectedValue());
         nganh.setNDgnl(cbbDgnl.getSelectedValue());
         nganh.setNThpt(cbbThpt.getSelectedValue());
         nganh.setNVsat(cbbVsat.getSelectedValue());
-        nganh.setSlXtt(parseInteger(txtSlXtt.getText()));
-        nganh.setSlDgnl(parseInteger(txtSlDgnl.getText()));
-        nganh.setSlVsat(parseInteger(txtSlVsat.getText()));
-        nganh.setSlThpt(txtSlThpt.getText().trim());
 
+        // cho ve 0 neu khong chon phuong thuc do
+        nganh.setSlXtt(cbbTuyenThang.isSelectedYes() 
+            ? parseInteger(txtSlXtt.getText()) : 0);
+
+        nganh.setSlDgnl(cbbDgnl.isSelectedYes() 
+            ? parseInteger(txtSlDgnl.getText()) : 0);
+
+        nganh.setSlThpt(cbbThpt.isSelectedYes() 
+            ? parseInteger(txtSlThpt.getText()) : 0);
+
+        nganh.setSlVsat(cbbVsat.isSelectedYes() 
+            ? parseInteger(txtSlVsat.getText()) : 0);
+
+        // bus
         if (type.equals("create")) {
             String message = bus.insertNganh(nganh);
-            JOptionPane.showMessageDialog(this, message, "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, message);
 
             if (message.contains("thành công")) {
                 parent.loadDataTable(bus.getAllNganh());
                 dispose();
             }
-        }else {
+        } else {
             try {
-                nganh.setIdnganh(currentNganh.getIdnganh());// lay id de thoa dieu kien ben bus
+                nganh.setIdnganh(currentNganh.getIdnganh());
+
                 if (bus.updateNganh(nganh)) {
                     JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
                     parent.loadDataTable(bus.getAllNganh());
@@ -208,7 +237,7 @@ public class NganhDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
+}
 
     private BigDecimal parseBigDecimal(String text) {
         if (text == null || text.trim().isEmpty()) return null;
@@ -244,6 +273,32 @@ public class NganhDialog extends JDialog {
             txtChiTieu.getTxtForm().requestFocus();
             return false;
         }
+        if (Validation.isEmpty(txtToHopGoc.getText())) {
+            JOptionPane.showMessageDialog(this, "Tổ hợp gốc không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtToHopGoc.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtSlDgnl.getText())) {
+            JOptionPane.showMessageDialog(this, "Số lượng DGNL không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtSlDgnl.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtSlThpt.getText())) {
+            JOptionPane.showMessageDialog(this, "Số lượng THPT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtSlThpt.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtSlVsat.getText())) {
+            JOptionPane.showMessageDialog(this, "Số lượng VSAT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtSlVsat.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtSlXtt.getText())) {
+            JOptionPane.showMessageDialog(this, "Số lượng xét tuyển sớm không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtSlXtt.getTxtForm().requestFocus();
+            return false;
+        }
+        
         return true;
     }
 }

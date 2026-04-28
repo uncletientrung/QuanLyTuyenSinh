@@ -6,6 +6,7 @@ package BUS;
 
 import DAO.XtDiemCongXetTuyenDAO;
 import ENTITY.XtDiemCongXetTuyen;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,6 +75,7 @@ public class XtDiemCongXetTuyenBUS {
     }
 
     public boolean addDiemCong(XtDiemCongXetTuyen dc) {
+        validateDiemCong(dc);
         if (xtdiemcongxettuyenDAO.insert(dc)) {
             listDiemCong.add(dc);
             return true;
@@ -82,6 +84,7 @@ public class XtDiemCongXetTuyenBUS {
     }
 
     public boolean updateDiemCong(XtDiemCongXetTuyen dc) {
+        validateDiemCong(dc);
         if (xtdiemcongxettuyenDAO.update(dc)) {
             for (int i = 0; i < listDiemCong.size(); i++) {
                 if (listDiemCong.get(i).getIdDiemCong() == dc.getIdDiemCong()) {
@@ -100,5 +103,49 @@ public class XtDiemCongXetTuyenBUS {
             return true;
         }
         return false;
+    }
+
+    public void validateDiemCong(XtDiemCongXetTuyen dc) throws IllegalArgumentException {
+        if (dc.getTsCccd() == null || dc.getTsCccd().trim().isEmpty()) {
+            throw new IllegalArgumentException("CCCD thí sinh không được để trống.");
+        }
+        if (dc.getMaNganh() == null || dc.getMaNganh().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã ngành không được để trống.");
+        }
+        if (dc.getMaToHop() == null || dc.getMaToHop().trim().isEmpty()) {
+            throw new IllegalArgumentException("Mã tổ hợp không được để trống.");
+        }
+        if (dc.getPhuongThuc() == null || dc.getPhuongThuc().trim().isEmpty()) {
+            throw new IllegalArgumentException("Phương thức xét tuyển không được để trống.");
+        }
+
+        // Điểm không âm
+        if (dc.getDiemCC() != null && dc.getDiemCC().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Điểm CC không được là số âm.");
+        }
+        if (dc.getDiemUtxt() != null && dc.getDiemUtxt().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Điểm UTXT không được là số âm.");
+        }
+
+        // Tổng điểm cộng kh vượt quá 3
+        BigDecimal diemCC = dc.getDiemCC() != null ? dc.getDiemCC() : BigDecimal.ZERO;
+        BigDecimal diemUtxt = dc.getDiemUtxt() != null ? dc.getDiemUtxt() : BigDecimal.ZERO;
+        BigDecimal tongDiem = diemCC.add(diemUtxt);
+
+        if (tongDiem.compareTo(new BigDecimal("3")) > 0) {
+            throw new IllegalArgumentException("Tổng điểm cộng không được vượt quá 3.0");
+        }
+
+        // Check Key trùng lặp
+        String currentKey = (dc.getTsCccd() + "_" + dc.getMaNganh() + "_" + dc.getMaToHop()).toLowerCase();
+
+        boolean isDuplicate = listDiemCong.stream().anyMatch(existing -> {
+            String existingKey = (existing.getTsCccd() + "_" + existing.getMaNganh() + "_" + existing.getMaToHop()).toLowerCase();
+            return existingKey.equals(currentKey) && existing.getIdDiemCong() != dc.getIdDiemCong();
+        });
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("Dữ liệu xét tuyển cho thí sinh này với ngành và tổ hợp này đã tồn tại.");
+        }
     }
 }

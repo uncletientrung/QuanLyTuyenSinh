@@ -73,8 +73,8 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
         txtMaToHop = new InputForm("Mã tổ hợp");
 
         // Cột 2
-        txtDiemCC = new InputForm("Điểm CC");
-        txtDiemUtxt = new InputForm("Điểm UTXT");
+        txtDiemCC = new InputForm("Điểm Chứng chỉ");
+        txtDiemUtxt = new InputForm("Điểm Ưu tiên xét tuyển");
         txtDiemTong = new InputForm("Điểm tổng");
         txtDiemTong.setEditable(false);
         txtDiemTong.getTxtForm().setText("0.00");

@@ -8,13 +8,15 @@ import ENTITY.XtDiemCongXetTuyen;
 import UTIL.HibernateUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
  * @author Windows
  */
 public class XtDiemCongXetTuyenDAO {
-     public static XtDiemCongXetTuyenDAO getInstance() {
+
+    public static XtDiemCongXetTuyenDAO getInstance() {
         return new XtDiemCongXetTuyenDAO();
     }
 
@@ -37,4 +39,55 @@ public class XtDiemCongXetTuyenDAO {
         return null;
     }
 
+    public boolean insert(XtDiemCongXetTuyen dc) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(dc);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean update(XtDiemCongXetTuyen dc) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(dc);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean delete(int iddiemcong) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            XtDiemCongXetTuyen dc = session.get(XtDiemCongXetTuyen.class, iddiemcong);
+            if (dc != null) {
+                session.remove(dc);
+                transaction.commit();
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

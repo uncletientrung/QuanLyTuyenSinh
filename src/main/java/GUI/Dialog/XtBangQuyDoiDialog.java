@@ -151,10 +151,10 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
         }
 
         txtPhanVi.setText(qd.getDPhanvi() != null ? qd.getDPhanvi() : "");
-        txtDiemA.setText(qd.getDDiema() != null ? qd.getDDiema().toString() : "");
-        txtDiemB.setText(qd.getDDiemb() != null ? qd.getDDiemb().toString() : "");
-        txtDiemC.setText(qd.getDDiemc() != null ? qd.getDDiemc().toString() : "");
-        txtDiemD.setText(qd.getDDiemd() != null ? qd.getDDiemd().toString() : "");
+        txtDiemA.setText(qd.getDDiema() != null ? String.format("%.2f", qd.getDDiema()) : "0.00");
+        txtDiemB.setText(qd.getDDiemb() != null ? String.format("%.2f", qd.getDDiemb()) : "0.00");
+        txtDiemC.setText(qd.getDDiemc() != null ? String.format("%.2f", qd.getDDiemc()) : "0.00");
+        txtDiemD.setText(qd.getDDiemd() != null ? String.format("%.2f", qd.getDDiemd()) : "0.00");
         txtMaQuyDoi.setText(qd.getDMaQuyDoi() != null ? qd.getDMaQuyDoi() : "");
     }
 
@@ -179,10 +179,10 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
             qd.setDTohop("VSAT".equals(cbxPhuongThuc.getValue()) ? null : txtToHopMon.getText().trim());
             qd.setDMon("VSAT".equals(cbxPhuongThuc.getValue()) ? txtToHopMon.getText().trim() : null);
             try {
-                qd.setDDiema(new BigDecimal(txtDiemA.getText().trim()));
-                qd.setDDiemb(new BigDecimal(txtDiemB.getText().trim()));
-                qd.setDDiemc(new BigDecimal(txtDiemC.getText().trim()));
-                qd.setDDiemd(new BigDecimal(txtDiemD.getText().trim()));
+                qd.setDDiema(new BigDecimal(txtDiemA.getText().trim()).setScale(2, java.math.RoundingMode.HALF_UP));
+                qd.setDDiemb(new BigDecimal(txtDiemB.getText().trim()).setScale(2, java.math.RoundingMode.HALF_UP));
+                qd.setDDiemc(new BigDecimal(txtDiemC.getText().trim()).setScale(2, java.math.RoundingMode.HALF_UP));
+                qd.setDDiemd(new BigDecimal(txtDiemD.getText().trim()).setScale(2, java.math.RoundingMode.HALF_UP));
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Điểm số không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;

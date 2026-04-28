@@ -3,25 +3,29 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package GUI.Panel;
+
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import java.awt.*;
 import javax.swing.*;
+
 /**
  *
  * @author DELL
  */
-public class TrangChuPanel extends  JPanel{
-    public TrangChuPanel(){
+public class TrangChuPanel extends JPanel {
+
+    public TrangChuPanel() {
         setLayout(new BorderLayout());
         JPanel centerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                java.net.URL imgURL = TrangChuPanel.class.getResource("/img/dashboard.jpg");
-                if (imgURL != null) {
-                    ImageIcon imageIcon = new ImageIcon(imgURL);
-                    Image image = imageIcon.getImage();
-                    g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
-                } else {
+
+                try {
+                    FlatSVGIcon svgIcon = new FlatSVGIcon("img/dashboard.svg", getWidth(), getHeight());
+
+                    svgIcon.paintIcon(this, g, 0, 0);
+                } catch (Exception e) {
                     g.setColor(new Color(245, 245, 245));
                     g.fillRect(0, 0, getWidth(), getHeight());
                 }

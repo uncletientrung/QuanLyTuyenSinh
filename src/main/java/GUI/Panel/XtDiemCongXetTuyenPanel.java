@@ -7,6 +7,7 @@ import GUI.Component.MainFunction;
 import GUI.Component.PaginatedTable;
 import GUI.Component.PanelBorderRadius;
 import GUI.Component.TableSorter;
+import GUI.Dialog.XtDiemCongXetTuyenDialog;
 import GUI.Main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -170,9 +171,51 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
         loadDataTable(result);
     }
 
+    private XtDiemCongXetTuyen getSelectedDiemCong() {
+        int row = paginatedTable.getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dòng trong bảng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);
+        int idDiemCong = (int) paginatedTable.getTable().getModel().getValueAt(modelRow, 0);
+        for (XtDiemCongXetTuyen dc : listDiemCong) {
+            if (dc.getIdDiemCong() == idDiemCong) {
+                return dc;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        //
+        if (e.getSource() == mainFunction.btn.get("create")) {
+            new XtDiemCongXetTuyenDialog(this, mainFrame, "Thêm bảng quy đổi", true, "create");
+        } else if (e.getSource() == mainFunction.btn.get("update")) {
+            XtDiemCongXetTuyen selected = getSelectedDiemCong();
+            if (selected != null) {
+                new XtDiemCongXetTuyenDialog(this, mainFrame, "Cập nhật điểm cộng xét tuyển", true, "update", selected);
+            }
+        } else if (e.getSource() == mainFunction.btn.get("detail")) {
+            XtDiemCongXetTuyen selected = getSelectedDiemCong();
+            if (selected != null) {
+                new XtDiemCongXetTuyenDialog(this, mainFrame, "Chi tiết điểm cộng xét tuyển", true, "detail", selected);
+            }
+        } else if (e.getSource() == mainFunction.btn.get("delete")) {
+            XtDiemCongXetTuyen selected = getSelectedDiemCong();
+            if (selected != null) {
+                int confirm = JOptionPane.showConfirmDialog(this, "Xóa điểm cộng xét tuyển của thí sinh " + selected.getTsCccd() + "?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (diemCongBUS.deleteDiemCong(selected.getIdDiemCong())) {
+                        JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                        listDiemCong = diemCongBUS.getAllDiemCong();
+                        loadDataTable(listDiemCong);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        }
     }
 
     @Override

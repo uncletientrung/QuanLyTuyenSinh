@@ -72,4 +72,33 @@ public class XtDiemCongXetTuyenBUS {
                         .collect(Collectors.toList());
         }
     }
+
+    public boolean addDiemCong(XtDiemCongXetTuyen dc) {
+        if (xtdiemcongxettuyenDAO.insert(dc)) {
+            listDiemCong.add(dc);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateDiemCong(XtDiemCongXetTuyen dc) {
+        if (xtdiemcongxettuyenDAO.update(dc)) {
+            for (int i = 0; i < listDiemCong.size(); i++) {
+                if (listDiemCong.get(i).getIdDiemCong() == dc.getIdDiemCong()) {
+                    listDiemCong.set(i, dc);
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deleteDiemCong(int idDiemCong) {
+        if (xtdiemcongxettuyenDAO.delete(idDiemCong)) {
+            listDiemCong.removeIf(dc -> dc.getIdDiemCong() == idDiemCong);
+            return true;
+        }
+        return false;
+    }
 }

@@ -120,6 +120,9 @@ public class MenuTaskbar extends JPanel{
                         case 8:
                             main.setPanel(new XtBangQuyDoiPanel(main));
                             break;
+                        case 9:
+                            main.setPanel(new XtDiemCongXetTuyenPanel(main));
+                            break;
                         case 10:
                             main.setPanel(new TaiKhoanPanel(main));
                             break;

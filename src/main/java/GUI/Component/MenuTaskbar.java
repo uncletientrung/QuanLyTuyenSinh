@@ -117,6 +117,9 @@ public class MenuTaskbar extends JPanel{
                         case 6:
                             main.setPanel(new NganhPanel(main));
                             break;
+                        case 7:
+                            main.setPanel(new NganhToHopPanel(main));
+                            break;
                         case 8:
                             main.setPanel(new XtBangQuyDoiPanel(main));
                             break;

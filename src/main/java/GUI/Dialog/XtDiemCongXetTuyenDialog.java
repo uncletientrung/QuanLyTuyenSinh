@@ -164,8 +164,7 @@ public class XtDiemCongXetTuyenDialog extends JDialog implements ActionListener 
                 ? String.format("%.2f", dc.getDiemCC()) : "");
         txtDiemUtxt.setText(dc.getDiemUtxt() != null
                 ? String.format("%.2f", dc.getDiemUtxt()) : "");
-        txtDiemTong.setText(dc.getDiemTong() != null
-                ? String.format("%.2f", dc.getDiemTong()) : "0.00");
+        txtDiemTong.setText(String.format("%.2f", dc.getDiemTong()));
 
         if (dc.getPhuongThuc() != null) {
             cbxPhuongThuc.getCbb().setSelectedItem(dc.getPhuongThuc());

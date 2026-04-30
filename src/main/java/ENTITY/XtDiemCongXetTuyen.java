@@ -31,7 +31,7 @@ public class XtDiemCongXetTuyen {
     private BigDecimal diemUtxt;  // Điểm ưu tiên xét tuyển
 
     @Column(name = "diemTong", precision = 6, scale = 2)
-    private BigDecimal diemTong;  // Tổng điểm
+    private BigDecimal diemTong = BigDecimal.ZERO;  // Tổng điểm
 
     @Column(name = "ghichu", columnDefinition = "TEXT")
     private String ghiChu;

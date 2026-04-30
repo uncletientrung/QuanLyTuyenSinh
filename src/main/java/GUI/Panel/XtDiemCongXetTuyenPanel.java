@@ -8,6 +8,7 @@ import GUI.Component.PaginatedTable;
 import GUI.Component.PanelBorderRadius;
 import GUI.Component.TableSorter;
 import GUI.Dialog.XtDiemCongXetTuyenDialog;
+import GUI.Dialog.XtDiemCongXetTuyenExcelDialog;
 import GUI.Main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -215,6 +216,8 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
                     }
                 }
             }
+        } else if (e.getSource() == mainFunction.btn.get("import")) {
+            new XtDiemCongXetTuyenExcelDialog(this, mainFrame);
         }
     }
 

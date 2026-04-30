@@ -17,8 +17,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -107,7 +109,7 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
             importThiSinhFromExcel();
         } else if (e.getSource() == btnDiemChungChi) {
             dispose();
-            // TODO: Gọi hàm import điểm chứng chỉ
+            importDiemChungChiFromExcel();
         } else if (e.getSource() == btnDiemUuTien) {
             dispose();
             // TODO: Gọi hàm import điểm ưu tiên xét tuyển
@@ -283,6 +285,231 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
         }
     }
 
+    // Import điểm chứng chỉ từ file Excel
+    private void importDiemChungChiFromExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn file Excel import điểm chứng chỉ");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls"));
+
+        int result = fileChooser.showOpenDialog(mainFrame);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File selectedFile = fileChooser.getSelectedFile();
+        FileInputStream fis = null;
+        Workbook workbook = null;
+
+        try {
+            fis = new FileInputStream(selectedFile);
+            workbook = WorkbookFactory.create(fis);
+            Sheet sheet = workbook.getSheetAt(0);
+
+            if (sheet.getPhysicalNumberOfRows() <= 1) {
+                JOptionPane.showMessageDialog(mainFrame, "File Excel không có dữ liệu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Đọc header để xác định vị trí các cột
+            Row headerRow = sheet.getRow(0);
+            int cccdCol = -1;
+            int diemCongCol = -1;
+
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                Cell cell = headerRow.getCell(i);
+                if (cell != null) {
+                    String header = cell.getStringCellValue().trim().toLowerCase();
+                    if (header.contains("cccd")) {
+                        cccdCol = i;
+                    } else if (header.contains("điểm cộng") || header.contains("diem cong")) {
+                        diemCongCol = i;
+                    }
+                }
+            }
+
+            // Kiểm tra xem đã tìm thấy đủ các cột cần thiết chưa
+            if (cccdCol == -1 || diemCongCol == -1) {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "File Excel phải có các cột: CCCD và Điểm cộng",
+                        "Lỗi định dạng", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Đọc dữ liệu từ Excel vào Map (CCCD -> Điểm cộng)
+            // Nếu có nhiều dòng cùng CCCD, lấy dòng có điểm cộng cao nhất
+            Map<String, BigDecimal> diemCongMap = new HashMap<>();
+            List<String> errorRows = new ArrayList<>();
+
+            for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) {
+                    continue;
+                }
+
+                try {
+                    String cccd = getCellStringValue(row.getCell(cccdCol));
+                    String diemCongStr = getCellStringValue(row.getCell(diemCongCol));
+
+                    // Bỏ qua dòng trống
+                    if (cccd.isEmpty() && diemCongStr.isEmpty()) {
+                        continue;
+                    }
+
+                    // Kiểm tra dữ liệu bắt buộc
+                    if (cccd.isEmpty()) {
+                        errorRows.add("Dòng " + (i + 1) + ": Thiếu CCCD");
+                        continue;
+                    }
+
+                    BigDecimal diemCong;
+                    try {
+                        diemCong = parseBigDecimal(diemCongStr);
+                    } catch (NumberFormatException e) {
+                        errorRows.add("Dòng " + (i + 1) + " (CCCD: " + cccd + "): Điểm cộng không hợp lệ - '" + diemCongStr + "'");
+                        continue;
+                    }
+
+                    // Nếu CCCD đã tồn tại, lấy điểm cao hơn
+                    if (diemCongMap.containsKey(cccd.trim())) {
+                        BigDecimal existingDiem = diemCongMap.get(cccd.trim());
+                        if (diemCong.compareTo(existingDiem) > 0) {
+                            diemCongMap.put(cccd.trim(), diemCong);
+                        }
+                    } else {
+                        diemCongMap.put(cccd.trim(), diemCong);
+                    }
+
+                } catch (Exception ex) {
+                    errorRows.add("Dòng " + (i + 1) + ": Lỗi đọc dữ liệu - " + ex.getMessage());
+                }
+            }
+
+            if (diemCongMap.isEmpty()) {
+                JOptionPane.showMessageDialog(mainFrame, "Không có dữ liệu hợp lệ trong file Excel!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Cập nhật điểm chứng chỉ vào database
+            List<XtDiemCongXetTuyen> allDiemCong = diemCongBUS.getAllDiemCong();
+            int updatedCount = 0;
+            int notFoundCount = 0;
+            List<String> notFoundCCCDs = new ArrayList<>();
+            List<String> updateErrors = new ArrayList<>();
+
+            for (Map.Entry<String, BigDecimal> entry : diemCongMap.entrySet()) {
+                String cccd = entry.getKey();
+                BigDecimal diemCong = entry.getValue();
+
+                // Tìm tất cả bản ghi có CCCD này
+                List<XtDiemCongXetTuyen> matchedRecords = new ArrayList<>();
+                for (XtDiemCongXetTuyen dc : allDiemCong) {
+                    if (dc.getTsCccd() != null && dc.getTsCccd().equals(cccd)) {
+                        matchedRecords.add(dc);
+                    }
+                }
+
+                if (matchedRecords.isEmpty()) {
+                    notFoundCount++;
+                    if (notFoundCCCDs.size() < 10) {
+                        notFoundCCCDs.add(cccd);
+                    }
+                    continue;
+                }
+
+                // Cập nhật từng bản ghi
+                for (XtDiemCongXetTuyen dc : matchedRecords) {
+                    try {
+                        dc.setDiemCC(diemCong);
+
+                        // Tính lại điểm tổng = diemCC + diemUtxt
+                        BigDecimal diemUtxt = dc.getDiemUtxt() != null ? dc.getDiemUtxt() : BigDecimal.ZERO;
+                        dc.setDiemTong(diemCong.add(diemUtxt));
+
+                        // Validate trước khi update
+                        try {
+                            diemCongBUS.validateDiemCong(dc);
+                            if (diemCongBUS.updateDiemCong(dc)) {
+                                updatedCount++;
+                            } else {
+                                updateErrors.add("CCCD " + cccd + ": Không thể cập nhật vào DB");
+                            }
+                        } catch (IllegalArgumentException ex) {
+                            updateErrors.add("CCCD " + cccd + ": " + ex.getMessage());
+                        }
+                    } catch (Exception ex) {
+                        updateErrors.add("CCCD " + cccd + ": Lỗi - " + ex.getMessage());
+                    }
+                }
+            }
+
+            // Hiển thị kết quả
+            StringBuilder message = new StringBuilder();
+            message.append("Kết quả import:\n");
+            message.append("Tổng số CCCD trong file Excel: ").append(diemCongMap.size()).append("\n");
+            message.append("Số bản ghi đã cập nhật: ").append(updatedCount).append("\n");
+            message.append("Số CCCD không tìm thấy trong hệ thống: ").append(notFoundCount).append("\n");
+
+            if (!notFoundCCCDs.isEmpty()) {
+                message.append("\nCác CCCD không tìm thấy:\n");
+                for (String cccd : notFoundCCCDs) {
+                    message.append("  • ").append(cccd).append("\n");
+                }
+                if (notFoundCount > 10) {
+                    message.append("  • ... và ").append(notFoundCount - 10).append(" CCCD khác\n");
+                }
+            }
+
+            if (!updateErrors.isEmpty()) {
+                message.append("\nLỗi cập nhật:\n");
+                int maxErrors = Math.min(updateErrors.size(), 10);
+                for (int i = 0; i < maxErrors; i++) {
+                    message.append("  • ").append(updateErrors.get(i)).append("\n");
+                }
+                if (updateErrors.size() > 10) {
+                    message.append("  • ... và ").append(updateErrors.size() - 10).append(" lỗi khác\n");
+                }
+            }
+
+            if (!errorRows.isEmpty()) {
+                message.append("\nLỗi đọc dữ liệu Excel:\n");
+                int maxErrors = Math.min(errorRows.size(), 10);
+                for (int i = 0; i < maxErrors; i++) {
+                    message.append("  • ").append(errorRows.get(i)).append("\n");
+                }
+                if (errorRows.size() > 10) {
+                    message.append("  • ... và ").append(errorRows.size() - 10).append(" lỗi khác\n");
+                }
+            }
+
+            message.append("\nHoàn thành import!");
+
+            // Hiển thị kết quả trong dialog
+            JOptionPane.showMessageDialog(mainFrame, message.toString(), "Kết quả Import Điểm Chứng Chỉ", JOptionPane.INFORMATION_MESSAGE);
+
+            // Refresh bảng dữ liệu
+            if (updatedCount > 0) {
+                parentPanel.loadDataTable(diemCongBUS.getAllDiemCong());
+            }
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(mainFrame, "Lỗi đọc file: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(mainFrame, "Lỗi xử lý file: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (workbook != null) {
+                    workbook.close();
+                }
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException ex) {
+                // Bỏ qua lỗi khi đóng file
+            }
+        }
+    }
+
     // Lấy giá trị chuỗi từ cell Excel
     private String getCellStringValue(Cell cell) {
         if (cell == null) {
@@ -314,5 +541,15 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
             default:
                 return "";
         }
+    }
+
+    // Chuyển chuỗi thành BigDecimal 
+    private BigDecimal parseBigDecimal(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        // Thay , = .
+        String normalized = value.trim().replace(",", ".");
+        return new BigDecimal(normalized);
     }
 }

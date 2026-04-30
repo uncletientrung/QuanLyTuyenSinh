@@ -31,13 +31,13 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
-        <mapping class="ENTITY.TaiKhoan"/>
-        <mapping class="ENTITY.XtThisinhXetTuyen25"/>
-        <mapping class="ENTITY.XtNguyenVongXetTuyen"/>
-        <mapping class="ENTITY.XtNganh"/>
-        <mapping class="ENTITY.XtNganhToHop"/>
-        <mapping class="ENTITY.XtBangQuyDoi"/>
-        <mapping class="ENTITY.XtDiemCongXetTuyen"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.TaiKhoan"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtNganh"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtNganhToHop"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtBangQuyDoi"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen"/>
 
     </session-factory>
 

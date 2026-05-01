@@ -32,7 +32,7 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
-        <mapping class="com.quanlytuyensinh.ENTITY.Mon"/>
+        <mapping class="com.quanlytuyensinh.ENTITY.XtToHopMonThi"/>
         <mapping class="com.quanlytuyensinh.ENTITY.TaiKhoan"/>
         <mapping class="com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25"/>
         <mapping class="com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen"/>

@@ -4,7 +4,7 @@
  */
 package com.quanlytuyensinh.DAO;
 
-import com.quanlytuyensinh.ENTITY.Mon;
+import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
 import java.util.List;
 import org.hibernate.Session;
@@ -15,29 +15,46 @@ import org.hibernate.Transaction;
  * @author ASUS
  */
 
-public class MonDAO {
-    public static MonDAO getInstance() {
-        return new MonDAO();
+public class XtToHopMonThiDAO {
+    public static XtToHopMonThiDAO getInstance() {
+        return new XtToHopMonThiDAO();
     }
     
-    public List<Mon> getAll() {
+    public List<XtToHopMonThi> getAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("from Mon", Mon.class).list();
+            return session.createQuery("from XtToHopMonThi", XtToHopMonThi.class).list();
         }
     }
     
     public boolean existMaToHop(String ma)
     {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "select count(m) from Mon m where m.matohop = :ma";
+            String hql = "select count(m) from XtToHopMonThi m where m.matohop = :ma";
             Long count = session.createQuery(hql, Long.class)
                                 .setParameter("ma", ma)
                                 .uniqueResult();
             return count != null && count > 0;
         }
     }
+
+    public String existToHopMon(List<String> toHop) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "select m.matohop from XtToHopMonThi m where m.mon1 IN (:toHop) AND  m.mon2 IN (:toHop) AND  m.mon3 IN (:toHop)";
+            String res = session.createQuery(hql, String.class)
+                                .setParameter("toHop", toHop)
+                                .uniqueResult();
+            if (res == null)
+                return "";
+            else
+                return res;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
     
-    public void importToDB(List<Mon> list)
+    public void importToDB(List<XtToHopMonThi> list)
     {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

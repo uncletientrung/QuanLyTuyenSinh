@@ -27,6 +27,13 @@ public class XtToHopMonThi {
     private String tentohop;
 
     public XtToHopMonThi() {}
+    public XtToHopMonThi(String matohop, String mon1, String mon2, String mon3, String tentohop) {
+        this.matohop = matohop;
+        this.mon1 = mon1;
+        this.mon2 = mon2;
+        this.mon3 = mon3;
+        this.tentohop = tentohop;
+    };
 
     // ==================== GETTER & SETTER ====================
 

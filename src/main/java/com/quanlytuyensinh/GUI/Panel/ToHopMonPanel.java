@@ -1,18 +1,20 @@
 package com.quanlytuyensinh.GUI.Panel;
 
-import com.quanlytuyensinh.BUS.MonBUS;
-import com.quanlytuyensinh.ENTITY.Mon;
+import com.quanlytuyensinh.BUS.XtToHopMonThiBUS;
+import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
 import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
+import com.quanlytuyensinh.GUI.Dialog.ToHopMonDialog;
 import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.JobAttributes;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -20,15 +22,19 @@ import java.awt.event.ItemListener;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
@@ -51,7 +57,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author ASUS
  */
-public class MonPanel extends JPanel implements ActionListener, ItemListener{
+public class ToHopMonPanel extends JPanel implements ActionListener, ItemListener{
     private PanelBorderRadius pnlMain, functionBar;
     private Main mainFrame;
     private JPanel pnlBorder1, pnlBorder2, pnlBorder3, pnlBorder4, contentCenter;
@@ -59,16 +65,27 @@ public class MonPanel extends JPanel implements ActionListener, ItemListener{
     private IntegratedSearch search;
     private PaginatedTable paginatedTable;
     
-    private MonBUS monBUS; 
-    private List<Mon> listMon;
+    private XtToHopMonThiBUS monBUS; 
+    private List<XtToHopMonThi> listToHop;
     private Color BackgroundColor = new Color(240, 247, 250);
+
+    public static final LinkedHashMap<String, String> tenMap = new LinkedHashMap<String, String>() {{
+    put("TO", "Toán"); put("VA", "Văn"); put("LI", "Vật lý"); put("HO", "Hóa học");
+    put("SI", "Sinh học"); put("SU", "Lịch sử"); put("DI", "Địa lí"); 
+    put("GDCD", "Giáo dục công dân"); put("N1", "Tiếng Anh");
+    put("KTPL", "Giáo dục Kinh tế và pháp luật"); put("TI", "Tin học");
+    put("CNCN", "Công nghệ công nghiệp"); put("CNNN", "Công nghệ nông nghiệp");
+    put("NK1", "Kể chuyện - Đọc diễn cảm"); put("NK2", "Hát – Nhạc");
+    put("NK3", "Hình họa"); put("NK4", "Trang trí");
+    put("NK5", "Hát – Nhạc cụ"); put("NK6", "Xướng âm - Thẩm âm - Tiết tấu");
+    }};
     
-    public MonPanel(Main main) {
+    public ToHopMonPanel(Main main) {
         this.mainFrame = main;
-        monBUS = new MonBUS();
-        listMon = monBUS.getList();
+        monBUS = new XtToHopMonThiBUS();
+        listToHop = monBUS.getList();
         initComponent();
-        loadDataTable(listMon);
+        loadDataTable(listToHop);
     }
     
     private void initComponent() {
@@ -159,17 +176,17 @@ public class MonPanel extends JPanel implements ActionListener, ItemListener{
         contentCenter.add(pnlMain, BorderLayout.CENTER);
     }
     
-    public void loadDataTable(List<Mon> list) {
+    public void loadDataTable(List<XtToHopMonThi> list) {
         java.util.List<Object[]> data = new java.util.ArrayList<>();
 
-        for (Mon m : list) {
+        for (XtToHopMonThi m : list) {
             data.add(new Object[]{
-                m.getId(),
-                m.getMaToHop(),
+                m.getIdtohop(),
+                m.getMatohop(),
                 m.getMon1(),
                 m.getMon2(),
                 m.getMon3(),
-                m.getTenToHop()
+                m.getTentohop()
             });
         }
         paginatedTable.setData(data);
@@ -179,7 +196,7 @@ public class MonPanel extends JPanel implements ActionListener, ItemListener{
         String keyword = search.txtSearchForm.getText();
         String searchType = (String) search.cbxChoose.getSelectedItem();
 
-        List<Mon> result = monBUS.search(searchType, keyword);
+        List<XtToHopMonThi> result = monBUS.search(searchType, keyword);
         loadDataTable(result);
     }
     
@@ -216,6 +233,8 @@ public class MonPanel extends JPanel implements ActionListener, ItemListener{
 //        } else 
         if (e.getSource() == mainFunction.btn.get("import")) {
             importExcel();
+        } else if (e.getSource() == mainFunction.btn.get("create")) {
+            new ToHopMonDialog(this, monBUS, null, mainFrame, "Tạo tổ hợp mới").setVisible(true);
         }
     }
 
@@ -227,84 +246,91 @@ public class MonPanel extends JPanel implements ActionListener, ItemListener{
             return;
         }
 
-        java.io.File file = fileChooser.getSelectedFile();
-        try {
-            Map<String, Mon> monMap = new LinkedHashMap<>();
-            Pattern pattern = Pattern.compile("(\\w+)\\((\\w+)-(\\d+),(\\w+)-(\\d+),(\\w+)-(\\d+)\\)");
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setIndeterminate(true);
+        JOptionPane pane = new JOptionPane(progressBar, JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = pane.createDialog(mainFrame, "Importing");
+        dialog.setModal(true);
+        dialog.pack();
+ 
+        SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                System.out.println("Import started");
+                java.io.File file = fileChooser.getSelectedFile();
+                try {
+                    Map<String, XtToHopMonThi> monMap = new LinkedHashMap<>();
+                    Pattern pattern = Pattern.compile("(\\w+)\\((\\w+)-(\\d+),(\\w+)-(\\d+),(\\w+)-(\\d+)\\)");
 
-            try (FileInputStream fis = new FileInputStream(file);
-                 Workbook workbook = file.getName().toLowerCase().endsWith(".xlsx")
-                         ? new XSSFWorkbook(fis) : new HSSFWorkbook(fis)) {
+                    try (FileInputStream fis = new FileInputStream(file);
+                        Workbook workbook = file.getName().toLowerCase().endsWith(".xlsx")
+                                ? new XSSFWorkbook(fis) : new HSSFWorkbook(fis)) {
 
-                Sheet sheet = workbook.getSheetAt(0);
-                boolean headerSkipped = false;
+                        Sheet sheet = workbook.getSheetAt(0);
+                        boolean headerSkipped = false;
 
-                for (Row row : sheet) {
-                    if (!headerSkipped) {
-                        headerSkipped = true;
-                        continue;
+                        for (Row row : sheet) {
+                            if (!headerSkipped) {
+                                headerSkipped = true;
+                                continue;
+                            }
+
+                            // Cột 3: MA_TO_HOP dạng "B03(TO-3,VA-3,SI-1)"
+                            String maToHopRaw = getCellString(row, 3);
+                            if (maToHopRaw.isEmpty()) continue;
+
+                            Matcher matcher = pattern.matcher(maToHopRaw);
+                            if (!matcher.find()) continue;
+
+                            String maTohop = matcher.group(1);
+                            if (monMap.containsKey(maTohop)) continue;
+
+                            String mon1 = matcher.group(2);
+                            String mon2 = matcher.group(4);
+                            String mon3 = matcher.group(6);
+                            
+                            String tenTohop = tenMap.get(mon1) + ", " + tenMap.get(mon2) + ", " + tenMap.get(mon3);
+
+                            XtToHopMonThi th = new XtToHopMonThi(maTohop, mon1.toUpperCase(), mon2.toUpperCase(), mon3.toUpperCase(), tenTohop);
+                            monMap.put(maTohop, th);
+                        }
                     }
 
-                    // Cột 3: MA_TO_HOP dạng "B03(TO-3,VA-3,SI-1)"
-                    String maToHopRaw = getCellString(row, 3);
-                    if (maToHopRaw.isEmpty()) continue;
-
-                    Matcher matcher = pattern.matcher(maToHopRaw);
-                    if (!matcher.find()) continue;
-
-                    String maTohop = matcher.group(1);
-                    if (monMap.containsKey(maTohop)) continue;
-
-                    String mon1 = matcher.group(2);
-                    String mon2 = matcher.group(4);
-                    String mon3 = matcher.group(6);
-
-                    // Cột 5: TEN_TO_HOP
-                    String tenTohop = getCellString(row, 5);
-                    if (tenTohop.isEmpty()) tenTohop = maTohop;
-
-                    Mon th = new Mon(maTohop, mon1.toUpperCase(), mon2.toUpperCase(), mon3.toUpperCase(), tenTohop);
-                    monMap.put(maTohop, th);
-                }
-            }
-
-            List<Mon> toImport = new ArrayList<>();
-            for (Mon th : monMap.values()) {
-                boolean existing = monBUS.existMaToHop(th.getMaToHop());
-                if (existing == false) {
-                    toImport.add(th);
-                }
-            }
-
-            System.out.println("Done checking existing");
-            System.out.println("Starting import");
-            System.out.println(toImport.isEmpty());
-           
-            if (!toImport.isEmpty()) {
-                SwingWorker<Void, Integer> worker = new SwingWorker<>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        System.out.println("Import started");
-                        monBUS.importToDB(toImport); 
-                        return null;
-                    }   
-
-                    @Override
-                    protected void done() {
-                        JOptionPane.showMessageDialog(null, "Import hoàn tất!", "Kết quả Import", JOptionPane.INFORMATION_MESSAGE);
-                        listMon = monBUS.refreshList();
-                        loadDataTable(listMon);
+                    List<XtToHopMonThi> toImport = new ArrayList<>();
+                    for (XtToHopMonThi th : monMap.values()) {
+                        boolean existing = monBUS.existMaToHop(th.getMatohop());
+                        if (existing == false) {
+                            toImport.add(th);
+                        }
                     }
-                };
+
+                    System.out.println("Done checking existing");
+                    System.out.println("Starting import");
+                    System.out.println(toImport.isEmpty());
                 
-                worker.execute();
+                    if (!toImport.isEmpty())
+                        monBUS.importToDB(toImport);
+                    
+                    return null;
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(mainFrame,
+                                "Lỗi đọc file Excel: " + ex.getMessage(),
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Lỗi đọc file Excel: " + ex.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+
+            @Override
+            protected void done() {
+                dialog.dispose();
+                listToHop = monBUS.refreshList();
+                loadDataTable(listToHop);
+                JOptionPane.showMessageDialog(mainFrame, "Hoàn tất Import!");
+            }
+        };
+
+        worker.execute();
+        dialog.setVisible(true);
     }
 
     private String getCellString(Row row, int col) {

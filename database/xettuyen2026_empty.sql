@@ -1072,7 +1072,7 @@ INSERT INTO `xt_thisinhxettuyen25` (`idthisinh`, `cccd`, `sobaodanh`, `ho`, `ten
 --
 
 CREATE TABLE `xt_tohop_monthi` (
-  `idtohop` int(11) NOT NULL,
+  `idtohop` int(11) NOT NULL AUTO_INCREMENT,
   `matohop` varchar(45) NOT NULL,
   `mon1` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `mon2` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,

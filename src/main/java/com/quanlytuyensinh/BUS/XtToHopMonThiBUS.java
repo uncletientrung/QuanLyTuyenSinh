@@ -4,8 +4,10 @@
  */
 package com.quanlytuyensinh.BUS;
 
-import com.quanlytuyensinh.DAO.MonDAO;
-import com.quanlytuyensinh.ENTITY.Mon;
+import com.quanlytuyensinh.DAO.XtToHopMonThiDAO;
+import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,23 +15,23 @@ import java.util.stream.Collectors;
  *
  * @author ASUS
  */
-public class MonBUS {
-    private final MonDAO monDAO = MonDAO.getInstance();
-    private List<Mon> listMon;
+public class XtToHopMonThiBUS {
+    private final XtToHopMonThiDAO tohopDAO = XtToHopMonThiDAO.getInstance();
+    private List<XtToHopMonThi> listMon;
     
-    public MonBUS() {
-        listMon = monDAO.getAll();
+    public XtToHopMonThiBUS() {
+        listMon = tohopDAO.getAll();
     }
     
-    public List<Mon> getList() {
+    public List<XtToHopMonThi> getList() {
         return listMon;
     }
     
-    public List<Mon> refreshList() {
-        return monDAO.getAll();
+    public List<XtToHopMonThi> refreshList() {
+        return tohopDAO.getAll();
     }
     
-    public List<Mon> search(String type, String keyword) {
+    public List<XtToHopMonThi> search(String type, String keyword) {
          if (keyword == null || keyword.trim().isEmpty()) {
             return listMon;
         }
@@ -39,7 +41,7 @@ public class MonBUS {
         switch (type) {
             case "Mã":
                 return listMon.stream()
-                        .filter(qd -> String.valueOf(qd.getMaToHop()).contains(lowerKeyword))
+                        .filter(qd -> String.valueOf(qd.getMatohop()).contains(lowerKeyword))
                         .collect(Collectors.toList());
             case "Môn 1":
                 return listMon.stream()
@@ -58,30 +60,35 @@ public class MonBUS {
                         .collect(Collectors.toList());
             case "Tên tổ hợp":
                 return listMon.stream()
-                        .filter(qd -> qd.getTenToHop() != null
-                        && qd.getTenToHop().toLowerCase().contains(lowerKeyword))
+                        .filter(qd -> qd.getTentohop() != null
+                        && qd.getTentohop().toLowerCase().contains(lowerKeyword))
                         .collect(Collectors.toList());
             case "Tất cả":
             default:
                 return listMon.stream()
                         .filter(qd
-                                -> (qd.getMaToHop() != null && qd.getMaToHop().toLowerCase().contains(lowerKeyword))
+                                -> (qd.getMatohop() != null && qd.getMatohop().toLowerCase().contains(lowerKeyword))
                         || (qd.getMon1() != null && qd.getMon1().toLowerCase().contains(lowerKeyword))
                         || (qd.getMon2() != null && qd.getMon2().toLowerCase().contains(lowerKeyword))
                         || (qd.getMon3() != null && qd.getMon3().toLowerCase().contains(lowerKeyword))
-                        || (qd.getTenToHop() != null && qd.getTenToHop().toLowerCase().contains(lowerKeyword))
-                            || String.valueOf(qd.getId()).contains(lowerKeyword)
+                        || (qd.getTentohop() != null && qd.getTentohop().toLowerCase().contains(lowerKeyword))
+                        || String.valueOf(qd.getIdtohop()).contains(lowerKeyword)
                         )
                         .collect(Collectors.toList());
         }
     }
     
     public boolean existMaToHop(String ma) {
-        return monDAO.existMaToHop(ma);
+        return tohopDAO.existMaToHop(ma);
     }
     
-    public void importToDB(List<Mon> list) {
-        monDAO.importToDB(list);
+    public String existToHopMon(String mon1, String mon2, String mon3) {
+        List<String> toHop = Arrays.asList(mon1, mon2, mon3);
+        return tohopDAO.existToHopMon(toHop);
+    }
+    
+    public void importToDB(List<XtToHopMonThi> list) {
+        tohopDAO.importToDB(list);
         return;
     }
 }

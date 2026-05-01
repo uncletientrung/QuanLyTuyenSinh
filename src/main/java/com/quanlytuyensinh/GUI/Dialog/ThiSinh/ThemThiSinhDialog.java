@@ -4,241 +4,245 @@
  */
 package com.quanlytuyensinh.GUI.Dialog.ThiSinh;
 
-import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
 import com.quanlytuyensinh.GUI.Component.ButtonCustom;
-import com.quanlytuyensinh.GUI.Component.InputForm;
-import com.quanlytuyensinh.GUI.Main;
-
+import com.quanlytuyensinh.GUI.Component.VerticalInputForm;
+import com.quanlytuyensinh.GUI.Component.VerticalComboBoxForm;
+import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
+import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import com.quanlytuyensinh.GUI.Component.NumericDocumentFilter;
+import com.quanlytuyensinh.helper.Validation;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.text.PlainDocument;
 
-/**
- *
- * @author DELL
- */
 public class ThemThiSinhDialog extends JDialog {
 
-    private Main mainFrame;
     private ThiSinhPanel parent;
-    private String currentType;
-    private String title;
+    private XtThisinhXetTuyen25BUS bus = new XtThisinhXetTuyen25BUS();
+    private XtThisinhXetTuyen25 currentThiSinh;
+    private String type; // "create" hoặc "edit"
 
-    // Input fields
-    private InputForm inputCCCD;
-    private InputForm inputSBD;
-    private InputForm inputHo;
-    private InputForm inputTen;
-    private InputForm inputSDT;
-    private InputForm inputEmail;
-    private InputForm inputNoiSinh;
-    private InputForm inputNgaySinh;
+    // Form fields
+    private VerticalInputForm txtCCCD, txtSBD, txtHo, txtTen, txtNgaySinh,
+            txtSDT, txtEmail, txtNoiSinh, txtPassword, txtPasswordConfirm;
 
-    // ComboBox fields
-    private JComboBox<String> cboGioiTinh;
-    private JComboBox<String> cboKhuVuc;
-    private JComboBox<String> cboDuoiTuong;
+    private VerticalComboBoxForm cbbGioiTinh, cbbKhuVuc, cbbDoiTuong;
 
-    // Buttons
-    private ButtonCustom btnLuu;
-    private ButtonCustom btnDong;
+    private ButtonCustom btnLuu, btnHuy;
 
     public ThemThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title, String type, boolean modal) {
         super(owner, title, modal);
-        this.mainFrame = (Main) owner;
         this.parent = parent;
-        this.currentType = type;
-        this.title = title;
-        init();
+        this.type = type;
+        this.setTitle(title);
+
+        initComponents();
+    }
+
+    private void initComponents() {
+        this.setSize(950, 720);
+        this.setLayout(new BorderLayout());
+        this.setLocationRelativeTo(null);
+        this.getContentPane().setBackground(Color.WHITE);
+
+        initMainPanel();
+        initButtonPanel();
+
+        this.add(pnlMain, BorderLayout.CENTER);
+        this.add(pnlButtons, BorderLayout.SOUTH);
+
+        if ("edit".equals(type) && currentThiSinh != null) {
+            loadData();
+        }
+
         this.setVisible(true);
     }
 
-    private void init() {
-        this.setSize(900, 500);
-        this.setLocationRelativeTo(getOwner());
-        this.setResizable(false);
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    private JPanel pnlMain, pnlButtons;
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+    private void initMainPanel() {
+        pnlMain = new JPanel(new GridLayout(1, 2, 40, 0));
+        pnlMain.setBorder(new EmptyBorder(30, 40, 30, 40));
+        pnlMain.setBackground(Color.WHITE);
 
-        // ===== HEADER =====
-        JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(70, 160, 220));
-        headerPanel.setPreferredSize(new Dimension(700, 60));
-        headerPanel.setLayout(new BorderLayout());
+        JPanel left = new JPanel(new GridLayout(7, 1, 0, 18));
+        JPanel right = new JPanel(new GridLayout(7, 1, 0, 18));
+        left.setBackground(Color.WHITE);
+        right.setBackground(Color.WHITE);
 
-        JLabel lblHeader = new JLabel(title, SwingConstants.CENTER);
-        lblHeader.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblHeader.setForeground(Color.WHITE);
-        lblHeader.setBorder(new EmptyBorder(10, 0, 10, 0));
-        headerPanel.add(lblHeader, BorderLayout.CENTER);
+        // ==================== LEFT COLUMN ====================
+        txtCCCD = new VerticalInputForm("CCCD / CMND");
+        txtSBD = new VerticalInputForm("Số báo danh (SBD)");
+        txtHo = new VerticalInputForm("Họ");
+        txtTen = new VerticalInputForm("Tên");
+        txtNgaySinh = new VerticalInputForm("Ngày sinh (dd/MM/yyyy)");
+        txtSDT = new VerticalInputForm("Số điện thoại");
+        txtPassword = new VerticalInputForm("Mật khẩu");
+        txtPasswordConfirm = new VerticalInputForm("Xác nhận mật khẩu");
 
-        // ===== FORM PANEL =====
-        JPanel formPanel = new JPanel();
-        formPanel.setBackground(Color.WHITE);
-        formPanel.setLayout(new GridLayout(6,2 , 10, 10));
+        cbbGioiTinh = new VerticalComboBoxForm("Giới tính",new String[]{"Nam", "Nữ"});
 
-        // --- Row 1: CCCD | SBD ---
-        inputCCCD = new InputForm("CCCD:", 280, 65);
-        inputSBD = new InputForm("SBD:", 280, 65);
+        left.add(txtCCCD);
+        left.add(txtSBD);
+        left.add(txtHo);
+        left.add(txtTen);
+        left.add(txtNgaySinh);
+        left.add(txtSDT);
+        left.add(cbbGioiTinh);
 
-        formPanel.add(inputCCCD, formPanel);
-        formPanel.add(inputSBD, formPanel);
+        // ==================== RIGHT COLUMN ====================
+        txtEmail = new VerticalInputForm("Email");
+        txtNoiSinh = new VerticalInputForm("Nơi sinh");
+        
+        cbbKhuVuc = new VerticalComboBoxForm("Khu vực", 
+            new String[]{"KV1", "KV2", "KV2-NT", "KV3"});
+        
+        cbbDoiTuong = new VerticalComboBoxForm("Đối tượng ưu tiên", 
+            new String[]{"Không ưu tiên", "Ưu tiên 1", "Ưu tiên 2"});
 
-        // --- Row 2: Ho | Ten ---
-        inputHo = new InputForm("Họ:", 280, 65);
-        inputTen = new InputForm("Tên:", 280, 65);
+        // Thêm các trường còn lại (có thể để trống hoặc có giá trị mặc định)
+        
+        right.add(txtEmail);
+        right.add(txtNoiSinh);
+        right.add(cbbKhuVuc);
+        right.add(cbbDoiTuong);
+        right.add(txtPassword);   // di chuyển xuống nếu cần cân bằng layout
+        right.add(txtPasswordConfirm);   // di chuyển xuống nếu cần cân bằng layout
 
-        formPanel.add(inputHo, formPanel);
-        formPanel.add(inputTen, formPanel);
+        pnlMain.add(left);
+        pnlMain.add(right);
+    }
 
-        // --- Row 3: Gioi tinh (ComboBox) | Ngay sinh ---
-        JPanel pnlGioiTinh = createLabelComboPanel("Giới tính:", new String[]{"Nam", "Nữ"});
-        cboGioiTinh = (JComboBox<String>) ((JPanel) pnlGioiTinh.getComponent(1)).getComponent(0);
+    private void initButtonPanel() {
+        pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
+        pnlButtons.setBackground(Color.WHITE);
+        pnlButtons.setBorder(new EmptyBorder(15, 0, 25, 0));
 
-        inputNgaySinh = new InputForm("Ngày sinh:", 280, 65);
+        String btnText = "create".equals(type) ? "Thêm thí sinh" : "Lưu thay đổi";
 
-        formPanel.add(pnlGioiTinh, formPanel);
-        formPanel.add(inputNgaySinh, formPanel);
+        btnLuu = new ButtonCustom(btnText, "success", 15);
+        btnHuy = new ButtonCustom("Hủy bỏ", "danger", 15);
 
-        // --- Row 4: SDT | Email ---
-        inputSDT = new InputForm("SĐT:", 280, 65);
-        inputEmail = new InputForm("Email:", 280, 65);
+        btnLuu.setPreferredSize(new Dimension(160, 48));
+        btnHuy.setPreferredSize(new Dimension(160, 48));
 
-        formPanel.add(inputSDT, formPanel);
-        formPanel.add(inputEmail, formPanel);
+//        btnLuu.addActionListener(e -> {
+//            if (validateInput()) {
+//                saveThiSinh();
+//            }
+//        });
 
-        // --- Row 5: Noi sinh | Khu vuc (ComboBox) ---
-        inputNoiSinh = new InputForm("Nơi sinh:", 280, 65);
+        btnHuy.addActionListener(e -> dispose());
 
-        JPanel pnlKhuVuc = createLabelComboPanel("Khu vực:", new String[]{"Khu vực 1", "Khu vực 2", "Khu vực 3"});
-        cboKhuVuc = (JComboBox<String>) ((JPanel) pnlKhuVuc.getComponent(1)).getComponent(0);
+        pnlButtons.add(btnLuu);
+        pnlButtons.add(btnHuy);
+    }
 
-        formPanel.add(inputNoiSinh, formPanel);
-        formPanel.add(pnlKhuVuc, formPanel);
+//    private void saveThiSinh() {
+//        XtThisinhXetTuyen25 ts = new XtThisinhXetTuyen25();
+//
+//        ts.setCccd(txtCCCD.getText().trim());
+//        ts.setSobaodanh(txtSBD.getText().trim());
+//        ts.setHo(txtHo.getText().trim());
+//        ts.setTen(txtTen.getText().trim());
+//        ts.setNgaySinh(convertDateFormat(txtNgaySinh.getText().trim()));
+//        ts.setDienThoai(txtSDT.getText().trim());
+//        ts.setEmail(txtEmail.getText().trim());
+//        ts.setNoiSinh(txtNoiSinh.getText().trim());
+//        ts.setGioiTinh((String) cbbGioiTinh.getSelectedValue());
+//        ts.setKhuVuc((String) cbbKhuVuc.getSelectedValue());
+//        ts.setDoiTuong((String) cbbDoiTuong.getSelectedValue());
+//        ts.setPassword(txtPassword.getText().trim());   // quan trọng: mật khẩu
+//
+//        // Các trường tự động
+//        ts.setUpdatedAt(java.sql.Date.valueOf(LocalDate.now()));
+//
+//        try {
+//            if ("create".equals(type)) {
+//                if (bus.insertThiSinh(ts)) {   // Bạn cần có phương thức này trong BUS
+//                    JOptionPane.showMessageDialog(this, "Thêm thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+//                    parent.listTS = bus.getAllThiSinh();   // refresh list
+//                    parent.loadDataTable(parent.listTS);
+//                    dispose();
+//                }
+//            } else {
+//                // edit logic (nếu cần sau này)
+//                JOptionPane.showMessageDialog(this, "Chức năng chỉnh sửa đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+//            }
+//        } catch (Exception ex) {
+//            JOptionPane.showMessageDialog(this, "Lỗi khi lưu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+//            ex.printStackTrace();
+//        }
+//    }
 
-        // --- Row 6: Doi tuong (ComboBox) ---
-        JPanel pnlDoiTuong = createLabelComboPanel("Đối tượng:", new String[]{"Không ưu tiên", "Ưu tiên 1", "Ưu tiên 2"});
-        cboDuoiTuong = (JComboBox<String>) ((JPanel) pnlDoiTuong.getComponent(1)).getComponent(0);
-
-        formPanel.add(pnlDoiTuong, formPanel);
-
-        // ===== BUTTON PANEL =====
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.setBorder(new EmptyBorder(5, 0, 15, 0));
-
-        btnLuu = new ButtonCustom("Lưu thông tin", "excel", 14, 160, 42);
-        btnDong = new ButtonCustom("Đóng", "success", 14, 120, 42);
-
-        btnLuu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleSave();
-            }
-        });
-
-        btnDong.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
-        buttonPanel.add(btnLuu);
-        buttonPanel.add(btnDong);
-
-        // ===== ASSEMBLE =====
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
-        mainPanel.add(formPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        this.setContentPane(mainPanel);
-
-        // Pre-fill data if editing
-        if ("edit".equals(currentType)) {
-            loadData();
+    private String convertDateFormat(String input) {
+        if (input == null || input.trim().isEmpty()) return null;
+        
+        // Chuyển từ dd/MM/yyyy sang yyyy-MM-dd (phù hợp với DB)
+        DateTimeFormatter inputFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter dbFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        
+        try {
+            LocalDate date = LocalDate.parse(input, inputFmt);
+            return date.format(dbFmt);
+        } catch (DateTimeParseException e) {
+            return input; // giữ nguyên nếu đã đúng format
         }
     }
 
-    /**
-     * Helper: tạo panel gồm JLabel + JComboBox (giống style InputForm)
-     */
-    private JPanel createLabelComboPanel(String labelText, String[] items) {
-        JPanel wrapper = new JPanel(new GridLayout(2, 1));
-        wrapper.setBackground(Color.WHITE);
-        wrapper.setBorder(new EmptyBorder(0, 10, 5, 10));
-        wrapper.setPreferredSize(new Dimension(280, 65));
-
-        JLabel lbl = new JLabel(labelText);
-        lbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
-
-        JPanel comboWrapper = new JPanel(new BorderLayout());
-        comboWrapper.setBackground(Color.WHITE);
-        JComboBox<String> combo = new JComboBox<>(items);
-        combo.setBackground(Color.WHITE);
-        comboWrapper.add(combo, BorderLayout.CENTER);
-
-        wrapper.add(lbl);
-        wrapper.add(comboWrapper);
-        return wrapper;
-    }
-
-    private void handleSave() {
-        String cccd = inputCCCD.getText().trim();
-        String sbd = inputSBD.getText().trim();
-        String ho = inputHo.getText().trim();
-        String ten = inputTen.getText().trim();
-        String sdt = inputSDT.getText().trim();
-        String email = inputEmail.getText().trim();
-        String noiSinh = inputNoiSinh.getText().trim();
-        String ngaySinh = inputNgaySinh.getText().trim();
-        String gioiTinh = (String) cboGioiTinh.getSelectedItem();
-        String khuVuc = (String) cboKhuVuc.getSelectedItem();
-        String doiTuong = (String) cboDuoiTuong.getSelectedItem();
-
-        // Basic validation
-        if (cccd.isEmpty() || ho.isEmpty() || ten.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Vui lòng điền đầy đủ thông tin bắt buộc (CCCD, Họ, Tên)!",
-                "Thiếu thông tin", JOptionPane.WARNING_MESSAGE);
-            return;
+    private boolean validateInput() {
+        if (Validation.isEmpty(txtCCCD.getText())) {
+            JOptionPane.showMessageDialog(this, "CCCD không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtCCCD.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtHo.getText())) {
+            JOptionPane.showMessageDialog(this, "Họ không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtHo.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtTen.getText())) {
+            JOptionPane.showMessageDialog(this, "Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtTen.getTxtForm().requestFocus();
+            return false;
+        }
+        if (Validation.isEmpty(txtNgaySinh.getText())) {
+            JOptionPane.showMessageDialog(this, "Ngày sinh không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtNgaySinh.getTxtForm().requestFocus();
+            return false;
         }
 
-        // TODO: Gọi DAO/Service để lưu vào database
-        // Ví dụ: ThiSinhDAO.save(new ThiSinh(cccd, sbd, ho, ten, ...));
+        // Kiểm tra định dạng ngày sinh
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate.parse(txtNgaySinh.getText().trim(), fmt);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Ngày sinh không đúng định dạng (dd/MM/yyyy)!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtNgaySinh.getTxtForm().requestFocus();
+            return false;
+        }
 
-        JOptionPane.showMessageDialog(this,
-            "Lưu thông tin thành công!",
-            "Thành công", JOptionPane.INFORMATION_MESSAGE);
-
-
-        dispose();
+        return true;
     }
-
 
     private void loadData() {
-        // TODO: Load dữ liệu thí sinh từ DAO theo ID
-        // Ví dụ:
-        // ThiSinh ts = ThiSinhDAO.findById(selectedId);
-        // inputCCCD.setText(ts.getCccd());
-        // inputSBD.setText(ts.getSbd());
-        // ...
+        // TODO: Implement khi cần chức năng Edit
+        if (currentThiSinh != null) {
+            txtCCCD.setText(currentThiSinh.getCccd());
+            txtSBD.setText(currentThiSinh.getSobaodanh());
+            txtHo.setText(currentThiSinh.getHo());
+            txtTen.setText(currentThiSinh.getTen());
+            // ... load các trường khác
+        }
     }
 
-    // ===== GETTERS =====
-    public String getCCCD()     { return inputCCCD.getText(); }
-    public String getSBD()      { return inputSBD.getText(); }
-    public String getHo()       { return inputHo.getText(); }
-    public String getTen()      { return inputTen.getText(); }
-    public String getSDT()      { return inputSDT.getText(); }
-    public String getEmail()    { return inputEmail.getText(); }
-    public String getNoiSinh()  { return inputNoiSinh.getText(); }
-    public String getNgaySinh() { return inputNgaySinh.getText(); }
-    public String getGioiTinh() { return (String) cboGioiTinh.getSelectedItem(); }
-    public String getKhuVuc()   { return (String) cboKhuVuc.getSelectedItem(); }
-    public String getDoiTuong() { return (String) cboDuoiTuong.getSelectedItem(); }
+    // Getter nếu cần
+    public void setCurrentThiSinh(XtThisinhXetTuyen25 ts) {
+        this.currentThiSinh = ts;
+    }
 }

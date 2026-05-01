@@ -8,6 +8,7 @@ import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
+import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
@@ -31,6 +32,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  *
@@ -40,11 +43,10 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
     PanelBorderRadius pnlMain, functionBar;
     Main mainFrame;
     JPanel pnlBorder1, pnlBorder2, pnlBorder3, pnlBorder4, contentCenter;
-    JTable tableThiSinh;
-    JScrollPane scrollTableThiSinh;
     MainFunction mainFunction; // Thanh function
     IntegratedSearch search; // Thanh Search
-    DefaultTableModel tblModel;
+    private PaginatedTable paginatedTable;
+
 
     XtThisinhXetTuyen25BUS TSBUS;
     List<XtThisinhXetTuyen25> listTS;
@@ -63,36 +65,44 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         this.setLayout(new BorderLayout(0, 0));
         this.setOpaque(true);
 
-        tableThiSinh = new JTable();
-        scrollTableThiSinh = new JScrollPane();
-
-        tblModel = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
         // Table Header
         String[] header = new String[] { "ID", "CCCD", "SBD", "Họ", "Tên", "Giới tính", "Ngày sinh", "SĐT", "Email",
                 "Nơi sinh", "Khu vực", "Đối tượng" };
-        tblModel.setColumnIdentifiers(header);
-        tableThiSinh.setModel(tblModel);
-        tableThiSinh.setFocusable(false);
-        tableThiSinh.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tableThiSinh.getTableHeader().setPreferredSize(new Dimension(0, 40));
-        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tableThiSinh.getTableHeader()
-                .getDefaultRenderer();
+        paginatedTable = new PaginatedTable(header);
+
+        JTable table = paginatedTable.getTable();
+        table.setFocusable(false);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        table.setAutoCreateRowSorter(true);
+        TableSorter.configureTableColumnSorter(table, 0, TableSorter.INTEGER_COMPARATOR);
+        
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader() .getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        scrollTableThiSinh.setViewportView(tableThiSinh);
+        
         // Table Cell
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 0; i < tableThiSinh.getColumnCount(); i++) {
-            tableThiSinh.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
-        // Table Sorter
-        tableThiSinh.setAutoCreateRowSorter(true);
-        TableSorter.configureTableColumnSorter(tableThiSinh, 0, TableSorter.INTEGER_COMPARATOR);
+        
+        table.setAutoCreateRowSorter(false);
+        Comparator<Object>[] comps = new Comparator[12];
+        comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
+        comps[1] = TableSorter.STRING_COMPARATOR;      // CCCD
+        comps[2] = TableSorter.STRING_COMPARATOR;      // SBD
+        comps[3] = TableSorter.STRING_COMPARATOR;      // Họ
+        comps[4] = TableSorter.STRING_COMPARATOR;      // Tên
+        comps[5] = TableSorter.STRING_COMPARATOR;      // Giới tính
+        comps[6] = TableSorter.DATE_COMPARATOR;      // Ngày sinh
+        comps[7] = TableSorter.STRING_COMPARATOR;      // SDT
+        comps[8] = TableSorter.STRING_COMPARATOR;      // Email
+        comps[9] = TableSorter.STRING_COMPARATOR;      // Nơi sinh
+        comps[10] = TableSorter.STRING_COMPARATOR;      // Khu vực
+        comps[11] = TableSorter.STRING_COMPARATOR;      // Đối tượng
+        
+        paginatedTable.enableFullDataSorting(comps);
 
         // Tạo khung viền
         pnlBorder1 = new JPanel();
@@ -152,18 +162,18 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         pnlMain = new PanelBorderRadius();
         pnlMain.setLayout(new BorderLayout());
         pnlMain.setBackground(Color.WHITE);
-        pnlMain.add(scrollTableThiSinh, BorderLayout.CENTER);
+        pnlMain.add(paginatedTable, BorderLayout.CENTER);
         contentCenter.add(pnlMain, BorderLayout.CENTER);
 
     }
 
     private void loadDataTable(List<XtThisinhXetTuyen25> listTS) {
-        tblModel.setRowCount(0);
+        List<Object[]> data = new ArrayList<>();
         DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         for (XtThisinhXetTuyen25 ts : listTS) {
-            tblModel.addRow(new Object[] {
-                    "TS-" + ts.getIdthisinh(),
+            data.add(new Object[] {
+                    ts.getIdthisinh(),
                     ts.getCccd(),
                     ts.getSobaodanh(),
                     ts.getHo(),
@@ -177,6 +187,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                     ts.getDoiTuong()
             });
         }
+        paginatedTable.setData(data);
     }
 
     @Override

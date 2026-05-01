@@ -18,6 +18,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 import com.quanlytuyensinh.BUS.XtToHopMonThiBUS;
 import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
@@ -73,6 +77,27 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
 
         tenToHop.setDisable();
         btnConfirm.setEnabled(false);
+
+        AbstractDocument doc = (AbstractDocument) maToHop.getTxtForm().getDocument();
+        doc.setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) 
+                throws BadLocationException {
+                
+                // Convert input to uppercase and remove anything that isn't A-Z or 0-9
+                String fixedText = text.toUpperCase().replaceAll("[^A-Z0-9]", "");
+                
+                super.replace(fb, offset, length, fixedText, attrs);
+            }
+        
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) 
+                throws BadLocationException {
+                
+                String fixedText = string.toUpperCase().replaceAll("[^A-Z0-9]", "");
+                super.insertString(fb, offset, fixedText, attr);
+            }
+        });
     
         mon1.getCbb().addActionListener(e -> {
             String tenMon1 = mon1.getValue();
@@ -132,6 +157,8 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
         pbottom.setBackground(Color.WHITE);
         pbottom.setBorder(new EmptyBorder(0, 0, 20, 0));
         
+        btnConfirm.addActionListener(this);
+        btnCancel.addActionListener(this);
         pbottom.add(btnConfirm);
         pbottom.add(btnCancel);
 
@@ -144,32 +171,18 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
         if (e.getSource() == btnCancel) {
             dispose();
         } else if (e.getSource() == btnConfirm) {
-            if (selectedToHop == newToHop)
-                dispose();
-            validate(newToHop);
-            if (selectedToHop == null) return;
-                //Create new Entity
-            else
-                return;
-                //Edit Entity
+            if (selectedToHop == null) {
+                String existIn;
+                String tenMon1 = mon1.getValue();
+                String tenMon2 = mon2.getValue();
+                String tenMon3 = mon3.getValue();
+                if (bus.existMaToHop(maToHop.getText())) {
+                    JOptionPane.showMessageDialog(this, "Mã tổ hợp " + maToHop.getText() + " đã tồn tại!", "Kiểm tra lại thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+                } else if ((existIn = bus.existToHopMon(tenMon1, tenMon2, tenMon3)) != "") {
+                    JOptionPane.showMessageDialog(this, "Tổ hợp đã tồn tại với mã " + existIn, "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+                } else
+                    JOptionPane.showMessageDialog(this, "Giờ thì thêm nó vào DB thôi", "Thành công!", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
-    }
-
-    private boolean validate(XtToHopMonThi toHop) {
-        String ma = toHop.getMatohop();
-        String mon1 = toHop.getMon1();
-        String mon2 = toHop.getMon2();
-        String mon3 = toHop.getMon3();
-
-        String existIn;
-        if (bus.existMaToHop(ma)) {
-            JOptionPane.showMessageDialog(main, "Mã tổ hợp " + ma + " đã tồn tại!", "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        else if ((existIn = bus.existToHopMon(mon1, mon2, mon3)) != "") {
-            JOptionPane.showMessageDialog(main, "Tổ hợp đã tồn tại với mã " + existIn, "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
     }
 }

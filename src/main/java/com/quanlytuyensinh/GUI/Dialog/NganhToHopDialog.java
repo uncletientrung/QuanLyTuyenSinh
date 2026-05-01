@@ -6,11 +6,11 @@ import com.quanlytuyensinh.GUI.Component.NumericDocumentFilter;
 import com.quanlytuyensinh.GUI.Panel.NganhToHopPanel;
 import com.quanlytuyensinh.BUS.XtNganhToHopBUS;
 import com.quanlytuyensinh.BUS.XtNganhBUS;
-import com.quanlytuyensinh.BUS.MonBUS;
+import com.quanlytuyensinh.BUS.XtToHopMonThiBUS;
 import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNganh;
 
-import com.quanlytuyensinh.ENTITY.Mon;
+import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
 import com.quanlytuyensinh.helper.Validation;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -37,11 +37,11 @@ public class NganhToHopDialog extends JDialog {
 
     private XtNganhToHopBUS bus      = new XtNganhToHopBUS();
     private XtNganhBUS      nganhBUS = new XtNganhBUS();
-    private MonBUS          monBUS   = new MonBUS();
+    private XtToHopMonThiBUS          XtToHopMonThiBUS   = new XtToHopMonThiBUS();
 
     // Cache danh sách để tra cứu khi cần
     private List<XtNganh>       listNganh = new ArrayList<>();
-    private List<Mon> listToHop = new ArrayList<>();
+    private List<XtToHopMonThi> listToHop = new ArrayList<>();
 
     private NganhToHopPanel parent;
     private XtNganhToHop    currentRecord;
@@ -82,7 +82,7 @@ public class NganhToHopDialog extends JDialog {
     
     private void loadLists() {
         listNganh = nganhBUS.getAllNganh();
-        listToHop = monBUS.getList();  
+        listToHop = XtToHopMonThiBUS.getList();  
     }
 
     // main panel
@@ -174,8 +174,8 @@ public class NganhToHopDialog extends JDialog {
     private JComboBox<String> buildComboToHop() {
         JComboBox<String> cbb = new JComboBox<>();
         cbb.addItem("-- Chọn tổ hợp --");
-        for (Mon t : listToHop) {
-            cbb.addItem(t.getMaToHop());
+        for (XtToHopMonThi t : listToHop) {
+            cbb.addItem(t.getMatohop());
         }
         styleCombo(cbb);
         return cbb;
@@ -238,14 +238,14 @@ public class NganhToHopDialog extends JDialog {
             return;
         }
 
-        for (Mon t : listToHop) {
-            if (matohop.equals(t.getMaToHop())) {
+        for (XtToHopMonThi t : listToHop) {
+            if (matohop.equals(t.getMatohop())) {
                 txtMon1.setText(t.getMon1() != null ? t.getMon1() : "");
                 txtMon2.setText(t.getMon2() != null ? t.getMon2() : "");
                 txtMon3.setText(t.getMon3() != null ? t.getMon3() : "");
                 lblBoolMonDisplay.setText(
-                    t.getTenToHop()!= null && !t.getTenToHop().isEmpty()
-                        ? t.getTenToHop()
+                    t.getTentohop()!= null && !t.getTentohop().isEmpty()
+                        ? t.getTentohop()
                         : "(Không có tên tổ hợp)");
                 return;
             }

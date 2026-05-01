@@ -42,7 +42,7 @@ public class XtNganhToHop {
     @Column(name = "N1")
     private Boolean n1;
 
-    @Column(name = "TO")
+    @Column(name = "`TO`")
     private Boolean to;
 
     @Column(name = "LI")

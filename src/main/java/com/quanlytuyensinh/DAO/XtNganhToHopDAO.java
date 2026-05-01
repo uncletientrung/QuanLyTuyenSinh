@@ -8,6 +8,7 @@ import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
 import java.util.List;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
@@ -26,6 +27,67 @@ public class XtNganhToHopDAO {
         }catch(Exception e){
             e.printStackTrace();
             return List.of();//tra ve danh sach rong neu loi
+        }
+    }
+    
+    public boolean delete(int idNganhToHop){
+        Transaction transaction = null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            XtNganhToHop nganhTH = session.get(XtNganhToHop.class, idNganhToHop);
+            if(nganhTH != null){
+                session.remove(nganhTH);
+            }
+            transaction.commit();
+            return true;
+        }catch(Exception e){
+            if(transaction != null) transaction.rollback();
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public XtNganhToHop getNganhTHById(int idNganhTH){
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            return session.get(XtNganhToHop.class, idNganhTH);
+        }catch(Exception e){
+        e.printStackTrace();
+        return null;
+    }
+        
+        
+        
+    }
+    
+    public boolean insert(XtNganhToHop nth){
+        Transaction transaction = null;
+        try(Session sesstion = HibernateUtil.getSessionFactory().openSession()){
+            transaction = sesstion.beginTransaction();//bat dau giao dich
+            sesstion.persist(nth);//giao dich
+            transaction.commit();//ket thuc giao dicjh
+            return true;
+        }catch (Exception e){
+            if(transaction !=null){
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean update(XtNganhToHop nth){
+        Transaction transaction = null;
+        try(Session session = HibernateUtil.getSessionFactory().openSession()){
+            transaction = session.beginTransaction();
+            session.merge(nth);
+            transaction.commit();
+            return true;
+        }catch (Exception e){
+            if(transaction !=null){
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -110,15 +110,16 @@ public class NganhDialog extends JDialog {
         pnlLeft.add(txtMaNganh);
         pnlLeft.add(txtTenNganh);
         pnlLeft.add(txtToHopGoc);
-        pnlLeft.add(txtChiTieu);
-        pnlLeft.add(txtDiemSan);
-        pnlLeft.add(txtDiemTrungTuyen);
         pnlLeft.add(cbbTuyenThang);
-
-        // cot phai
-        pnlRight.add(cbbDgnl);
-        pnlRight.add(cbbThpt);
-        pnlRight.add(cbbVsat);
+        pnlLeft.add(cbbDgnl);
+        pnlLeft.add(cbbThpt);
+        pnlLeft.add(cbbVsat);
+        
+        
+        //cot phai
+        pnlRight.add(txtChiTieu);
+        pnlRight.add(txtDiemSan);
+        pnlRight.add(txtDiemTrungTuyen);     
         pnlRight.add(txtSlXtt);
         pnlRight.add(txtSlDgnl);
         pnlRight.add(txtSlVsat);

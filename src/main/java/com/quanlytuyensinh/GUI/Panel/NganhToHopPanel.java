@@ -7,6 +7,8 @@ import com.quanlytuyensinh.GUI.Component.MainFunction;
 import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
+import com.quanlytuyensinh.GUI.Dialog.NganhDialog;
+import com.quanlytuyensinh.GUI.Dialog.NganhToHopDialog;
 import com.quanlytuyensinh.GUI.Main;
 import java.awt.*;
 import java.awt.event.*;
@@ -226,36 +228,10 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
 
 
     private void performSearch() {
-        if (listNganhToHop == null) return;
-        String keyword    = search.txtSearchForm.getText().trim().toLowerCase();
+        String keyword    = search.txtSearchForm.getText().trim();
         String searchType = (String) search.cbxChoose.getSelectedItem();
-
-        if (keyword.isEmpty()) {
-            paginatedTable.setData(buildRows(listNganhToHop));
-            return;
-        }
-
-        List<Object[]> filtered = new java.util.ArrayList<>();
-        for (XtNganhToHop nth : listNganhToHop) {
-            boolean match = false;
-            switch (searchType) {
-                case "Tất cả":
-                    match = nvl(nth.getManganh()).toLowerCase().contains(keyword)
-                         || nvl(nth.getMatohop()).toLowerCase().contains(keyword)
-                         || nvl(nth.getThMon1()).toLowerCase().contains(keyword)
-                         || nvl(nth.getThMon2()).toLowerCase().contains(keyword)
-                         || nvl(nth.getThMon3()).toLowerCase().contains(keyword)
-                         || nvl(nth.getTbKeys()).toLowerCase().contains(keyword);
-                    break;
-                case "Mã ngành":   match = nvl(nth.getManganh()).toLowerCase().contains(keyword);  break;
-                case "Mã tổ hợp":  match = nvl(nth.getMatohop()).toLowerCase().contains(keyword);  break;
-                case "Môn 1":      match = nvl(nth.getThMon1()).toLowerCase().contains(keyword);   break;
-                case "Môn 2":      match = nvl(nth.getThMon2()).toLowerCase().contains(keyword);   break;
-                case "Môn 3":      match = nvl(nth.getThMon3()).toLowerCase().contains(keyword);   break;
-            }
-            if (match) filtered.add(buildRow(nth));
-        }
-        paginatedTable.setData(filtered);
+        listNganhToHop = nganhToHopBUS.searchNTH(keyword, searchType);
+        loadDataTable(listNganhToHop);    
     }
 
     private void resetSearch() {
@@ -288,12 +264,11 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this);
         Object source = e.getSource();
 
         if (source == mainFunction.btn.get("create")) {
-            JOptionPane.showMessageDialog(this,
-                "Chức năng Thêm ngành – tổ hợp chưa được thực hiện.",
-                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+             new NganhToHopDialog(this, owner, "Thêm ngành tổ hợp mới", true, "create", null);
         }
         else if (source == mainFunction.btn.get("import")) {
             JOptionPane.showMessageDialog(this,
@@ -308,19 +283,27 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
             if (selected == null) return;
 
             if (source == mainFunction.btn.get("update")) {
-                JOptionPane.showMessageDialog(this,
-                    "Chức năng Sửa chưa được thực hiện.",
-                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                new NganhToHopDialog(this, owner, "Chỉnh sửa ngành tổ hợp", true, "update", selected);
             }
             else if (source == mainFunction.btn.get("detail")) {
-                JOptionPane.showMessageDialog(this,
-                    "Chức năng Xem chi tiết chưa được thực hiện.",
-                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                new NganhToHopDialog(this, owner, "Thông tin chi tiết ngành", true, "view", selected);
             }
             else if (source == mainFunction.btn.get("delete")) {
-                JOptionPane.showMessageDialog(this,
-                    "Chức năng Xóa chưa được thực hiện.",
-                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                if(selected != null){
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                        "Xóa ngành tổ hợp: " + selected.getTbKeys()+ "?",
+                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        if (nganhToHopBUS.deleteNTH(selected.getId())) {
+                            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                            listNganhToHop = nganhToHopBUS.getAll();
+                            loadDataTable(listNganhToHop);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+          
+                }
             }
         }
     }

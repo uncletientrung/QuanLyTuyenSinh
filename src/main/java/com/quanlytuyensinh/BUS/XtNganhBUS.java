@@ -15,7 +15,6 @@ public class XtNganhBUS {
 
     private final XtNganhDAO nganhDAO;
 
-    // Constructor
     public XtNganhBUS() {
         this.nganhDAO = XtNganhDAO.getInstance();
     }

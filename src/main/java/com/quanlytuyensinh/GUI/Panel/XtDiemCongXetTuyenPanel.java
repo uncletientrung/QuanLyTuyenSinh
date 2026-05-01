@@ -9,7 +9,7 @@ import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
 import com.quanlytuyensinh.GUI.Dialog.XtDiemCongXetTuyenDialog;
 import com.quanlytuyensinh.GUI.Dialog.XtDiemCongXetTuyenExcelDialog;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

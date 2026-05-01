@@ -22,9 +22,9 @@ public class TrangChuPanel extends JPanel {
                 super.paintComponent(g);
 
                 try {
-                    FlatSVGIcon svgIcon = new FlatSVGIcon("img/dashboard.svg", getWidth(), getHeight());
+                    FlatSVGIcon svgIcon = new FlatSVGIcon(getClass().getResource("/static/img/dashboard.svg"));
 
-                    svgIcon.paintIcon(this, g, 0, 0);
+                    svgIcon.derive(getWidth(), getHeight()).paintIcon(this, g, 0, 0);
                 } catch (Exception e) {
                     g.setColor(new Color(245, 245, 245));
                     g.fillRect(0, 0, getWidth(), getHeight());

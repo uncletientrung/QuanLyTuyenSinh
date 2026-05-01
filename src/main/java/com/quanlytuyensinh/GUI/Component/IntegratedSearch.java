@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.quanlytuyensinh.GUI.Component;
+
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import java.awt.*;
@@ -26,15 +27,15 @@ public class IntegratedSearch extends JPanel {
         BoxLayout bx = new BoxLayout(this, BoxLayout.Y_AXIS);
         this.setLayout(bx);
 
-        JPanel jpSearch = new JPanel(new BorderLayout(5,10));
-        jpSearch.setBorder(new EmptyBorder(18,15,18,15));
+        JPanel jpSearch = new JPanel(new BorderLayout(5, 10));
+        jpSearch.setBorder(new EmptyBorder(18, 15, 18, 15));
         jpSearch.setBackground(Color.white);
         cbxChoose = new JComboBox();
         cbxChoose.setModel(new DefaultComboBoxModel<>(str));
         cbxChoose.setPreferredSize(new Dimension(140, 0));
         cbxChoose.setFont(new java.awt.Font(FlatRobotoFont.FAMILY, 0, 13));
         cbxChoose.setFocusable(false);
-        jpSearch.add(cbxChoose,BorderLayout.WEST);
+        jpSearch.add(cbxChoose, BorderLayout.WEST);
 
         txtSearchForm = new JTextField();
         txtSearchForm.setFont(new Font(FlatRobotoFont.FAMILY, 0, 13));
@@ -44,10 +45,10 @@ public class IntegratedSearch extends JPanel {
 
         btnReset = new JButton("Làm mới");
         btnReset.setFont(new java.awt.Font(FlatRobotoFont.FAMILY, 0, 14));
-        btnReset.setIcon(new FlatSVGIcon("./icons/refresh.svg"));
+        btnReset.setIcon(new FlatSVGIcon(getClass().getResource("/static/icons/refresh.svg")));
         btnReset.setPreferredSize(new Dimension(125, 0));
         btnReset.addActionListener(this::btnResetActionPerformed);
-        jpSearch.add(btnReset,BorderLayout.EAST);
+        jpSearch.add(btnReset, BorderLayout.EAST);
         this.add(jpSearch);
     }
 

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package GUI;
+package com.quanlytuyensinh.GUI;
 
 import com.quanlytuyensinh.GUI.Component.MenuTaskbar;
 import com.quanlytuyensinh.GUI.Panel.TrangChuPanel;
@@ -17,15 +17,18 @@ import javax.swing.border.EmptyBorder;
  *
  * @author DELL
  */
-public class Main extends  JFrame{
+public class Main extends JFrame {
+
     public JPanel MainContent;
     private MenuTaskbar menuTaskbar;
     Color MainColor = new Color(250, 250, 250);
-    public Main(){
+
+    public Main() {
         setupLAF();
         initComponent();
     }
-     // Setup Look And Feel
+    // Setup Look And Feel
+
     private void setupLAF() {
         FlatRobotoFont.install();
         FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY);
@@ -42,40 +45,34 @@ public class Main extends  JFrame{
         UIManager.put("TableHeader.height", 40);
         UIManager.put("TableHeader.background", new Color(242, 242, 242));
     }
-    
-    private void initComponent(){
+
+    private void initComponent() {
         this.setSize(new Dimension(1400, 800));
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout(0, 0));
         this.setTitle("Hệ thống quản lý tuyển sinh");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         // MENU
         menuTaskbar = new MenuTaskbar(this);
         menuTaskbar.setPreferredSize(new Dimension(250, 1400));
         this.add(menuTaskbar, BorderLayout.WEST);
-        
+
         // MAIN CONTENT
         MainContent = new JPanel();
         MainContent.setBackground(MainColor);
         MainContent.setLayout(new BorderLayout(0, 0));
         this.add(MainContent, BorderLayout.CENTER);
-        
+
         // TRANG CHỦ MẶC ĐỊNH
         this.setPanel(new TrangChuPanel());
     }
+
     public void setPanel(JPanel pn) { // Tạo Panel Trung tâm
         MainContent.removeAll();
         MainContent.add(pn, BorderLayout.CENTER);
         MainContent.repaint();
         MainContent.revalidate();
     }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new Main().setVisible(true); 
-        });
-    }
-    
-    
-    
+
 }

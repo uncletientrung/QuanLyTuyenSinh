@@ -12,7 +12,7 @@ import com.quanlytuyensinh.GUI.Panel.TrangChuPanel;
 import com.quanlytuyensinh.GUI.Panel.XtDiemCongXetTuyenPanel;
 import com.quanlytuyensinh.GUI.Panel.XtBangQuyDoiPanel;
 import com.quanlytuyensinh.GUI.Panel.NganhToHopPanel;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

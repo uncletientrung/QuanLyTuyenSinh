@@ -8,7 +8,7 @@ import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
 import com.quanlytuyensinh.GUI.Dialog.NganhDialog;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;

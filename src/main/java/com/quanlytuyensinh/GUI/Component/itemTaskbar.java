@@ -38,7 +38,7 @@ public class itemTaskbar extends JPanel implements MouseListener {
         lblIcon.setBorder(new EmptyBorder(0, 10, 0, 0));
         lblIcon.setPreferredSize(new Dimension(45, 30));
         try {
-            lblIcon.setIcon(new FlatSVGIcon("icons/" + linkIcon, 24, 24));
+            lblIcon.setIcon(new FlatSVGIcon("static/icons/" + linkIcon, 24, 24));
         } catch (Exception e) {
             System.err.println("Lỗi load icon: " + linkIcon);
         }
@@ -62,7 +62,7 @@ public class itemTaskbar extends JPanel implements MouseListener {
         lblIcon.setPreferredSize(new Dimension(80, 80));
         lblIcon.setBorder(new EmptyBorder(0, 15, 0, 0));
         try {
-            lblIcon.setIcon(new FlatSVGIcon("icons/" + linkIcon, 40, 40));
+            lblIcon.setIcon(new FlatSVGIcon("static/icons/" + linkIcon, 40, 40));
         } catch (Exception e) {
             System.err.println("Loi load icon: " + linkIcon);
         }

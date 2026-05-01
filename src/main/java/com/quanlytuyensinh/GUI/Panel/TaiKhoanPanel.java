@@ -11,7 +11,7 @@ import com.quanlytuyensinh.GUI.Component.MainFunction;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

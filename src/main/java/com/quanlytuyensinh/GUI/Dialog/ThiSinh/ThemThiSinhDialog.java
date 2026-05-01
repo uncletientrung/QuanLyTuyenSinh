@@ -7,7 +7,7 @@ package com.quanlytuyensinh.GUI.Dialog.ThiSinh;
 import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
 import com.quanlytuyensinh.GUI.Component.ButtonCustom;
 import com.quanlytuyensinh.GUI.Component.InputForm;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

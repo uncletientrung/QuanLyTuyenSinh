@@ -13,7 +13,7 @@ import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
 import com.quanlytuyensinh.GUI.Dialog.ThiSinh.ThemThiSinhDialog;
 import com.quanlytuyensinh.GUI.Dialog.testDialog;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

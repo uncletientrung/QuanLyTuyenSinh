@@ -6,12 +6,12 @@ package com.quanlytuyensinh.GUI.Panel;
 
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import javax.swing.JPanel;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
-import GUI.Main;
+import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

@@ -87,12 +87,12 @@ public class PaginatedTable extends JPanel {
             btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
         try {
-            btnPrev.setIcon(new FlatSVGIcon("icons/previous.svg", 18, 18));
+            btnPrev.setIcon(new FlatSVGIcon("static/icons/previous.svg", 18, 18));
         } catch (Exception e) {
             btnPrev.setText("< Trước");
         }
         try {
-            btnNext.setIcon(new FlatSVGIcon("icons/next.svg", 18, 18));
+            btnNext.setIcon(new FlatSVGIcon("static/icons/next.svg", 18, 18));
         } catch (Exception e) {
             btnNext.setText("Tiếp >");
         }

@@ -218,10 +218,8 @@ public class NganhDialog extends JDialog {
 
         // bus
         if (type.equals("create")) {
-            String message = bus.insertNganh(nganh);
-            JOptionPane.showMessageDialog(this, message);
-
-            if (message.contains("thành công")) {
+            if (bus.insertNganh(nganh)) {
+                JOptionPane.showMessageDialog(this, "Thêm mới thành công!");
                 parent.loadDataTable(bus.getAllNganh());
                 dispose();
             }

@@ -268,11 +268,11 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
                     ng.setSlVsat((int) row.getCell(13).getNumericCellValue());
                     ng.setSlThpt((int) row.getCell(14).getNumericCellValue());
 
-                    String msg = nganhBUS.insertNganh(ng);
-                    if (msg.contains("thành công")) {
+               
+                    if (nganhBUS.insertNganh(ng)) {
                         successCount++;
                     } else {
-                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: " + msg);
+                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: ");
                     }
 
                 } catch (Exception ex) {
@@ -361,18 +361,18 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
                 new NganhDialog(this, owner, "Thông tin chi tiết ngành", true, "view", selected);
             }
             else if (source == mainFunction.btn.get("delete")) {
-                if (JOptionPane.showConfirmDialog(this,
-                        "Xóa ngành " + selected.getTennganh() + " ?",
-                        "Xác nhận", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-
-                    String message = nganhBUS.deleteNganh(selected.getIdnganh());
-                    JOptionPane.showMessageDialog(this, message);
-
-                    if (message.contains("thành công")) {
-                        listNganh = nganhBUS.getAllNganh();
-                        loadDataTable(listNganh);
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Xóa ngành tổ hợp: " + selected.getManganh()+ "?",
+                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        if (nganhBUS.deleteNganh(selected.getIdnganh())) {
+                            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                            listNganh = nganhBUS.getAllNganh();
+                            loadDataTable(listNganh);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
-                }
             }
         }
     }

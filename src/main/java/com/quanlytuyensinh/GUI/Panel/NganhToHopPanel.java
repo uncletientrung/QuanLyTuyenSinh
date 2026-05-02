@@ -223,6 +223,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
     private String boolToText(Boolean value) {
         if (value == null) return "";
         return value ? "Có" : "Không";
+        //return value ? "✔" : "✘";
     }
 
 

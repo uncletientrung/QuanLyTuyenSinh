@@ -179,10 +179,12 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
                 ng.getNChitieu(),
                 ng.getNDiemsan(),
                 ng.getNDiemtrungtuyen(),
-                ng.getNTuyenthang(),
-                ng.getNDgnl(),
-                ng.getNThpt(),
-                ng.getNVsat(),
+                
+                StringDBToText(ng.getNTuyenthang()),               
+                StringDBToText(ng.getNDgnl()),
+                StringDBToText(ng.getNThpt()),
+                StringDBToText(ng.getNVsat()),
+                
                 ng.getSlXtt(),
                 ng.getSlDgnl(),
                 ng.getSlVsat(),
@@ -191,6 +193,11 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
         }
         paginatedTable.setData(data);
     }
+    
+    private String StringDBToText(String value) {
+        return "1".equals(value) ? "✔" : "✘";
+}
+
 
     private void performSearch() {
         String keyword    = search.txtSearchForm.getText().trim();
@@ -307,6 +314,7 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
         listNganh = nganhBUS.getAllNganh();
         loadDataTable(listNganh);
     }
+    
 
     // "Có" -> "1", "Không" -> "0"
     private String parseFlag(String value) {

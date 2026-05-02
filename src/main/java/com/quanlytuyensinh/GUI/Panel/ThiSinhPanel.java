@@ -12,7 +12,7 @@ import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
-import com.quanlytuyensinh.GUI.Dialog.ThiSinh.ThemThiSinhDialog;
+import com.quanlytuyensinh.GUI.Dialog.ThiSinh.ThiSinhDialog;
 import com.quanlytuyensinh.GUI.Dialog.testDialog;
 import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
@@ -173,7 +173,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         for (XtThisinhXetTuyen25 ts : listTS) {
             data.add(new Object[] {
-                    ts.getIdthisinh(),
+                    "TS-"+ts.getIdthisinh(),
                     ts.getCccd(),
                     ts.getSobaodanh(),
                     ts.getHo(),
@@ -190,18 +190,45 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         paginatedTable.setData(data);
     }
 
+    private XtThisinhXetTuyen25 getSelectedThiSinh() {
+        int row = paginatedTable.getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một thí sinh!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);// Mục đích là để lấy model lấy dữ liệu gốc để nếu chọn hàng đó mà sort thì nó thay đổi theo
+        String idStr  = paginatedTable.getTable().getModel().getValueAt(modelRow, 0).toString();
+        int id = Integer.parseInt(idStr.replace("TS-", ""));
+        for (XtThisinhXetTuyen25 ts : listTS) {
+            if (ts.getIdthisinh() == id) return ts;
+        }
+        return null;
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this); // Lấy Frame cha
         Object source = e.getSource();
+        
         if(source == mainFunction.btn.get("create") ){
             System.err.println("chạy");
-            new ThemThiSinhDialog(this, owner, "THÊM THÍ SINH", "create",true, () -> {
+            new ThiSinhDialog(this, owner, "THÊM THÍ SINH", "create",true, () -> {
                                                                                                                                                     listTS = TSBUS.getAllThiSinh();
-                                                                                                                                                    System.out.println(listTS.size());
                                                                                                                                                     loadDataTable(listTS);
-                                                                                                                                                }
+                                                                                                                                                }, null
             );
+        }else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
+                            source == mainFunction.btn.get("remove")){
+            XtThisinhXetTuyen25 thiSinhDuocChon = getSelectedThiSinh();
+            if (thiSinhDuocChon == null) return;
+                
+            if(source == mainFunction.btn.get("detail") ){
+                new ThiSinhDialog(this, owner, "XEM CHI TIẾT THÍ SINH " + "TS-" +thiSinhDuocChon.getIdthisinh(), "detail",true, () -> {
+                                                                                                                                                    listTS = TSBUS.getAllThiSinh();
+                                                                                                                                                    loadDataTable(listTS);
+                                                                                                                                                }, thiSinhDuocChon
+            );
+            }
+            
         }
     }
 

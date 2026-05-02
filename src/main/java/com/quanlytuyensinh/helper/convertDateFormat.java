@@ -12,10 +12,10 @@ import java.util.Date;
  * @author dell
  */
 public class convertDateFormat {
-    // Date → String (yyyy-MM-dd)
+    // Date → String (dd-MM-yyyy)
     public static String DateToString(Date date) {
         if (date == null) return null;
-        return new SimpleDateFormat("yyyy-MM-dd").format(date);
+        return new SimpleDateFormat("dd-MM-yyyy").format(date);
     }
 
     // Date → String (dd/MM/yyyy) (hiển thị UI)

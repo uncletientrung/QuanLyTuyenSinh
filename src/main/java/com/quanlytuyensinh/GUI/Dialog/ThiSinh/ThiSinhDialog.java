@@ -18,6 +18,7 @@ import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
@@ -25,7 +26,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.PlainDocument;
 
-public class ThemThiSinhDialog extends JDialog {
+public class ThiSinhDialog extends JDialog {
 
     private ThiSinhPanel parent;
     private XtThisinhXetTuyen25BUS bus;
@@ -36,16 +37,17 @@ public class ThemThiSinhDialog extends JDialog {
     // Form fields
     private VerticalInputForm txtCCCD, txtSBD, txtHo, txtTen,
             txtSDT, txtEmail, txtNoiSinh, txtPassword, txtPasswordConfirm;
-    private InputDate txtNgaySinh;
+    private InputDate txtNgaySinh, txtUpdateAt;
     private VerticalComboBoxForm cbbGioiTinh, cbbKhuVuc, cbbDoiTuong;
     private ButtonCustom btnLuu, btnHuy;
 
-    public ThemThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess) {
+    public ThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess, XtThisinhXetTuyen25 ts) {
         super(owner, title, modal);
         this.parent = parent;
         this.bus = parent.getBUS(); // Dùng chung 1 BUS với cha
         this.type = type;
         this.onSuccess = onSuccess;
+        this.currentThiSinh = ts;
         this.setTitle(title);
 
         initComponents();
@@ -59,10 +61,15 @@ public class ThemThiSinhDialog extends JDialog {
 
         initMainPanel();
         initButtonPanel();
-        setFakeData(); // Set dữ liệu giả
+        if(this.type.equals("create")){
+            setFakeData(); // Set dữ liệu giả
+        }else if(this.type.equals("detail")){
+            setAllFieldsDisable(); // Chặn chỉnh sửa
+            setThiSinhData(currentThiSinh);
+        }
+
         this.add(pnlMain, BorderLayout.CENTER);
         this.add(pnlButtons, BorderLayout.SOUTH);
-
         this.setVisible(true);
     }
 
@@ -89,6 +96,7 @@ public class ThemThiSinhDialog extends JDialog {
         txtSDT = new VerticalInputForm("Số điện thoại");
         txtPassword = new VerticalInputForm("Mật khẩu");
         txtPasswordConfirm = new VerticalInputForm("Xác nhận mật khẩu");
+        txtUpdateAt =  new InputDate("Cập nhật lần cuối", 300, 40);
         cbbGioiTinh = new VerticalComboBoxForm("Giới tính",new String[]{"Nam", "Nữ"});
         txtEmail = new VerticalInputForm("Email");
         txtNoiSinh = new VerticalInputForm("Nơi sinh");
@@ -96,6 +104,8 @@ public class ThemThiSinhDialog extends JDialog {
             new String[]{"KV1", "KV2", "KV2-NT", "KV3"});
         cbbDoiTuong = new VerticalComboBoxForm("Đối tượng ưu tiên", 
             new String[]{"Không ưu tiên", "Ưu tiên 1", "Ưu tiên 2"});
+        
+        Label lbHide = new Label();
         
         // ==================== LEFT COLUMN ====================
         left.add(txtCCCD);
@@ -112,13 +122,20 @@ public class ThemThiSinhDialog extends JDialog {
         right.add(cbbGioiTinh);
         right.add(cbbKhuVuc);
         right.add(txtEmail);
-        right.add(txtPasswordConfirm);
+        if(this.type.equals("detail")){
+            right.add(lbHide);
+            right.add(txtUpdateAt);
+        }else{
+            right.add(txtPasswordConfirm);
+        }
+        
         
         // =======================
         pnlMain.add(left);
         pnlMain.add(right);
     }
 
+    // Khởi tạo nút
     private void initButtonPanel() {
         pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         pnlButtons.setBackground(Color.WHITE);
@@ -140,7 +157,9 @@ public class ThemThiSinhDialog extends JDialog {
 
         btnHuy.addActionListener(e -> dispose());
 
-        pnlButtons.add(btnLuu);
+        if (!this.type.equals("detail")) {
+            pnlButtons.add(btnLuu);
+        }
         pnlButtons.add(btnHuy);
     }
 
@@ -188,6 +207,7 @@ public class ThemThiSinhDialog extends JDialog {
         }
     }
     
+    // Kiểm tra dữ liệu nhập
     private boolean validateInput() {
 
         // ===== CCCD =====
@@ -312,6 +332,47 @@ public class ThemThiSinhDialog extends JDialog {
         return true;
     }
    
+    private void setAllFieldsDisable(){
+        VerticalInputForm[] listInput = {txtCCCD, txtSBD, txtHo, txtTen, txtSDT, txtEmail, txtNoiSinh, txtPassword,
+                txtPasswordConfirm};
+        for (VerticalInputForm f : listInput) {
+            f.setDisable();
+        }
+        txtNgaySinh.setDisable();
+        txtUpdateAt.setDisable();
+        cbbGioiTinh.setDisable();
+        cbbKhuVuc.setDisable();
+        cbbDoiTuong.setDisable();
+    }
+    
+    private void setThiSinhData(XtThisinhXetTuyen25 ts){
+        txtCCCD.setText(ts.getCccd());
+        txtHo.setText(ts.getHo());
+        txtTen.setText(ts.getTen());
+        txtSBD.setText(ts.getSobaodanh());
+       try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(ts.getNgaySinh(), fmt);
+            Date date = java.sql.Date.valueOf(localDate);
+            txtNgaySinh.getDateChooser().setDate(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       txtNoiSinh.setText(ts.getNoiSinh());
+       txtSDT.setText(ts.getDienThoai());
+       txtEmail.setText(ts.getEmail());
+       txtPassword.setText(ts.getPassword());
+       if(this.type.equals("detail")){
+           Date dateUpdateAt = Date.from( ts.getUpdatedAt().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            txtUpdateAt.setDate(dateUpdateAt);
+       }
+        // ComboBox
+        cbbGioiTinh.getComboBox().setSelectedItem(ts.getGioiTinh());
+        cbbKhuVuc.getComboBox().setSelectedItem(ts.getKhuVuc());
+        cbbDoiTuong.getComboBox().setSelectedItem("Không ưu tiên");
+       
+    }
+    // Làm dữ liệu giả 
     private void setFakeData() {
         txtCCCD.setText("012345678901");
         txtHo.setText("Nguyen");

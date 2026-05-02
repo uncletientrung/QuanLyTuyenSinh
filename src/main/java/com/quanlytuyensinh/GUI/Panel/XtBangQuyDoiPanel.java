@@ -364,7 +364,6 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         }
         return java.math.BigDecimal.valueOf(val);
     }
-    // END Excel
 
     @Override
     public void actionPerformed(ActionEvent e) {

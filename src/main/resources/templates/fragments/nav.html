@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="nav">
+    <div class="bg-sidebar-dark">
+        <div class="content">
+            <div id="main-navigation" class="push">
+                <ul class="nav-main nav-main-horizontal nav-main-hover nav-main-dark">
+                    <li class="nav-main-item">
+                        <a class="nav-main-link" th:href="@{/tracuu}">
+                            <i class="nav-main-link-icon fa fa-magnifying-glass-chart"></i>
+                            <span class="nav-main-link-name">Kết quả xét tuyển</span>
+                        </a>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
+                           aria-expanded="false" href="javascript:void(0)">
+                            <i class="nav-main-link-icon fa fa-calculator"></i>
+                            <span class="nav-main-link-name">Tính điểm xét tuyển</span>
+                        </a>
+                        <ul class="nav-main-submenu">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" th:href="@{/tinhdiemDGNL}">
+                                    <span class="nav-main-link-name">ĐGNL</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link" th:href="@{/tinhdiemVSAT}">
+                                    <span class="nav-main-link-name">VSAT / THPT</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

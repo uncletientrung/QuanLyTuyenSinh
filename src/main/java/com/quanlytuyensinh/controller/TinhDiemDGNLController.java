@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Windows
  */
 @Controller
-public class TinhDiemController {
-    // Running on http://localhost:8080/tinhdiem
-    @RequestMapping("/tinhdiem")
-    public String tinhdiem() {
-        return "tinhdiem";
+public class TinhDiemDGNLController {
+    // Running on http://localhost:8080/tinhdiemDGNL
+    @RequestMapping("/tinhdiemDGNL")
+    public String tinhdiemDGNL() {
+        return "tinhdiemDGNL";
     }
 }

@@ -169,8 +169,6 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
 
     private void loadDataTable(List<XtThisinhXetTuyen25> listTS) {
         List<Object[]> data = new ArrayList<>();
-        DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter outputFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         for (XtThisinhXetTuyen25 ts : listTS) {
             data.add(new Object[] {
                     "TS-"+ts.getIdthisinh(),
@@ -179,7 +177,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                     ts.getHo(),
                     ts.getTen(),
                     ts.getGioiTinh(),
-                    LocalDate.parse(ts.getNgaySinh(), inputFormat).format(outputFormat),
+                    ts.getNgaySinh(),
                     ts.getDienThoai(),
                     ts.getEmail(),
                     ts.getNoiSinh(),
@@ -226,7 +224,13 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                                                                                                                                                     listTS = TSBUS.getAllThiSinh();
                                                                                                                                                     loadDataTable(listTS);
                                                                                                                                                 }, thiSinhDuocChon
-            );
+                );
+            }else if(source == mainFunction.btn.get("update") ){
+                new ThiSinhDialog(this, owner, "SỬA THÍ SINH " + "TS-" +thiSinhDuocChon.getIdthisinh(), "update",true, () -> {
+                                                                                                                                                    listTS = TSBUS.getAllThiSinh();
+                                                                                                                                                    loadDataTable(listTS);
+                                                                                                                                                }, thiSinhDuocChon
+                );
             }
             
         }

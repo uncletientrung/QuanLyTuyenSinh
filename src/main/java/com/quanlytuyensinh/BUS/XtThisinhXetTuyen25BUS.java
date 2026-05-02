@@ -44,11 +44,37 @@ public class XtThisinhXetTuyen25BUS {
         int newId = maxId + 1;
         return String.format("BD%03d", newId);
     }
-    public boolean checkCCCD(String cccd){
+    public boolean checkCCCD(String cccd, int idTS){
         for(XtThisinhXetTuyen25 ts : listThiSinh){
-            if (ts.getCccd().equals(cccd))  return false; // Đã tồn tại
+            if (ts.getCccd().equals(cccd) && ts.getIdthisinh() != idTS)  return false; // Đã tồn tại
         }
         return true;
+    }
+    public boolean updateThiSinh(XtThisinhXetTuyen25 tsUpdate){
+        if (tsUpdate == null) return false;
+        boolean rs = TSDAO.update(tsUpdate);
+        if(rs){
+            for (XtThisinhXetTuyen25 ts : listThiSinh) {
+                if (tsUpdate.getIdthisinh() == ts.getIdthisinh()) {
+                    ts.setCccd(tsUpdate.getCccd());
+                    ts.setSobaodanh(tsUpdate.getSobaodanh());
+                    ts.setHo(tsUpdate.getHo());
+                    ts.setTen(tsUpdate.getTen());
+                    ts.setNgaySinh(tsUpdate.getNgaySinh());
+                    ts.setDienThoai(tsUpdate.getDienThoai());
+                    ts.setPassword(tsUpdate.getPassword());
+                    ts.setGioiTinh(tsUpdate.getGioiTinh());
+                    ts.setEmail(tsUpdate.getEmail());
+                    ts.setNoiSinh(tsUpdate.getNoiSinh());
+                    ts.setUpdatedAt(tsUpdate.getUpdatedAt());
+                    ts.setDoiTuong(tsUpdate.getDoiTuong());
+                    ts.setKhuVuc(tsUpdate.getKhuVuc());
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
 }

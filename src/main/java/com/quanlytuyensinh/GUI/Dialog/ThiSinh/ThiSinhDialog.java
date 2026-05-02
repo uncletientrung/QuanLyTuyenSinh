@@ -66,6 +66,8 @@ public class ThiSinhDialog extends JDialog {
         }else if(this.type.equals("detail")){
             setAllFieldsDisable(); // Chặn chỉnh sửa
             setThiSinhData(currentThiSinh);
+        }else if(this.type.equals("update")){
+            setThiSinhData(currentThiSinh);
         }
 
         this.add(pnlMain, BorderLayout.CENTER);
@@ -86,7 +88,7 @@ public class ThiSinhDialog extends JDialog {
         right.setBackground(Color.WHITE);
         // ==================== ĐỊNH NGHĨA CÁC THUỘC TÍNH ====================
         
-        txtCCCD = new VerticalInputForm("CCCD / CMND");
+        txtCCCD = new VerticalInputForm("CCCD");
         txtSBD = new VerticalInputForm("Số báo danh (SBD)");
         txtSBD.setText("Hệ thống tự sinh");
         txtSBD.setDisable();
@@ -101,9 +103,9 @@ public class ThiSinhDialog extends JDialog {
         txtEmail = new VerticalInputForm("Email");
         txtNoiSinh = new VerticalInputForm("Nơi sinh");
         cbbKhuVuc = new VerticalComboBoxForm("Khu vực", 
-            new String[]{"KV1", "KV2", "KV2-NT", "KV3"});
+            new String[]{"1", "2", "2NT", "3"});
         cbbDoiTuong = new VerticalComboBoxForm("Đối tượng ưu tiên", 
-            new String[]{"Không ưu tiên", "Ưu tiên 1", "Ưu tiên 2"});
+            new String[]{"Không ưu tiên","01", "02", "03", "04","05","06a","06b","07a","07b"});
         
         Label lbHide = new Label();
         
@@ -141,7 +143,7 @@ public class ThiSinhDialog extends JDialog {
         pnlButtons.setBackground(Color.WHITE);
         pnlButtons.setBorder(new EmptyBorder(15, 0, 25, 0));
 
-        String btnText = "create".equals(type) ? "Thêm thí sinh" : "Lưu thay đổi";
+        String btnText = "create".equals(type) ? "Thêm thí sinh" : "Lưu chỉnh sửa";
 
         btnLuu = new ButtonCustom(btnText, "success", 15);
         btnHuy = new ButtonCustom("Hủy bỏ", "danger", 15);
@@ -149,8 +151,9 @@ public class ThiSinhDialog extends JDialog {
         btnLuu.setPreferredSize(new Dimension(160, 48));
         btnHuy.setPreferredSize(new Dimension(160, 48));
 
+        int idTS = this.currentThiSinh != null ? this.currentThiSinh.getIdthisinh() : -1; // Truyền id vào để kiểm tra trùng CCCD
         btnLuu.addActionListener(e -> {
-            if (validateInput()) {
+            if (validateInput(idTS)) {
                  saveThiSinh();
             }
         });
@@ -173,7 +176,6 @@ public class ThiSinhDialog extends JDialog {
         }
         
         XtThisinhXetTuyen25 ts = new XtThisinhXetTuyen25();
-        
         ts.setCccd(txtCCCD.getText().trim());
         ts.setSobaodanh(txtSBD.getText().trim());
         ts.setHo(txtHo.getText().trim());
@@ -184,7 +186,10 @@ public class ThiSinhDialog extends JDialog {
         ts.setNoiSinh(txtNoiSinh.getText().trim());
         ts.setGioiTinh((String) cbbGioiTinh.getSelectedValue());
         ts.setKhuVuc((String) cbbKhuVuc.getSelectedValue());
-        ts.setDoiTuong((String) cbbDoiTuong.getSelectedValue());
+        String doiTuong = (String) cbbDoiTuong.getSelectedValue();
+        ts.setDoiTuong(
+            "Không ưu tiên".equals(doiTuong) ?  null : doiTuong
+        );
         ts.setPassword(txtPassword.getText().trim()); 
          ts.setUpdatedAt(LocalDate.now()); // Cập nhật trạng thái chỉnh sửa
        
@@ -197,9 +202,15 @@ public class ThiSinhDialog extends JDialog {
                     }
                     dispose();
                 }
-            } else {
-                // edit logic (nếu cần sau này)
-                JOptionPane.showMessageDialog(this, "Chức năng chỉnh sửa đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            } else if (this.type.equals("update")) {
+                ts.setIdthisinh(this.currentThiSinh.getIdthisinh());
+                if(bus.updateThiSinh(ts)){
+                    JOptionPane.showMessageDialog(this, "Sửa thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        if (onSuccess != null) {
+                            onSuccess.run();
+                        }
+                        dispose();
+                }
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Lỗi khi lưu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -208,7 +219,7 @@ public class ThiSinhDialog extends JDialog {
     }
     
     // Kiểm tra dữ liệu nhập
-    private boolean validateInput() {
+    private boolean validateInput(int idTS) {
 
         // ===== CCCD =====
         String cccd = txtCCCD.getText().trim();
@@ -222,7 +233,7 @@ public class ThiSinhDialog extends JDialog {
             txtCCCD.getTxtForm().requestFocus();
             return false;
         }
-        if (!bus.checkCCCD(cccd)) {
+        if (!bus.checkCCCD(cccd, idTS)) {
             JOptionPane.showMessageDialog(this, "CCCD đã tồn tại trong hệ thống", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtCCCD.getTxtForm().requestFocus();
             return false;
@@ -366,6 +377,9 @@ public class ThiSinhDialog extends JDialog {
            Date dateUpdateAt = Date.from( ts.getUpdatedAt().atStartOfDay(ZoneId.systemDefault()).toInstant());
             txtUpdateAt.setDate(dateUpdateAt);
        }
+       if(this.type.equals("update")){
+           txtPasswordConfirm.setText(ts.getPassword());
+       }
         // ComboBox
         cbbGioiTinh.getComboBox().setSelectedItem(ts.getGioiTinh());
         cbbKhuVuc.getComboBox().setSelectedItem(ts.getKhuVuc());
@@ -378,10 +392,10 @@ public class ThiSinhDialog extends JDialog {
         txtHo.setText("Nguyen");
         txtTen.setText("An");
 
-        // Ngày sinh: 15/05/2004
+
         try {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate localDate = LocalDate.parse("15/05/2004", fmt);
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse("2004-05-15", fmt);
             Date date = java.sql.Date.valueOf(localDate);
             txtNgaySinh.getDateChooser().setDate(date);
         } catch (Exception e) {
@@ -397,7 +411,7 @@ public class ThiSinhDialog extends JDialog {
 
         // ComboBox
         cbbGioiTinh.getComboBox().setSelectedItem("Nam");
-        cbbKhuVuc.getComboBox().setSelectedItem("KV1");
+        cbbKhuVuc.getComboBox().setSelectedItem("1");
         cbbDoiTuong.getComboBox().setSelectedItem("Không ưu tiên");
     }
 

@@ -32,28 +32,18 @@ public class XtThisinhXetTuyen25DAO {
     }
 
     public boolean update(XtThisinhXetTuyen25 ts) {
-
         Transaction transaction = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
-
-            session.merge(ts);
-
+            session.merge(ts); // Tự tìm đối tượng dựa trên primary sau đó xem thử field nào bị thay đổi thì nó sửa
             transaction.commit();
-
             return true;
-
         } catch (Exception e) {
-
             if (transaction != null) {
                 transaction.rollback();
             }
-
             e.printStackTrace();
         }
-
         return false;
     }
 

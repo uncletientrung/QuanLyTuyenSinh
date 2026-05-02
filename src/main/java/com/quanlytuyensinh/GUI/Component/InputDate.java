@@ -49,6 +49,9 @@ public class InputDate extends JPanel {
         date = new JDateChooser();
         date.setDateFormatString("dd/MM/yyyy");
         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        // Set ngày mặc định
+        date.setDate(new Date());
+        
         this.add(lbltitle);
         this.add(date);
     }

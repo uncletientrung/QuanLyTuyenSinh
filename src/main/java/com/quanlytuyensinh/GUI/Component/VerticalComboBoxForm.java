@@ -37,7 +37,7 @@ public class VerticalComboBoxForm extends JPanel {
     }
 
     /**
-     * Kiểm tra có phải chọn "Có" hay không (dùng cho các trường Có/Không)
+     * Kiểm tra có phải chọn "Có" hay không 
      */
     public boolean isSelectedYes() {
         String selected = (String) cbbForm.getSelectedItem();
@@ -52,11 +52,10 @@ public class VerticalComboBoxForm extends JPanel {
         if (selected == null || "-- Chọn --".equals(selected)) {
             return null;
         }
-        // Chuyển "Có" → "1", "Không" → "0"
         if ("Có".equals(selected)) return "1";
         if ("Không".equals(selected)) return "0";
         
-        return selected; // Trả về nguyên giá trị nếu là combo tùy chỉnh
+        return selected; // Trả về nguyên giá trị
     }
 
     /**
@@ -67,14 +66,11 @@ public class VerticalComboBoxForm extends JPanel {
             cbbForm.setSelectedIndex(0);
             return;
         }
-
-        // Xử lý trường hợp Có/Không
         if ("1".equals(dbValue)) {
             cbbForm.setSelectedItem("Có");
         } else if ("0".equals(dbValue)) {
             cbbForm.setSelectedItem("Không");
         } else {
-            // Combo tùy chỉnh: tìm item khớp
             for (int i = 0; i < cbbForm.getItemCount(); i++) {
                 if (dbValue.equals(cbbForm.getItemAt(i))) {
                     cbbForm.setSelectedIndex(i);
@@ -109,7 +105,7 @@ public class VerticalComboBoxForm extends JPanel {
     }
 
     /**
-     * Set items mới cho combo (nếu cần thay đổi động)
+     * Set items mới cho combo
      */
     public void setOptions(String[] options) {
         cbbForm.setModel(new DefaultComboBoxModel<>(options));

@@ -104,9 +104,10 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 0; i < table.getColumnCount(); i++) {
+        for (int i = 0; i < table.getColumnCount() - 1; i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
+        table.getColumnModel().getColumn(table.getColumnCount() - 1).setPreferredWidth(300);;
         
         table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[10];
@@ -147,7 +148,7 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
         functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
         functionBar.setBackground(Color.WHITE);
         
-        String[] action = {"create", "update", "delete", "detail", "import"};
+        String[] action = {"create", "update", "delete", "import"};
         mainFunction = new MainFunction(1, "nguoiDung", action);
         for (String ac : action) {
             mainFunction.btn.get(ac).addActionListener(this);
@@ -198,18 +199,6 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
     
     @Override
     public void actionPerformed(ActionEvent e) {
-//        if (e.getSource() == mainFunction.btn.get("create")) {
-//            new XtBangQuyDoiDialog(this, mainFrame, "Thêm bảng quy đổi", true, "create");
-//        } else if (e.getSource() == mainFunction.btn.get("update")) {
-//            XtBangQuyDoi selected = getSelectedQuyDoi();
-//            if (selected != null) {
-//                new XtBangQuyDoiDialog(this, mainFrame, "Chỉnh sửa bảng quy đổi", true, "update", selected);
-//            }
-//        } else if (e.getSource() == mainFunction.btn.get("detail")) {
-//            XtBangQuyDoi selected = getSelectedQuyDoi();
-//            if (selected != null) {
-//                new XtBangQuyDoiDialog(this, mainFrame, "Chi tiết bảng quy đổi", true, "detail", selected);
-//            }
 //        } else if (e.getSource() == mainFunction.btn.get("delete")) {
 //            XtBangQuyDoi selected = getSelectedQuyDoi();
 //            if (selected != null) {
@@ -226,11 +215,30 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
 //                    }
 //                }
 //            }
-//        } else 
         if (e.getSource() == mainFunction.btn.get("import")) {
             importExcel();
         } else if (e.getSource() == mainFunction.btn.get("create")) {
             new ToHopMonDialog(this, monBUS, null, mainFrame, "Tạo tổ hợp mới").setVisible(true);
+        } else if (e.getSource() == mainFunction.btn.get("update")) {
+            XtToHopMonThi selected = getSelectedToHop();
+            if (selected != null) {
+                new ToHopMonDialog(this, monBUS, selected, mainFrame, "Tạo tổ hợp mới").setVisible(true);
+            }
+        } else if (e.getSource() == mainFunction.btn.get("delete")) {
+           XtToHopMonThi selected = getSelectedToHop();
+           if (selected != null) {
+               int confirm = JOptionPane.showConfirmDialog(this,
+                       "Xóa tổ hợp mã " + selected.getMatohop() + "?",
+                       "Xác nhận", JOptionPane.YES_NO_OPTION);
+               if (confirm == JOptionPane.YES_OPTION) {
+                   if (monBUS.deleteToHop(selected)) {
+                       JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                       loadDataTable(monBUS.refreshList());
+                   } else {
+                       JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                   }
+               }
+           }
         }
     }
 
@@ -341,6 +349,13 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
             }
             default -> "";
         };
+    }
+
+    private XtToHopMonThi getSelectedToHop() {
+        int row = paginatedTable.getTable().getSelectedRow();
+        int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);
+        int id = (int) paginatedTable.getTable().getModel().getValueAt(modelRow, 0);
+        return monBUS.findById(id);
     }
     
     @Override

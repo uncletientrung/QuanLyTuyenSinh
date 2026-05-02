@@ -11,6 +11,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -51,6 +52,7 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
         initComponents();
     }
 
+    private Set<String> listMon = ToHopMonPanel.tenMap.keySet();
     private void initComponents() {
         this.setSize(new Dimension(400, 700));
         this.setLayout(new BorderLayout(0, 0));
@@ -63,7 +65,7 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
         
         ArrayList<String> list = new ArrayList<>();
         list.add("Chọn tổ hợp môn");
-        list.addAll(ToHopMonPanel.tenMap.keySet());
+        list.addAll(listMon);
         
         String[] monArr = list.toArray(new String[0]);
         maToHop = new InputForm("Mã tổ hợp");
@@ -98,7 +100,7 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
                 super.insertString(fb, offset, fixedText, attr);
             }
         });
-    
+
         mon1.getCbb().addActionListener(e -> {
             String tenMon1 = mon1.getValue();
             String tenMon2 = mon2.getValue();
@@ -147,6 +149,14 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
             }
         });
 
+        if (selectedToHop != null) {
+            maToHop.setText(selectedToHop.getMatohop());            
+            mon1.setSelectedIndex(list.indexOf(selectedToHop.getMon1()));
+            mon2.setSelectedIndex(list.indexOf(selectedToHop.getMon2()));
+            mon3.setSelectedIndex(list.indexOf(selectedToHop.getMon3()));
+            tenToHop.setText(selectedToHop.getTentohop());
+        }
+
         pmain.add(maToHop);
         pmain.add(mon1);
         pmain.add(mon2);
@@ -171,17 +181,44 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
         if (e.getSource() == btnCancel) {
             dispose();
         } else if (e.getSource() == btnConfirm) {
-            if (selectedToHop == null) {
                 String existIn;
                 String tenMon1 = mon1.getValue();
                 String tenMon2 = mon2.getValue();
                 String tenMon3 = mon3.getValue();
-                if (bus.existMaToHop(maToHop.getText())) {
-                    JOptionPane.showMessageDialog(this, "Mã tổ hợp " + maToHop.getText() + " đã tồn tại!", "Kiểm tra lại thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-                } else if ((existIn = bus.existToHopMon(tenMon1, tenMon2, tenMon3)) != "") {
+                String maToHopText = maToHop.getText();
+                if (bus.existMaToHop(maToHopText)) {
+                    JOptionPane.showMessageDialog(this, "Mã tổ hợp " + maToHopText + " đã tồn tại!", "Kiểm tra lại thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+                } else if ((existIn = bus.existToHopMon(tenMon1, tenMon2, tenMon3)) != "" && !(existIn.equals(selectedToHop.getMatohop()))) {
                     JOptionPane.showMessageDialog(this, "Tổ hợp đã tồn tại với mã " + existIn, "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-                } else
-                    JOptionPane.showMessageDialog(this, "Giờ thì thêm nó vào DB thôi", "Thành công!", JOptionPane.INFORMATION_MESSAGE);
+                } else if (maToHopText.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Nhập mã tổ hợp", "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+                } 
+                else {
+                    newToHop = new XtToHopMonThi(maToHopText, tenMon1, tenMon2, tenMon3, tenToHop.getText());
+                    if (selectedToHop == null) {
+                        if (bus.addNewToHop(newToHop)) {
+                            parentPanel.loadDataTable(bus.refreshList());
+                            JOptionPane.showMessageDialog(this, "Thêm tổ hợp mới thành công!");
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Xảy ra lỗi khi thêm tổ hợp với vào database!");
+                        }
+                    } else if (selectedToHop.toString() == newToHop.toString())
+                        dispose();
+                    else {
+                        selectedToHop.setMatohop(maToHopText);
+                        selectedToHop.setMon1(tenMon1);
+                        selectedToHop.setMon2(tenMon2);
+                        selectedToHop.setMon3(tenMon3);
+                        selectedToHop.setTentohop(tenToHop.getText());
+                        if (bus.updateToHop(selectedToHop)) {
+                            parentPanel.loadDataTable(bus.refreshList());
+                            JOptionPane.showMessageDialog(this, "Cập nhật tổ hợp mới thành công!");
+                            dispose();
+                        }
+                        else
+                            JOptionPane.showMessageDialog(this, "Xảy ra lỗi khi thêm tổ hợp với vào database!");
+                    }
             }
         }
     }

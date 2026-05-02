@@ -7,6 +7,9 @@ package com.quanlytuyensinh.DAO;
 import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
 import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -23,6 +26,14 @@ public class XtToHopMonThiDAO {
     public List<XtToHopMonThi> getAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from XtToHopMonThi", XtToHopMonThi.class).list();
+        }
+    }
+
+    public XtToHopMonThi findById(int id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("select t from XtToHopMonThi t where t.idtohop = :id", XtToHopMonThi.class)
+                        .setParameter("id", id)
+                        .uniqueResult();
         }
     }
     
@@ -53,7 +64,51 @@ public class XtToHopMonThiDAO {
         }
         return "";
     }
+
+    public boolean addNewToHop(XtToHopMonThi t)
+    {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(t);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null , e.getMessage());
+            transaction.rollback();
+            return false;
+        }
+    }
     
+    public boolean updateToHop(XtToHopMonThi t)
+    {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(t);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null , e.getMessage());
+            transaction.rollback();
+            return false;
+        }
+    }
+
+    public boolean deleteToHop(XtToHopMonThi t) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.remove(t);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null , e.getMessage());
+            transaction.rollback();
+            return false;
+        }
+    }
+
     public void importToDB(List<XtToHopMonThi> list)
     {
         Transaction transaction = null;

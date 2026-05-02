@@ -86,6 +86,22 @@ public class XtToHopMonThiBUS {
         List<String> toHop = Arrays.asList(mon1, mon2, mon3);
         return tohopDAO.existToHopMon(toHop);
     }
+
+    public boolean addNewToHop(XtToHopMonThi t) {
+        return tohopDAO.addNewToHop(t);
+    }
+
+    public XtToHopMonThi findById(int id) {
+        return tohopDAO.findById(id);
+    }
+
+    public boolean updateToHop(XtToHopMonThi t) {
+        return tohopDAO.updateToHop(t);
+    }
+
+    public boolean deleteToHop(XtToHopMonThi t) {
+        return tohopDAO.deleteToHop(t);
+    }
     
     public void importToDB(List<XtToHopMonThi> list) {
         tohopDAO.importToDB(list);

@@ -15,6 +15,8 @@ import com.quanlytuyensinh.GUI.Component.TableSorter;
 import com.quanlytuyensinh.GUI.Dialog.ThiSinh.ThiSinhDialog;
 import com.quanlytuyensinh.GUI.Dialog.testDialog;
 import com.quanlytuyensinh.GUI.Main;
+import com.quanlytuyensinh.UTIL.ExcelImportUtil;
+import com.quanlytuyensinh.helper.Validation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +28,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import javax.swing.border.EmptyBorder;
@@ -134,7 +137,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
         functionBar.setBackground(Color.WHITE);
 
-        String[] action = { "create", "update", "delete", "detail", "import", "export" };
+        String[] action = { "create", "update", "delete", "detail", "import" };
         mainFunction = new MainFunction(1, "thiSinh", action); // Sửa khi có nhóm quyền
         for (String ac : action) {
             mainFunction.btn.get(ac).addActionListener(this);
@@ -214,6 +217,9 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                                                                                                                                                     loadDataTable(listTS);
                                                                                                                                                 }, null
             );
+        }
+        else if (source == mainFunction.btn.get("import")) {
+            importExcel();
         }else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
                             source == mainFunction.btn.get("delete")){
             XtThisinhXetTuyen25 thiSinhDuocChon = getSelectedThiSinh();
@@ -256,5 +262,105 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
     }
     public XtThisinhXetTuyen25BUS getBUS() {
         return TSBUS;
+    }
+    
+           // ===================== IMPORT EXCEL =====================
+    private void importExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx", "xls"));
+        
+        int result = fileChooser.showOpenDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) return;
+        File selectedFile = fileChooser.getSelectedFile();
+        try {
+            List<XtThisinhXetTuyen25> listImport = ExcelImportUtil.readThiSinhFromExcel(selectedFile.getAbsolutePath());
+            
+            if (listImport.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy dữ liệu hợp lệ trong file Excel!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int success = 0;
+            int skipped = 0;
+            StringBuilder errors = new StringBuilder();
+
+            for (XtThisinhXetTuyen25 ts : listImport) {
+                // ===== VALIDATION =====
+                String errorMsg = validateThiSinh(ts);
+                if (errorMsg != null) {
+                    errors.append("Dòng ").append(listImport.indexOf(ts) + 2)
+                          .append(" (CCCD: ").append(ts.getCccd()).append("): ")
+                          .append(errorMsg).append("\n");
+                    skipped++;
+                    continue;
+                }
+
+                try {
+                    if (TSBUS.insertThiSinh(ts)) {
+                        success++;
+                    } else {
+                        errors.append("Dòng ").append(listImport.indexOf(ts) + 2)
+                              .append(" (CCCD: ").append(ts.getCccd()).append("): Lỗi insert vào DB\n");
+                        skipped++;
+                    }
+                } catch (Exception ex) {
+                    errors.append("Dòng ").append(listImport.indexOf(ts) + 2)
+                          .append(" (CCCD: ").append(ts.getCccd()).append("): ").append(ex.getMessage()).append("\n");
+                    skipped++;
+                }
+            }
+
+            String message = "Import hoàn tất!\n" +
+                            "Thành công: " + success + " thí sinh\n" +
+                            "Bỏ qua: " + skipped + " thí sinh\n";
+            
+            if (errors.length() > 0) {
+                message += "\nChi tiết lỗi:\n" + errors;
+            }
+
+            JOptionPane.showMessageDialog(this, message, "Kết quả Import", 
+                success > 0 ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
+
+            // Refresh table
+            listTS = TSBUS.getAllThiSinh();
+            loadDataTable(listTS);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Import thất bại!\n" + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    private String validateThiSinh(XtThisinhXetTuyen25 ts) {
+        // CCCD
+        if (Validation.isEmpty(ts.getCccd())) {
+            return "CCCD không được để trống!";
+        }
+        if (!ts.getCccd().matches("\\d{12}")) {
+            return "CCCD phải gồm đúng 12 chữ số!";
+        }
+        if (!TSBUS.checkCCCD(ts.getCccd(), 0)) {
+            return "CCCD đã tồn tại trong hệ thống!";
+        }
+
+        // Họ Tên (ít nhất phải có họ hoặc tên)
+        if (Validation.isEmpty(ts.getHo()) && Validation.isEmpty(ts.getTen())) {
+            return "Họ Tên không được để trống!";
+        }
+
+        // Giới tính
+        if (Validation.isEmpty(ts.getGioiTinh())) {
+            return "Giới tính không được để trống!";
+        }
+        String gt = ts.getGioiTinh().trim().toLowerCase();
+        if (!gt.equals("nam") && !gt.equals("nữ") && !gt.equals("male") && !gt.equals("female")) {
+            return "Giới tính chỉ được là Nam hoặc Nữ!";
+        }
+
+        // Ngày sinh
+        if (Validation.isEmpty(ts.getNgaySinh())) {
+            return "Ngày sinh không được để trống!";
+        }
+
+        return null; // Valid
     }
 }

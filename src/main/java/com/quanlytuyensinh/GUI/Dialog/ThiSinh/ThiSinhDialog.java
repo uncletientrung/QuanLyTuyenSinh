@@ -239,13 +239,6 @@ public class ThiSinhDialog extends JDialog {
             return false;
         }
 
-        // ===== SBD =====
-        if (Validation.isEmpty(txtSBD.getText())) {
-            JOptionPane.showMessageDialog(this, "Số báo danh không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSBD.getTxtForm().requestFocus();
-            return false;
-        }
-
         // ===== Họ =====
         if (Validation.isEmpty(txtHo.getText())) {
             JOptionPane.showMessageDialog(this, "Họ không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);

@@ -1,7 +1,9 @@
 package com.quanlytuyensinh.GUI.Dialog;
 
 import com.quanlytuyensinh.BUS.XtDiemCongXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtToHopMonThiBUS;
 import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
 import com.quanlytuyensinh.GUI.Component.ButtonCustom;
 import com.quanlytuyensinh.GUI.Panel.XtDiemCongXetTuyenPanel;
 import java.awt.BorderLayout;
@@ -114,7 +116,7 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
             importDiemChungChiFromExcel();
         } else if (e.getSource() == btnDiemUuTien) {
             dispose();
-            // TODO: Gọi hàm import điểm ưu tiên xét tuyển
+            importDiemUuTienFromExcel();
         }
     }
 
@@ -533,6 +535,304 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
         loadingDialog.setVisible(true);
     }
 
+    // Excel điểm ưu tiên
+    private void importDiemUuTienFromExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn file Excel import điểm ưu tiên xét tuyển");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls"));
+
+        int result = fileChooser.showOpenDialog(mainFrame);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File selectedFile = fileChooser.getSelectedFile();
+
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setIndeterminate(true);
+        JOptionPane pane = new JOptionPane(progressBar, JOptionPane.INFORMATION_MESSAGE);
+        JDialog loadingDialog = pane.createDialog(mainFrame, "Đang import điểm ưu tiên xét tuyển...");
+        loadingDialog.setModal(true);
+        loadingDialog.pack();
+
+        SwingWorker<Void, String> worker = new SwingWorker<>() {
+            private int successCount = 0, errorCount = 0, notFoundCount = 0;
+            private List<String> errorRows = new ArrayList<>();
+            private String errorMessage = null;
+            private XtToHopMonThiBUS toHopBUS = new XtToHopMonThiBUS();
+
+            @Override
+            protected Void doInBackground() throws Exception {
+                FileInputStream fis = null;
+                Workbook workbook = null;
+
+                try {
+                    fis = new FileInputStream(selectedFile);
+                    workbook = WorkbookFactory.create(fis);
+
+                    Map<String, BigDecimal> diemUuTienMap = new HashMap<>();
+                    List<XtToHopMonThi> listToHop = toHopBUS.getList();
+                    List<XtDiemCongXetTuyen> allDiemCong = diemCongBUS.getAllDiemCong();
+
+                    // SHEET 1
+                    Sheet sheetThiSinh = null;
+                    for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                        String name = workbook.getSheetName(i).toLowerCase();
+                        if (name.contains("thi sinh") || name.contains("thisinh")) {
+                            sheetThiSinh = workbook.getSheetAt(i);
+                            break;
+                        }
+                    }
+                    if (sheetThiSinh == null && workbook.getNumberOfSheets() > 0) {
+                        sheetThiSinh = workbook.getSheetAt(0);
+                    }
+
+                    if (sheetThiSinh != null) {
+                        // Đọc header xác định vị trí cột
+                        Row headerRow = sheetThiSinh.getRow(0);
+                        int cccdCol = -1, maMonCol = -1, diemCoMonCol = -1, diemKoMonCol = -1;
+
+                        for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                            Cell cell = headerRow.getCell(i);
+                            if (cell == null) {
+                                continue;
+                            }
+                            String header = cell.getStringCellValue().trim();
+                            if (header.equalsIgnoreCase("CCCD")) {
+                                cccdCol = i;
+                            } else if (header.equalsIgnoreCase("Mã môn")) {
+                                maMonCol = i;
+                            } else if (header.contains("Điểm cộng cho môn đạt giải")) {
+                                diemCoMonCol = i;
+                            } else if (header.contains("Điểm cộng cho THXT")) {
+                                diemKoMonCol = i;
+                            }
+                        }
+
+                        if (cccdCol >= 0 && maMonCol >= 0 && diemCoMonCol >= 0 && diemKoMonCol >= 0) {
+                            for (int i = 1; i <= sheetThiSinh.getLastRowNum(); i++) {
+                                Row row = sheetThiSinh.getRow(i);
+                                if (row == null) {
+                                    continue;
+                                }
+
+                                String cccd = getCellStringValue(row.getCell(cccdCol));
+                                String maMon = getCellStringValue(row.getCell(maMonCol));
+                                BigDecimal diemCoMon = parseBigDecimal(getCellStringValue(row.getCell(diemCoMonCol)));
+                                BigDecimal diemKoMon = parseBigDecimal(getCellStringValue(row.getCell(diemKoMonCol)));
+
+                                if (cccd.isEmpty()) {
+                                    continue;
+                                }
+
+                                // Tìm tất cả bản ghi của thí sinh này
+                                for (XtDiemCongXetTuyen dc : allDiemCong) {
+                                    if (cccd.equals(dc.getTsCccd())) {
+                                        XtToHopMonThi toHop = findToHopByMa(listToHop, dc.getMaToHop());
+                                        BigDecimal diemCong;
+
+                                        if (toHop != null && monTrungToHop(maMon, toHop)) {
+                                            // Môn đạt giải CÓ trong tổ hợp
+                                            diemCong = diemCoMon;
+                                        } else {
+                                            // Môn đạt giải KHÔNG trong tổ hợp
+                                            diemCong = diemKoMon;
+                                        }
+
+                                        String key = cccd + "||" + dc.getMaNganh() + "||" + dc.getMaToHop();
+                                        diemUuTienMap.merge(key, diemCong,
+                                                (oldVal, newVal) -> oldVal.compareTo(newVal) > 0 ? oldVal : newVal);
+                                    }
+                                }
+                            }
+                        } else {
+                            errorRows.add("Sheet 'ds thi sinh': Không tìm thấy đủ cột CCCD, Mã môn, Điểm cộng");
+                        }
+                    }
+
+                    // SHEET 2
+                    Sheet sheetNguyenVong = null;
+                    for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                        String name = workbook.getSheetName(i).toLowerCase();
+                        if (name.contains("nguyen vong") || name.contains("nguyenvong")) {
+                            sheetNguyenVong = workbook.getSheetAt(i);
+                            break;
+                        }
+                    }
+                    if (sheetNguyenVong == null && workbook.getNumberOfSheets() > 1) {
+                        sheetNguyenVong = workbook.getSheetAt(1);
+                    }
+
+                    if (sheetNguyenVong != null) {
+                        Row headerRow = sheetNguyenVong.getRow(0);
+                        int cccdCol = -1, monDatGiaiCol = -1, diemCoMonCol = -1, diemKoMonCol = -1;
+
+                        for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                            Cell cell = headerRow.getCell(i);
+                            if (cell == null) {
+                                continue;
+                            }
+                            String header = cell.getStringCellValue().trim();
+                            if (header.equalsIgnoreCase("CCCD")) {
+                                cccdCol = i;
+                            } else if (header.equalsIgnoreCase("Môn đạt giải")) {
+                                monDatGiaiCol = i;
+                            } else if (header.contains("Điểm cộng cho môn đạt giải")) {
+                                diemCoMonCol = i;
+                            } else if (header.contains("Điểm cộng cho THXT")) {
+                                diemKoMonCol = i;
+                            }
+                        }
+
+                        if (cccdCol >= 0 && monDatGiaiCol >= 0 && diemCoMonCol >= 0 && diemKoMonCol >= 0) {
+                            for (int i = 1; i <= sheetNguyenVong.getLastRowNum(); i++) {
+                                Row row = sheetNguyenVong.getRow(i);
+                                if (row == null) {
+                                    continue;
+                                }
+
+                                String cccd = getCellStringValue(row.getCell(cccdCol));
+                                String tenMonDatGiai = getCellStringValue(row.getCell(monDatGiaiCol));
+                                BigDecimal diemCoMon = parseBigDecimal(getCellStringValue(row.getCell(diemCoMonCol)));
+                                BigDecimal diemKoMon = parseBigDecimal(getCellStringValue(row.getCell(diemKoMonCol)));
+
+                                if (cccd.isEmpty()) {
+                                    continue;
+                                }
+
+                                // Tìm tất cả bản ghi của thí sinh này
+                                for (XtDiemCongXetTuyen dc : allDiemCong) {
+                                    if (cccd.equals(dc.getTsCccd())) {
+                                        XtToHopMonThi toHop = findToHopByMa(listToHop, dc.getMaToHop());
+                                        BigDecimal diemCong;
+
+                                        if (toHop != null && tenMonTrungTenToHop(tenMonDatGiai, toHop.getTentohop())) {
+                                            // Tên môn đạt giải CÓ trong tên tổ hợp
+                                            diemCong = diemCoMon;
+                                        } else {
+                                            // Tên môn đạt giải KHÔNG trong tên tổ hợp
+                                            diemCong = diemKoMon;
+                                        }
+
+                                        String key = cccd + "||" + dc.getMaNganh() + "||" + dc.getMaToHop();
+                                        diemUuTienMap.merge(key, diemCong,
+                                                (oldVal, newVal) -> oldVal.compareTo(newVal) > 0 ? oldVal : newVal);
+                                    }
+                                }
+                            }
+                        } else {
+                            errorRows.add("Sheet 'ds nguyen vong': Không tìm thấy đủ cột CCCD, Môn đạt giải, Điểm cộng");
+                        }
+                    }
+
+                    if (diemUuTienMap.isEmpty()) {
+                        errorMessage = "Không có dữ liệu hợp lệ trong file Excel!";
+                        return null;
+                    }
+
+                    //Vô db
+                    for (Map.Entry<String, BigDecimal> entry : diemUuTienMap.entrySet()) {
+                        String[] parts = entry.getKey().split("\\|\\|", 3);
+                        if (parts.length < 3) {
+                            continue;
+                        }
+                        String cccd = parts[0];
+                        String maNganh = parts[1];
+                        String maToHop = parts[2];
+                        BigDecimal diemUuTien = entry.getValue();
+
+                        boolean found = false;
+                        for (XtDiemCongXetTuyen dc : allDiemCong) {
+                            if (cccd.equals(dc.getTsCccd())
+                                    && maNganh.equals(dc.getMaNganh())
+                                    && maToHop.equals(dc.getMaToHop())) {
+
+                                dc.setDiemUtxt(diemUuTien);
+                                BigDecimal diemCC = dc.getDiemCC() != null ? dc.getDiemCC() : BigDecimal.ZERO;
+                                dc.setDiemTong(diemCC.add(diemUuTien));
+
+                                try {
+                                    diemCongBUS.validateDiemCong(dc);
+                                    if (diemCongBUS.updateDiemCong(dc)) {
+                                        successCount++;
+                                    } else {
+                                        errorRows.add("CCCD " + cccd + ": Không thể cập nhật");
+                                        errorCount++;
+                                    }
+                                } catch (IllegalArgumentException ex) {
+                                    errorRows.add("CCCD " + cccd + ": " + ex.getMessage());
+                                    errorCount++;
+                                }
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            notFoundCount++;
+                        }
+                    }
+
+                } catch (IOException ex) {
+                    errorMessage = "Lỗi đọc file: " + ex.getMessage();
+                } catch (Exception ex) {
+                    errorMessage = "Lỗi xử lý file: " + ex.getMessage();
+                    ex.printStackTrace();
+                } finally {
+                    try {
+                        if (workbook != null) {
+                            workbook.close();
+                        }
+                    } catch (IOException ex) {
+                    }
+                    try {
+                        if (fis != null) {
+                            fis.close();
+                        }
+                    } catch (IOException ex) {
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                loadingDialog.dispose();
+
+                if (errorMessage != null) {
+                    JOptionPane.showMessageDialog(mainFrame, errorMessage, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                StringBuilder message = new StringBuilder();
+                message.append("Kết quả import điểm ưu tiên xét tuyển:\n\n");
+                message.append("Cập nhật thành công: ").append(successCount).append(" bản ghi\n");
+                message.append("Lỗi: ").append(errorCount).append(" bản ghi\n");
+                message.append("Không tìm thấy trong DB: ").append(notFoundCount).append(" bản ghi\n");
+
+                if (!errorRows.isEmpty()) {
+                    message.append("\nChi tiết:\n");
+                    for (int i = 0; i < Math.min(errorRows.size(), 15); i++) {
+                        message.append("  • ").append(errorRows.get(i)).append("\n");
+                    }
+                    if (errorRows.size() > 15) {
+                        message.append("  • ... và ").append(errorRows.size() - 15).append(" lỗi khác\n");
+                    }
+                }
+
+                JOptionPane.showMessageDialog(mainFrame, message.toString(),
+                        "Kết quả Import", JOptionPane.INFORMATION_MESSAGE);
+
+                if (successCount > 0) {
+                    parentPanel.loadDataTable(diemCongBUS.getAllDiemCong());
+                }
+            }
+        };
+
+        worker.execute();
+        loadingDialog.setVisible(true);
+    }
+    // END Excel điểm ưu tiên
+
     // Lấy giá trị chuỗi từ cell Excel
     private String getCellStringValue(Cell cell) {
         if (cell == null) {
@@ -574,5 +874,37 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
         // Thay , = .
         String normalized = value.trim().replace(",", ".");
         return new BigDecimal(normalized);
+    }
+
+    // Mã Môn == mon1 || mon2 || mon3
+    private boolean monTrungToHop(String maMon, XtToHopMonThi toHop) {
+        if (maMon == null || toHop == null) {
+            return false;
+        }
+        String mon = maMon.trim().toUpperCase();
+        return mon.equalsIgnoreCase(toHop.getMon1())
+                || mon.equalsIgnoreCase(toHop.getMon2())
+                || mon.equalsIgnoreCase(toHop.getMon3());
+    }
+
+    // Tên Môn == Tên Tổ hợp (Môn1, Môn2, Môn3)
+    private boolean tenMonTrungTenToHop(String tenMon, String tenToHop) {
+        if (tenMon == null || tenMon.trim().isEmpty() || tenToHop == null) {
+            return false;
+        }
+        return tenToHop.toLowerCase().contains(tenMon.trim().toLowerCase());
+    }
+
+    // Tìm tổ hợp bởi Mã
+    private XtToHopMonThi findToHopByMa(List<XtToHopMonThi> listToHop, String maToHop) {
+        if (maToHop == null) {
+            return null;
+        }
+        for (XtToHopMonThi th : listToHop) {
+            if (maToHop.equalsIgnoreCase(th.getMatohop())) {
+                return th;
+            }
+        }
+        return null;
     }
 }

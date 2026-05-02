@@ -130,30 +130,32 @@ public class XtDiemCongXetTuyenBUS {
             throw new IllegalArgumentException("Điểm cộng không được là số âm.");
         }
 
-        // Giới hạn (3đ cho thang 30)
-        String phuongThuc = (dc.getPhuongThuc() != null) ? dc.getPhuongThuc().toUpperCase() : "THPT";
-        BigDecimal maxLimit;
+        // Tuyển thẳng ko cần +
+        boolean isTuyenThang = "Tuyển thẳng".equals(dc.getPhuongThuc());
+        if (isTuyenThang) {
+            if (diemCC.compareTo(BigDecimal.ZERO) != 0 || diemUtxt.compareTo(BigDecimal.ZERO) != 0) {
+                throw new IllegalArgumentException(
+                        "Phương thức Tuyển thẳng không được nhập điểm cộng"
+                );
+            }
+        }
 
-        switch (phuongThuc) {
-            case "TUYỂN THẲNG":
-                if (tongDiem.compareTo(BigDecimal.ZERO) > 0) {
-                    throw new IllegalArgumentException("Phương thức 'Tuyển thẳng' không có điểm cộng.");
-                }
-                maxLimit = BigDecimal.ZERO;
-                break;
-
-            case "ĐGNL":
-                maxLimit = new BigDecimal("120"); // 10% của thang 1200
-                break;
-
-            case "VSAT":
-                maxLimit = new BigDecimal("45");  // 10% của thang 450
-                break;
-
-            case "THPT":
-            default:
-                maxLimit = new BigDecimal("3.0"); // Thang 30
-                break;
+        // Điểm cộng ko quá 3
+        BigDecimal MAX = new BigDecimal("3.00");
+        if (tongDiem.compareTo(MAX) > 0) {
+            BigDecimal du = tongDiem.subtract(MAX);
+            if (diemUtxt.compareTo(du) >= 0) {
+                diemUtxt = diemUtxt.subtract(du);
+            } else {
+                du = du.subtract(diemUtxt);
+                diemUtxt = BigDecimal.ZERO;
+                diemCC = diemCC.subtract(du);
+            }
+            diemCC = diemCC.setScale(2, java.math.RoundingMode.HALF_UP);
+            diemUtxt = diemUtxt.setScale(2, java.math.RoundingMode.HALF_UP);
+            dc.setDiemCC(diemCC);
+            dc.setDiemUtxt(diemUtxt);
+            dc.setDiemTong(MAX);
         }
 
         // Check Key trùng lặp

@@ -80,10 +80,88 @@ public class XtThisinhXetTuyen25BUS {
         if(IdThiSinh <=0) return false;
         boolean rs = TSDAO.delete(IdThiSinh);
         if (rs) {
-         listThiSinh.removeIf(ts -> ts.getIdthisinh() == IdThiSinh);
-         return true;
-     }
+            listThiSinh.removeIf(ts -> ts.getIdthisinh() == IdThiSinh);
+            return true;
+        }
         return false;  
+    }
+   public List<XtThisinhXetTuyen25> searchThiSinh(String keyword, String searchType) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return listThiSinh;
+        }
+        String key = keyword.trim().toLowerCase();
+        List<XtThisinhXetTuyen25> result = new ArrayList<>();
+
+        for (XtThisinhXetTuyen25 ts : listThiSinh) {
+            switch (searchType) {
+
+                case "Mã":
+                    if (String.valueOf(ts.getIdthisinh()).contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Căn cước CD":
+                    if (ts.getCccd() != null && ts.getCccd().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "SBD":
+                    if (ts.getSobaodanh() != null && ts.getSobaodanh().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Họ Tên":
+                    String fullName = (ts.getHo() + " " + ts.getTen()).toLowerCase();
+                    if (fullName.contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Số điện thoại":
+                    if (ts.getDienThoai() != null && ts.getDienThoai().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Email":
+                    if (ts.getEmail() != null && ts.getEmail().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Nơi sinh":
+                    if (ts.getNoiSinh() != null && ts.getNoiSinh().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Khu vực":
+                    if (ts.getKhuVuc() != null && ts.getKhuVuc().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                default: // Tất cả
+                    if (
+                        String.valueOf(ts.getIdthisinh()).contains(key) ||
+                        (ts.getCccd() != null && ts.getCccd().toLowerCase().contains(key)) ||
+                        (ts.getSobaodanh() != null && ts.getSobaodanh().toLowerCase().contains(key)) ||
+                        ((ts.getHo() + " " + ts.getTen()).toLowerCase().contains(key)) ||
+                        (ts.getDienThoai() != null && ts.getDienThoai().contains(key)) ||
+                        (ts.getEmail() != null && ts.getEmail().toLowerCase().contains(key)) ||
+                        (ts.getNoiSinh() != null && ts.getNoiSinh().toLowerCase().contains(key)) ||
+                        (ts.getKhuVuc() != null && ts.getKhuVuc().toLowerCase().contains(key))
+                    ) {
+                        result.add(ts);
+                    }
+                    break;
+            }
+        }
+
+        return result;
     }
 
 }

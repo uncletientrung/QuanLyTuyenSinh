@@ -144,19 +144,16 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         }
         functionBar.add(mainFunction);
 
-        search = new IntegratedSearch(new String[] { "Tất cả", "Mã", "Căn cước CD", "SBD", "Họ Tên", "Khu vực" });
+        search = new IntegratedSearch(new String[] { "Tất cả", "Mã", "Căn cước CD", "SBD", "Họ Tên", "Số điện thoại", "Email", "Nơi sinh","Khu vực" });
         search.txtSearchForm.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                // thucHienTimKiem(); Viết hàm Search
+                 Search(); //Viết hàm Search
             }
         });
         search.cbxChoose.addItemListener(this);
         search.btnReset.addActionListener(e -> {
-            search.txtSearchForm.setText("");
-            search.cbxChoose.setSelectedIndex(0);
-            listTS = TSBUS.getAllThiSinh();
-            loadDataTable(listTS);
+            resetSearch();
         });
 
         functionBar.add(search);
@@ -167,7 +164,19 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         pnlMain.setBackground(Color.WHITE);
         pnlMain.add(paginatedTable, BorderLayout.CENTER);
         contentCenter.add(pnlMain, BorderLayout.CENTER);
-
+    }
+    
+    private void Search(){
+        String keyword = this.search.txtSearchForm.getText().trim();
+        String searchType = (String) this.search.cbxChoose.getSelectedItem(); // Trả về value luôn
+        listTS = this.TSBUS.searchThiSinh(keyword, searchType);
+        loadDataTable(listTS);
+    }
+    private void resetSearch() {
+        search.txtSearchForm.setText("");
+        search.cbxChoose.setSelectedIndex(0);
+        listTS = this.TSBUS.getAllThiSinh();
+        loadDataTable(listTS);
     }
 
     private void loadDataTable(List<XtThisinhXetTuyen25> listTS) {
@@ -257,8 +266,9 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from
-                                                                       // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            Search();
+        }
     }
     public XtThisinhXetTuyen25BUS getBUS() {
         return TSBUS;

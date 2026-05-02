@@ -67,8 +67,8 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                }
            };
            // Table Header
-           String[] header = new String[] { "ID", "CCCD", "Mã ngành", "Thứ tự NV", "Điểm xét", "Điểm UT", "Điểm cộng", "Kết quả", "Phương thức",
-                   "Tổ hợp", "NV_Keys" };
+           String[] header = new String[] { "ID", "CCCD", "Mã ngành", "Thứ tự NV", "Điểm THXT", "Điểm UT", "Điểm cộng", "Điểm xét tuyển","Kết quả", "Phương thức",
+                   "Tổ hợp" };
            tblModel.setColumnIdentifiers(header);
            tableNguyenVong.setModel(tblModel);
            tableNguyenVong.setFocusable(false);
@@ -125,19 +125,16 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            }
            functionBar.add(mainFunction);
 
-           search = new IntegratedSearch(new String[] { "Tất cả", "Mã", "Căn cước CD", "SBD", "Họ Tên", "Khu vực" });
+           search = new IntegratedSearch(new String[] { "Tất cả", "Mã", "Căn cước CD", "Mã ngành", "Phương thức", "Tổ hợp" });
            search.txtSearchForm.addKeyListener(new KeyAdapter() {
                @Override
                public void keyReleased(KeyEvent e) {
-                   // thucHienTimKiem(); Viết hàm Search
+                    Search();
                }
            });
            search.cbxChoose.addItemListener(this);
            search.btnReset.addActionListener(e -> {
-               search.txtSearchForm.setText("");
-               search.cbxChoose.setSelectedIndex(0);
-               listNV = NVBUS.getAllNguyenVong();
-               loadDataTable(listNV);
+              resetSearch();
            });
 
            functionBar.add(search);
@@ -150,6 +147,20 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            contentCenter.add(pnlMain, BorderLayout.CENTER);
 
        }
+        
+        private void Search(){
+            String keyword = this.search.txtSearchForm.getText().trim();
+            String searchType = (String) this.search.cbxChoose.getSelectedItem(); // Trả về value luôn
+            listNV = this.NVBUS.searchNguyenVong(keyword, searchType);
+            loadDataTable(listNV);
+        }
+        private void resetSearch() {
+            search.txtSearchForm.setText("");
+            search.cbxChoose.setSelectedIndex(0);
+            listNV = this.NVBUS.getAllNguyenVong();
+            loadDataTable(listNV);
+        }
+        
 
         private void loadDataTable(List<XtNguyenVongXetTuyen> listNV) {
             tblModel.setRowCount(0);
@@ -162,12 +173,12 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                         nv.getDiemThxt(),
                         nv.getDiemUtqd(),
                         nv.getDiemCong(),
+                        nv.getDiemXettuyen(),
                         nv.getNvKetqua(),
                         nv.getTtPhuongthuc(),
                         nv.getTtThm(),
-                        nv.getNvKeys()
                 });
-            }
+            } 
         }
 
     @Override
@@ -177,7 +188,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         Search();
     }
 
 }

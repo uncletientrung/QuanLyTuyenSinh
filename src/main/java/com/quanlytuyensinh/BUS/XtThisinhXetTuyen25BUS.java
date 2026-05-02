@@ -145,16 +145,7 @@ public class XtThisinhXetTuyen25BUS {
                     break;
 
                 default: // Tất cả
-                    if (
-                        String.valueOf(ts.getIdthisinh()).contains(key) ||
-                        (ts.getCccd() != null && ts.getCccd().toLowerCase().contains(key)) ||
-                        (ts.getSobaodanh() != null && ts.getSobaodanh().toLowerCase().contains(key)) ||
-                        ((ts.getHo() + " " + ts.getTen()).toLowerCase().contains(key)) ||
-                        (ts.getDienThoai() != null && ts.getDienThoai().contains(key)) ||
-                        (ts.getEmail() != null && ts.getEmail().toLowerCase().contains(key)) ||
-                        (ts.getNoiSinh() != null && ts.getNoiSinh().toLowerCase().contains(key)) ||
-                        (ts.getKhuVuc() != null && ts.getKhuVuc().toLowerCase().contains(key))
-                    ) {
+                    if(ts.toString().toLowerCase().contains(key)){
                         result.add(ts);
                     }
                     break;

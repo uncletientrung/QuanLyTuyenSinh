@@ -48,30 +48,20 @@ public class XtThisinhXetTuyen25DAO {
     }
 
     public boolean delete(int id) {
-
         Transaction transaction = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
-
             XtThisinhXetTuyen25 ts =
                     session.get(XtThisinhXetTuyen25.class, id);
-
             if (ts != null) {
                 session.remove(ts);
             }
-
             transaction.commit();
-
             return true;
-
         } catch (Exception e) {
-
             if (transaction != null) {
                 transaction.rollback();
             }
-
             e.printStackTrace();
         }
 

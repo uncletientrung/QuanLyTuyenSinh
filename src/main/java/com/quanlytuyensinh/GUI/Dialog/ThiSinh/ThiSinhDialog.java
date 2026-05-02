@@ -383,7 +383,8 @@ public class ThiSinhDialog extends JDialog {
         // ComboBox
         cbbGioiTinh.getComboBox().setSelectedItem(ts.getGioiTinh());
         cbbKhuVuc.getComboBox().setSelectedItem(ts.getKhuVuc());
-        cbbDoiTuong.getComboBox().setSelectedItem("Không ưu tiên");
+        String doiTuong = ts.getDoiTuong() == null ? "Không ưu tiên" : ts.getDoiTuong();
+        cbbDoiTuong.getComboBox().setSelectedItem(doiTuong);
        
     }
     // Làm dữ liệu giả 

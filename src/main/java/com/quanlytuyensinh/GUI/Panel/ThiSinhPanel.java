@@ -215,7 +215,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                                                                                                                                                 }, null
             );
         }else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
-                            source == mainFunction.btn.get("remove")){
+                            source == mainFunction.btn.get("delete")){
             XtThisinhXetTuyen25 thiSinhDuocChon = getSelectedThiSinh();
             if (thiSinhDuocChon == null) return;
                 
@@ -231,6 +231,19 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                                                                                                                                                     loadDataTable(listTS);
                                                                                                                                                 }, thiSinhDuocChon
                 );
+            }else if(source == mainFunction.btn.get("delete") ){
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Xóa thí sinh số báo danh: " + thiSinhDuocChon.getSobaodanh()+ "?",
+                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                        if (TSBUS.deleteThiSinh(thiSinhDuocChon.getIdthisinh())) {
+                            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                            listTS = TSBUS.getAllThiSinh();
+                            loadDataTable(listTS);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
             }
             
         }

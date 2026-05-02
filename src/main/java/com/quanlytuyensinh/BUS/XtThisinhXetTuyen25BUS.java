@@ -76,5 +76,14 @@ public class XtThisinhXetTuyen25BUS {
         }
         return false;
     }
+    public boolean deleteThiSinh(int IdThiSinh){
+        if(IdThiSinh <=0) return false;
+        boolean rs = TSDAO.delete(IdThiSinh);
+        if (rs) {
+         listThiSinh.removeIf(ts -> ts.getIdthisinh() == IdThiSinh);
+         return true;
+     }
+        return false;  
+    }
 
 }

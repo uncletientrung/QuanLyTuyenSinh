@@ -196,7 +196,12 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         Object source = e.getSource();
         if(source == mainFunction.btn.get("create") ){
             System.err.println("chạy");
-            new ThemThiSinhDialog(this, owner, "THÊM THÍ SINH", "create",true);
+            new ThemThiSinhDialog(this, owner, "THÊM THÍ SINH", "create",true, () -> {
+                                                                                                                                                    listTS = TSBUS.getAllThiSinh();
+                                                                                                                                                    System.out.println(listTS.size());
+                                                                                                                                                    loadDataTable(listTS);
+                                                                                                                                                }
+            );
         }
     }
 
@@ -205,5 +210,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         throw new UnsupportedOperationException("Not supported yet."); // Generated from
                                                                        // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-
+    public XtThisinhXetTuyen25BUS getBUS() {
+        return TSBUS;
+    }
 }

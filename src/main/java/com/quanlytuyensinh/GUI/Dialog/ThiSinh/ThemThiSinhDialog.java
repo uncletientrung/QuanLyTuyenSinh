@@ -11,9 +11,12 @@ import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Component.InputDate;
+import com.quanlytuyensinh.helper.convertDateFormat;
 import com.quanlytuyensinh.GUI.Component.NumericDocumentFilter;
 import com.quanlytuyensinh.helper.Validation;
 import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -25,9 +28,10 @@ import javax.swing.text.PlainDocument;
 public class ThemThiSinhDialog extends JDialog {
 
     private ThiSinhPanel parent;
-    private XtThisinhXetTuyen25BUS bus = new XtThisinhXetTuyen25BUS();
+    private XtThisinhXetTuyen25BUS bus;
     private XtThisinhXetTuyen25 currentThiSinh;
     private String type; // "create" hoặc "edit"
+    private Runnable onSuccess; // Lưu hàm chạy sau khi xong
 
     // Form fields
     private VerticalInputForm txtCCCD, txtSBD, txtHo, txtTen,
@@ -36,10 +40,12 @@ public class ThemThiSinhDialog extends JDialog {
     private VerticalComboBoxForm cbbGioiTinh, cbbKhuVuc, cbbDoiTuong;
     private ButtonCustom btnLuu, btnHuy;
 
-    public ThemThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title, String type, boolean modal) {
+    public ThemThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess) {
         super(owner, title, modal);
         this.parent = parent;
+        this.bus = parent.getBUS(); // Dùng chung 1 BUS với cha
         this.type = type;
+        this.onSuccess = onSuccess;
         this.setTitle(title);
 
         initComponents();
@@ -53,7 +59,7 @@ public class ThemThiSinhDialog extends JDialog {
 
         initMainPanel();
         initButtonPanel();
-
+        setFakeData(); // Set dữ liệu giả
         this.add(pnlMain, BorderLayout.CENTER);
         this.add(pnlButtons, BorderLayout.SOUTH);
 
@@ -75,6 +81,8 @@ public class ThemThiSinhDialog extends JDialog {
         
         txtCCCD = new VerticalInputForm("CCCD / CMND");
         txtSBD = new VerticalInputForm("Số báo danh (SBD)");
+        txtSBD.setText("Hệ thống tự sinh");
+        txtSBD.setDisable();
         txtHo = new VerticalInputForm("Họ");
         txtTen = new VerticalInputForm("Tên");
         txtNgaySinh = new InputDate("Ngày sinh (dd/MM/yyyy)", 300, 40);
@@ -104,9 +112,9 @@ public class ThemThiSinhDialog extends JDialog {
         right.add(cbbGioiTinh);
         right.add(cbbKhuVuc);
         right.add(txtEmail);
-        right.add(txtPasswordConfirm);   // di chuyển xuống nếu cần cân bằng layout
+        right.add(txtPasswordConfirm);
         
-
+        // =======================
         pnlMain.add(left);
         pnlMain.add(right);
     }
@@ -126,7 +134,7 @@ public class ThemThiSinhDialog extends JDialog {
 
         btnLuu.addActionListener(e -> {
             if (validateInput()) {
-                 JOptionPane.showMessageDialog(this, "THÀNH CÔNG", "Lỗi", JOptionPane.WARNING_MESSAGE);
+                 saveThiSinh();
             }
         });
 
@@ -136,58 +144,50 @@ public class ThemThiSinhDialog extends JDialog {
         pnlButtons.add(btnHuy);
     }
 
-//    private void saveThiSinh() {
-//        XtThisinhXetTuyen25 ts = new XtThisinhXetTuyen25();
-//
-//        ts.setCccd(txtCCCD.getText().trim());
-//        ts.setSobaodanh(txtSBD.getText().trim());
-//        ts.setHo(txtHo.getText().trim());
-//        ts.setTen(txtTen.getText().trim());
-//        ts.setNgaySinh(convertDateFormat(txtNgaySinh.getText().trim()));
-//        ts.setDienThoai(txtSDT.getText().trim());
-//        ts.setEmail(txtEmail.getText().trim());
-//        ts.setNoiSinh(txtNoiSinh.getText().trim());
-//        ts.setGioiTinh((String) cbbGioiTinh.getSelectedValue());
-//        ts.setKhuVuc((String) cbbKhuVuc.getSelectedValue());
-//        ts.setDoiTuong((String) cbbDoiTuong.getSelectedValue());
-//        ts.setPassword(txtPassword.getText().trim());   // quan trọng: mật khẩu
-//
-//        // Các trường tự động
-//        ts.setUpdatedAt(java.sql.Date.valueOf(LocalDate.now()));
-//
-//        try {
-//            if ("create".equals(type)) {
-//                if (bus.insertThiSinh(ts)) {   // Bạn cần có phương thức này trong BUS
-//                    JOptionPane.showMessageDialog(this, "Thêm thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-//                    parent.listTS = bus.getAllThiSinh();   // refresh list
-//                    parent.loadDataTable(parent.listTS);
-//                    dispose();
-//                }
-//            } else {
-//                // edit logic (nếu cần sau này)
-//                JOptionPane.showMessageDialog(this, "Chức năng chỉnh sửa đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-//            }
-//        } catch (Exception ex) {
-//            JOptionPane.showMessageDialog(this, "Lỗi khi lưu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-//            ex.printStackTrace();
-//        }
-//    }
-
-    private String convertDateFormat(String input) {
-        if (input == null || input.trim().isEmpty()) return null;
-        
-        // Chuyển từ dd/MM/yyyy sang yyyy-MM-dd (phù hợp với DB)
-        DateTimeFormatter inputFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter dbFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        
+    private void saveThiSinh() {
+        String ngaySinh = "";
         try {
-            LocalDate date = LocalDate.parse(input, inputFmt);
-            return date.format(dbFmt);
-        } catch (DateTimeParseException e) {
-            return input; // giữ nguyên nếu đã đúng format
+            ngaySinh = convertDateFormat.DateToString(txtNgaySinh.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi định dạng ngày khi save");
+        }
+        
+        XtThisinhXetTuyen25 ts = new XtThisinhXetTuyen25();
+        
+        ts.setCccd(txtCCCD.getText().trim());
+        ts.setSobaodanh(txtSBD.getText().trim());
+        ts.setHo(txtHo.getText().trim());
+        ts.setTen(txtTen.getText().trim());
+        ts.setNgaySinh(ngaySinh);
+        ts.setDienThoai(txtSDT.getText().trim());
+        ts.setEmail(txtEmail.getText().trim());
+        ts.setNoiSinh(txtNoiSinh.getText().trim());
+        ts.setGioiTinh((String) cbbGioiTinh.getSelectedValue());
+        ts.setKhuVuc((String) cbbKhuVuc.getSelectedValue());
+        ts.setDoiTuong((String) cbbDoiTuong.getSelectedValue());
+        ts.setPassword(txtPassword.getText().trim()); 
+         ts.setUpdatedAt(LocalDate.now()); // Cập nhật trạng thái chỉnh sửa
+       
+        try {
+            if ("create".equals(type)) {
+                if (bus.insertThiSinh(ts)) {
+                    JOptionPane.showMessageDialog(this, "Thêm thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
+                    dispose();
+                }
+            } else {
+                // edit logic (nếu cần sau này)
+                JOptionPane.showMessageDialog(this, "Chức năng chỉnh sửa đang phát triển!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lưu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
     }
-
+    
     private boolean validateInput() {
 
         // ===== CCCD =====
@@ -199,6 +199,11 @@ public class ThemThiSinhDialog extends JDialog {
         }
         if (!cccd.matches("\\d{12}")) {
             JOptionPane.showMessageDialog(this, "CCCD phải gồm đúng 12 chữ số!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtCCCD.getTxtForm().requestFocus();
+            return false;
+        }
+        if (!bus.checkCCCD(cccd)) {
+            JOptionPane.showMessageDialog(this, "CCCD đã tồn tại trong hệ thống", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtCCCD.getTxtForm().requestFocus();
             return false;
         }
@@ -227,14 +232,14 @@ public class ThemThiSinhDialog extends JDialog {
         // ===== Ngày sinh =====
         Date ngaySinh = txtNgaySinh.getDateChooser().getDate();
         if (ngaySinh == null) {
-            JOptionPane.showMessageDialog(this, "Ngày sinh không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ngày sinh không hợp lệ", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtNgaySinh.getDateChooser().requestFocus();
             return false;
         }
 
         // Optional: kiểm tra không được chọn ngày tương lai
         if (ngaySinh.after(new Date())) {
-            JOptionPane.showMessageDialog(this, "Ngày sinh không hợp lệ (không được là ngày tương lai)!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ngày sinh không được là ngày tương lai!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtNgaySinh.getDateChooser().requestFocus();
             return false;
         }
@@ -305,6 +310,34 @@ public class ThemThiSinhDialog extends JDialog {
         }
 
         return true;
+    }
+   
+    private void setFakeData() {
+        txtCCCD.setText("012345678901");
+        txtHo.setText("Nguyen");
+        txtTen.setText("An");
+
+        // Ngày sinh: 15/05/2004
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse("15/05/2004", fmt);
+            Date date = java.sql.Date.valueOf(localDate);
+            txtNgaySinh.getDateChooser().setDate(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        txtNoiSinh.setText("TP.HCM");
+        txtSDT.setText("0912345678");
+        txtEmail.setText("test@gmail.com");
+
+        txtPassword.setText("123456");
+        txtPasswordConfirm.setText("123456");
+
+        // ComboBox
+        cbbGioiTinh.getComboBox().setSelectedItem("Nam");
+        cbbKhuVuc.getComboBox().setSelectedItem("KV1");
+        cbbDoiTuong.getComboBox().setSelectedItem("Không ưu tiên");
     }
 
 }

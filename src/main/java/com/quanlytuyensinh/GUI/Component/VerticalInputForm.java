@@ -25,7 +25,7 @@ public class VerticalInputForm extends JPanel {
        
         txtForm.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-                BorderFactory.createEmptyBorder(5, 15, 5, 15) 
+                BorderFactory.createEmptyBorder(5, 5, 5, 5) 
         ));
 
         this.add(lblTitle, BorderLayout.NORTH);

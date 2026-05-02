@@ -13,30 +13,22 @@ public class XtThisinhXetTuyen25DAO {
         return new XtThisinhXetTuyen25DAO();
     }
 
-    public boolean insert(XtThisinhXetTuyen25 ts) {
-
+    public XtThisinhXetTuyen25  insert(XtThisinhXetTuyen25 ts) {
         Transaction transaction = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
-
-            session.persist(ts);
-
+            session.save(ts);
             transaction.commit();
-
-            return true;
-
+             return ts;
         } catch (Exception e) {
 
             if (transaction != null) {
                 transaction.rollback();
             }
-
             e.printStackTrace();
         }
 
-        return false;
+        return null;
     }
 
     public boolean update(XtThisinhXetTuyen25 ts) {

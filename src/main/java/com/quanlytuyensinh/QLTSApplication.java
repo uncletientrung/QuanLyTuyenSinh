@@ -1,4 +1,4 @@
-package com.example.quanlytuyensinh;
+package com.quanlytuyensinh;
 
 import com.quanlytuyensinh.GUI.Main;
 import javax.swing.SwingUtilities;

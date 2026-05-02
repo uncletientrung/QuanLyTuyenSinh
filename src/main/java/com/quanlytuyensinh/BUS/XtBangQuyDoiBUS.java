@@ -27,6 +27,10 @@ public class XtBangQuyDoiBUS {
     }
 
     public List<XtBangQuyDoi> getAllQuyDoi() {
+        listQuyDoi = xtbangquydoiDAO.getAll();
+        if (listQuyDoi == null) {
+            listQuyDoi = new ArrayList<>();
+        }
         return listQuyDoi;
     }
 
@@ -94,7 +98,7 @@ public class XtBangQuyDoiBUS {
     public boolean updateQuyDoi(XtBangQuyDoi qd) {
         validateQuyDoi(qd);
         if (xtbangquydoiDAO.update(qd)) {
-            for (int i = 0; i <= listQuyDoi.size(); i++) {
+            for (int i = 0; i < listQuyDoi.size(); i++) {
                 if (listQuyDoi.get(i).getIdqd() == qd.getIdqd()) {
                     listQuyDoi.set(i, qd);
                     break;

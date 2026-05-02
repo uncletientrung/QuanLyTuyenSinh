@@ -28,6 +28,10 @@ public class XtDiemCongXetTuyenBUS {
     }
 
     public List<XtDiemCongXetTuyen> getAllDiemCong() {
+        listDiemCong = xtdiemcongxettuyenDAO.getAll();
+        if (listDiemCong == null) {
+            listDiemCong = new ArrayList<>();
+        }
         return listDiemCong;
     }
 

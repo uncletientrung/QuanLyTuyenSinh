@@ -199,87 +199,116 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
             return;
         }
 
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setIndeterminate(true);
+        JOptionPane pane = new JOptionPane(progressBar, JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = pane.createDialog(mainFrame, "Đang import dữ liệu...");
+        dialog.setModal(true);
+        dialog.pack();
+
         java.io.File file = fileChooser.getSelectedFile();
-        int successCount = 0, failCount = 0;
 
-        try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook
-                = new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.FileInputStream(file))) {
+        SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                int successCount = 0, failCount = 0;
 
-            // Sheet name -> phương thức tương ứng
-            java.util.Map<String, String> sheetPhuongThuc = new java.util.LinkedHashMap<>();
-            sheetPhuongThuc.put("DGNL", "DGNL");
-            sheetPhuongThuc.put("VSAT", "VSAT");
+                try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook
+                        = new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.FileInputStream(file))) {
 
-            for (java.util.Map.Entry<String, String> entry : sheetPhuongThuc.entrySet()) {
-                org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheet(entry.getKey());
-                if (sheet == null) {
-                    continue;
-                }
-                String phuongThuc = entry.getValue();
+                    // Sheet name -> phương thức tương ứng
+                    java.util.Map<String, String> sheetPhuongThuc = new java.util.LinkedHashMap<>();
+                    sheetPhuongThuc.put("DGNL", "DGNL");
+                    sheetPhuongThuc.put("VSAT", "VSAT");
 
-                // Row 0&1 = header, dữ liệu từ row 1
-                for (int i = 2; i <= sheet.getLastRowNum(); i++) {
-                    org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
-                    if (row == null) {
-                        continue;
-                    }
-
-                    try {
-                        String toHopMon = getCellStringValue(row.getCell(0)).trim().toUpperCase();
-                        if (toHopMon.isEmpty()) {
+                    for (java.util.Map.Entry<String, String> entry : sheetPhuongThuc.entrySet()) {
+                        org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheet(entry.getKey());
+                        if (sheet == null) {
                             continue;
                         }
+                        String phuongThuc = entry.getValue();
 
-                        java.math.BigDecimal diemA = getCellDecimalValue(row.getCell(1)); // Điểm thấp nhất DGNL/VSAT
-                        java.math.BigDecimal diemB = getCellDecimalValue(row.getCell(2)); // Điểm cao nhất DGNL/VSAT
-                        java.math.BigDecimal diemC = getCellDecimalValue(row.getCell(3)); // Điểm thấp nhất THPT
-                        java.math.BigDecimal diemD = getCellDecimalValue(row.getCell(4)); // Điểm cao nhất THPT
-                        String phanVi = String.valueOf((int) row.getCell(5).getNumericCellValue());
+                        // Row 0&1 = header, dữ liệu từ row 1
+                        for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+                            org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
+                            if (row == null) {
+                                continue;
+                            }
 
-                        // Tạo mã quy đổi giống logic trong Dialog
-                        String maQuyDoi = phuongThuc + "_" + toHopMon + "_" + phanVi;
+                            try {
+                                String toHopMon = getCellStringValue(row.getCell(0)).trim().toUpperCase();
+                                if (toHopMon.isEmpty()) {
+                                    continue;
+                                }
 
-                        XtBangQuyDoi qd = new XtBangQuyDoi();
-                        qd.setDPhuongthuc(phuongThuc);
-                        if ("VSAT".equals(phuongThuc)) {
-                            qd.setDMon(toHopMon);
-                            qd.setDTohop(null);
-                        } else {
-                            qd.setDTohop(toHopMon);
-                            qd.setDMon(null);
+                                java.math.BigDecimal diemA = getCellDecimalValue(row.getCell(1));
+                                java.math.BigDecimal diemB = getCellDecimalValue(row.getCell(2));
+                                java.math.BigDecimal diemC = getCellDecimalValue(row.getCell(3));
+                                java.math.BigDecimal diemD = getCellDecimalValue(row.getCell(4));
+                                String phanVi = String.valueOf((int) row.getCell(5).getNumericCellValue());
+
+                                String maQuyDoi = phuongThuc + "_" + toHopMon + "_" + phanVi;
+
+                                XtBangQuyDoi qd = new XtBangQuyDoi();
+                                qd.setDPhuongthuc(phuongThuc);
+                                if ("VSAT".equals(phuongThuc)) {
+                                    qd.setDMon(toHopMon);
+                                    qd.setDTohop(null);
+                                } else {
+                                    qd.setDTohop(toHopMon);
+                                    qd.setDMon(null);
+                                }
+                                qd.setDDiema(diemA);
+                                qd.setDDiemb(diemB);
+                                qd.setDDiemc(diemC);
+                                qd.setDDiemd(diemD);
+                                qd.setDMaQuyDoi(maQuyDoi);
+                                qd.setDPhanvi(phanVi);
+
+                                if (qdBUS.addQuyDoi(qd)) {
+                                    successCount++;
+                                } else {
+                                    failCount++;
+                                }
+                            } catch (Exception ex) {
+                                failCount++;
+                            }
                         }
-                        qd.setDDiema(diemA);
-                        qd.setDDiemb(diemB);
-                        qd.setDDiemc(diemC);
-                        qd.setDDiemd(diemD);
-                        qd.setDMaQuyDoi(maQuyDoi);
-                        qd.setDPhanvi(phanVi);
-
-                        if (qdBUS.addQuyDoi(qd)) {
-                            successCount++;
-                        } else {
-                            failCount++;
-                        }
-                    } catch (Exception ex) {
-                        failCount++;
                     }
+
+                } catch (Exception ex) {
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(XtBangQuyDoiPanel.this,
+                                "Lỗi đọc file Excel: " + ex.getMessage(),
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    });
+                    return null;
                 }
+
+                final int finalSuccess = successCount;
+                final int finalFail = failCount;
+
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(XtBangQuyDoiPanel.this,
+                            "Import hoàn tất!\nThành công: " + finalSuccess + " dòng\nThất bại: " + finalFail + " dòng",
+                            "Kết quả Import", JOptionPane.INFORMATION_MESSAGE);
+                });
+
+                return null;
             }
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Lỗi đọc file Excel: " + ex.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            @Override
+            protected void done() {
+                dialog.dispose();
+                listQD = qdBUS.getAllQuyDoi();
+                loadDataTable(listQD);
+            }
+        };
 
-        JOptionPane.showMessageDialog(this,
-                "Import hoàn tất!\nThành công: " + successCount + " dòng\nThất bại: " + failCount + " dòng",
-                "Kết quả Import", JOptionPane.INFORMATION_MESSAGE);
-
-        listQD = qdBUS.getAllQuyDoi();
-        loadDataTable(listQD);
+        worker.execute();
+        dialog.setVisible(true);
     }
+    // END Excel
 
     // Helper: đọc cell thành String
     private String getCellStringValue(org.apache.poi.ss.usermodel.Cell cell) {
@@ -336,7 +365,7 @@ public class XtBangQuyDoiPanel extends JPanel implements ActionListener, ItemLis
         return java.math.BigDecimal.valueOf(val);
     }
     // END Excel
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == mainFunction.btn.get("create")) {

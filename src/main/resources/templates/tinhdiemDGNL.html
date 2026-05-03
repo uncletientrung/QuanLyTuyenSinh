@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-   <head th:replace="fragments/head :: head"></head>
+    <head th:replace="fragments/head :: head"></head>
 
     <body>
         <!-- Page Container -->
@@ -14,7 +14,74 @@
 
                 <!-- Page Content -->
                 <div class="content">
-                    Kết quả tính điểm ĐGNL
+                    <!-- Table Sections -->
+                    <div class="block block-rounded">
+                        <div class="block-header block-header-default">
+                            <h3 class="block-title">Tính quy đổi điểm xét tuyển ĐGNL:
+                                <span class="fw-bold text-primary">Quản lý giáo dục (7140114)</span>
+                            </h3>
+                        </div>
+                        <div class="block-content">
+                            <p>
+                                Tổ hợp gốc quy đổi theo ngành:
+                                <span class="fw-bold text-primary">D01</span>,
+                                Ngưỡng đầu vào:
+                            </p>
+
+                            <!--
+                              Separate your table content with multiple tbody sections. Add one row and add the class .js-table-sections-header to a
+                              tbody section to make it clickable. It will then toggle the next tbody section which can have multiple rows. Eg:
+                  
+                              <tbody class="js-table-sections-header">One row</tbody>
+                              <tbody>Multiple rows</tbody>
+                              <tbody class="js-table-sections-header">One row</tbody>
+                              <tbody>Multiple rows</tbody>
+                              <tbody class="js-table-sections-header">One row</tbody>
+                              <tbody>Multiple rows</tbody>
+                  
+                              You can also add the class .show in your tbody.js-table-sections-header to make the next tbody section visible by default
+                            -->
+                            <div class="table-responsive">
+                                <table class="js-table-sections table table-hover table-vcenter table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Nội dung</th>
+                                            <th>Chi tiết điểm</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody class="fs-sm">
+                                        <tr>
+                                            <td>Điểm thi ĐGNL</td>
+                                            <td>890.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Công thức quy đổi về thang 30 <span class="fw-bold text-primary">(THXT gốc: D01)</span>
+                                            </td>
+                                            <td>22.25 + (890 - 889.00) / (895.00 - 889.00) * (22.25 - 22.25)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Điểm thi quy đổi</td>
+                                            <td>22.25</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Điểm cộng</td>
+                                            <td>2.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Điểm ưu tiên quy đổi</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Điểm xét tuyển = <code>Điểm quy đổi + Điểm cộng + Điểm ưu tiên quy đổi</code></td>
+                                            <td>24.25</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END Table Sections -->
                 </div>
                 <!-- END Page Content -->
             </main>
@@ -28,5 +95,6 @@
     <!-- JS -->
     <script th:src="@{/js/dashmix.app.min.js}"></script>
     <script th:src="@{/js/jquery.min.js}"></script>
+    <script>Dashmix.helpersOnLoad(['dm-table-tools-sections']);</script>
 
 </html>

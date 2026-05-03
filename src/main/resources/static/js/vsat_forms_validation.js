@@ -23,49 +23,49 @@ Dashmix.onLoad((() => class {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-van-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-ly-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-hoa-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-sinh-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-su-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-dia-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 },
                 "diem-anh-input": {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 10
+                    max: 150
                 }
             },
             messages: {
@@ -82,49 +82,49 @@ Dashmix.onLoad((() => class {
                     required: "Vui lòng nhập điểm Toán (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-van-input": {
                     required: "Vui lòng nhập điểm Ngữ văn (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-ly-input": {
                     required: "Vui lòng nhập điểm Vật lý (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-hoa-input": {
                     required: "Vui lòng nhập điểm Hoá học (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-sinh-input": {
                     required: "Vui lòng nhập điểm Sinh học (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-su-input": {
                     required: "Vui lòng nhập điểm Lịch sử (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-dia-input": {
                     required: "Vui lòng nhập điểm Địa lý (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 },
                 "diem-anh-input": {
                     required: "Vui lòng nhập điểm Tiếng Anh (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
-                    max: "Điểm tối đa là 10"
+                    max: "Điểm tối đa là 150"
                 }
             },
             errorClass: 'invalid-feedback animated fadeIn',

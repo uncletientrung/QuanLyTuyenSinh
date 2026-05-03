@@ -23,7 +23,7 @@ Dashmix.onLoad((() => class {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 990
+                    max: 1200
                 }
             },
             messages: {
@@ -40,7 +40,7 @@ Dashmix.onLoad((() => class {
                     required: "Vui lòng nhập điểm thi",
                     number: "Điểm thi phải là số",
                     min: "Điểm thi tối thiểu là 0",
-                    max: "Điểm thi tối đa là 990"
+                    max: "Điểm thi tối đa là 1200"
                 }
             },
             errorClass: 'invalid-feedback animated fadeIn',

@@ -6,6 +6,7 @@ package com.quanlytuyensinh.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  *
@@ -13,8 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class TinhDiemDGNLController {
+    // Running on http://localhost:8080/tinhdiemDGNL-view
+    @RequestMapping(value = "/tinhdiemDGNL-view", method = RequestMethod.GET)
+    public String viewForm() {
+        return "tinhdiemDGNL-view";
+    }
+    
     // Running on http://localhost:8080/tinhdiemDGNL
-    @RequestMapping("/tinhdiemDGNL")
+    @RequestMapping(value = "/tinhdiemDGNL", method = RequestMethod.POST)
     public String tinhdiemDGNL() {
         return "tinhdiemDGNL";
     }

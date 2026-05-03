@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <head th:replace="fragments/head :: head"></head>
+   <head th:replace="fragments/head :: head"></head>
 
     <body>
         <!-- Page Container -->
@@ -14,82 +14,7 @@
 
                 <!-- Page Content -->
                 <div class="content">
-                    <!-- Elements -->
-                    <div class="block block-rounded">
-                        <div class="block-header block-header-default">
-                            <h3 class="block-title">Công cụ tham khảo tính điểm xét tuyển</h3>
-                        </div>
-                        <div class="block-content">
-                            <form class="js-validation-dgnl" th:action="@{/tinhdiemDGNL}" method="POST">
-                                <!-- Basic Elements -->
-                                <h2 class="content-heading pt-0">Điểm thi <span class="fw-bold text-primary">
-                                        Đánh Giá Năng Lực</span></h2>
-                                <div class="row push">
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <!-- TODO: Should use <option th:each> to replace hardcode -->
-                                            <label class="form-label" for="nganh-select">Chọn ngành</label>
-                                            <select class="form-select" id="nganh-select" name="nganh-select">
-                                                <option selected>Open this select menu</option>
-                                                <option value="1">Option #1</option>
-                                                <option value="2">Option #2</option>
-                                                <option value="3">Option #3</option>
-                                                <option value="4">Option #4</option>
-                                                <option value="5">Option #5</option>
-                                                <option value="6">Option #6</option>
-                                                <option value="7">Option #7</option>
-                                                <option value="8">Option #8</option>
-                                                <option value="9">Option #9</option>
-                                                <option value="10">Option #10</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="diem-cong-input">Điểm cộng <span class="fw-bold text-primary">
-                                                    (<= 3.0)</span></label>
-                                            <input type="number" step="0.1" class="form-control" id="diem-cong-input" name="diem-cong-input"
-                                                   placeholder="0.0">
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="khuvuc-select">Khu vực ưu tiên</label>
-                                            <select class="form-select" id="khuvuc-select" name="khuvuc-select">
-                                                <option selected>Không có</option>
-                                                <option value="1">Khu vực 1</option>
-                                                <option value="2">Khu vực 2</option>
-                                                <option value="3">Khu vực 3</option>
-                                                <option value="2NT">Khu vực 2 nông thôn</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="doituong-select">Đối tượng ưu tiên</label>
-                                            <select class="form-select" id="doituong-select" name="doituong-select">
-                                                <option selected>Không đối tượng</option>
-                                                <option value="01">Đối tượng 01</option>
-                                                <option value="02">Đối tượng 02</option>
-                                                <option value="03">Đối tượng 03</option>
-                                                <option value="04">Đối tượng 04</option>
-                                                <option value="05">Đối tượng 05</option>
-                                                <option value="06">Đối tượng 06</option>
-                                                <option value="07">Đối tượng 07</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <label class="form-label" for="diem-thi-input">Điểm thi</label>
-                                            <input type="number" class="form-control" id="diem-thi-input" name="diem-thi-input" placeholder="0">
-                                        </div>
-                                        <div class="mb-4">
-                                            <button type="submit" class="btn btn-hero btn-primary">Tính điểm</button>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- END Basic Elements -->
-                            </form>
-                        </div>
-                    </div>
-                    <!-- END Elements -->
+                    Kết quả tính điểm ĐGNL
                 </div>
                 <!-- END Page Content -->
             </main>
@@ -101,10 +26,7 @@
     </body>
 
     <!-- JS -->
-    <script th:src="@{/js/jquery.min.js}"></script>
-    <script th:src="@{/js/jquery.validate.min.js}"></script>
     <script th:src="@{/js/dashmix.app.min.js}"></script>
-
-    <script th:src="@{/js/dgnl_forms_validation.js}"></script>
+    <script th:src="@{/js/jquery.min.js}"></script>
 
 </html>

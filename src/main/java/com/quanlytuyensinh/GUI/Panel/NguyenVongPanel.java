@@ -8,6 +8,7 @@ import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
+import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
@@ -23,6 +24,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import javax.swing.border.EmptyBorder;
@@ -36,18 +39,18 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     PanelBorderRadius pnlMain, functionBar;
     Main mainFrame;
     JPanel pnlBorder1, pnlBorder2, pnlBorder3, pnlBorder4, contentCenter;
-    JTable tableNguyenVong;
-    JScrollPane scrollTableNguyenVong;
     MainFunction mainFunction; // Thanh function
     IntegratedSearch search; // Thanh Search
-    DefaultTableModel tblModel;
-
-    XtNguyenVongXetTuyenBUS NVBUS = new XtNguyenVongXetTuyenBUS();
-    List<XtNguyenVongXetTuyen> listNV = NVBUS.getAllNguyenVong();
+    private PaginatedTable paginatedTable;
+    
+    XtNguyenVongXetTuyenBUS NVBUS;
+    List<XtNguyenVongXetTuyen> listNV;
     Color BackgroundColor = new Color(240, 247, 250);
     
     public NguyenVongPanel(Main mainF) {
         this.mainFrame = mainF;
+        NVBUS = new XtNguyenVongXetTuyenBUS();
+        listNV = NVBUS.getAllNguyenVong();
         initComponent();
         loadDataTable(listNV);
     }
@@ -57,36 +60,42 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            this.setLayout(new BorderLayout(0, 0));
            this.setOpaque(true);
 
-           tableNguyenVong = new JTable();
-           scrollTableNguyenVong = new JScrollPane();
-
-           tblModel = new DefaultTableModel() {
-               @Override
-               public boolean isCellEditable(int row, int column) {
-                   return false;
-               }
-           };
            // Table Header
            String[] header = new String[] { "ID", "CCCD", "Mã ngành", "Thứ tự NV", "Điểm THXT", "Điểm UT", "Điểm cộng", "Điểm xét tuyển","Kết quả", "Phương thức",
                    "Tổ hợp" };
-           tblModel.setColumnIdentifiers(header);
-           tableNguyenVong.setModel(tblModel);
-           tableNguyenVong.setFocusable(false);
-           tableNguyenVong.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
-           tableNguyenVong.getTableHeader().setPreferredSize(new Dimension(0, 40));
-           DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tableNguyenVong.getTableHeader()
-                   .getDefaultRenderer();
+           paginatedTable = new PaginatedTable(header);
+           
+           JTable table = paginatedTable.getTable();
+           table.setFocusable(false);
+           table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+           table.getTableHeader().setPreferredSize(new Dimension(0, 40));
+           table.setAutoCreateRowSorter(true);
+           TableSorter.configureTableColumnSorter(table, 0, TableSorter.INTEGER_COMPARATOR);
+           
+           DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
            headerRenderer.setHorizontalAlignment(JLabel.CENTER);
-           scrollTableNguyenVong.setViewportView(tableNguyenVong);
+           
            // Table Cell
            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-           for (int i = 0; i < tableNguyenVong.getColumnCount(); i++) {
-               tableNguyenVong.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+           for (int i = 0; i < table.getColumnCount(); i++) {
+               table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
            }
            // Table Sorter
-           tableNguyenVong.setAutoCreateRowSorter(true);
-           TableSorter.configureTableColumnSorter(tableNguyenVong, 0, TableSorter.INTEGER_COMPARATOR);
+           table.setAutoCreateRowSorter(false);
+           Comparator<Object>[] comps = new Comparator[11];
+            comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
+            comps[1] = TableSorter.STRING_COMPARATOR;      // CCCD
+            comps[2] = TableSorter.STRING_COMPARATOR;      // Mã ngành
+            comps[3] = TableSorter.INTEGER_COMPARATOR;      // Thứ tự nguyện vọng
+            comps[4] = TableSorter.BIG_DECIMAL_COMPARATOR;      // Điểm THXT
+            comps[5] = TableSorter.BIG_DECIMAL_COMPARATOR;      // Điểm UT
+            comps[6] = TableSorter.BIG_DECIMAL_COMPARATOR;      // Điểm cộng
+            comps[7] = TableSorter.BIG_DECIMAL_COMPARATOR;      // Điểm xét tuyển
+            comps[8] = TableSorter.STRING_COMPARATOR;      // Kết quả
+            comps[9] = TableSorter.STRING_COMPARATOR;      // Phương thức
+            comps[10] = TableSorter.STRING_COMPARATOR;      // Tổ hợp
+            paginatedTable.enableFullDataSorting(comps);
 
            // Tạo khung viền
            pnlBorder1 = new JPanel();
@@ -143,7 +152,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            pnlMain = new PanelBorderRadius();
            pnlMain.setLayout(new BorderLayout());
            pnlMain.setBackground(Color.WHITE);
-           pnlMain.add(scrollTableNguyenVong, BorderLayout.CENTER);
+           pnlMain.add(paginatedTable, BorderLayout.CENTER);
            contentCenter.add(pnlMain, BorderLayout.CENTER);
 
        }
@@ -163,9 +172,9 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         
 
         private void loadDataTable(List<XtNguyenVongXetTuyen> listNV) {
-            tblModel.setRowCount(0);
+            List<Object[]> data = new ArrayList<>();
             for (XtNguyenVongXetTuyen nv : listNV) {
-                tblModel.addRow(new Object[] {
+                data.add(new Object[] {
                         "NV-" + nv.getIdnv(),
                         nv.getNnCccd(),
                         nv.getNvManganh(),
@@ -179,16 +188,25 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                         nv.getTtThm(),
                 });
             } 
+            paginatedTable.setData(data);
         }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this); // Lấy Frame cha
+        Object source = e.getSource();
+        
+        if(source == mainFunction.btn.get("create") ){
+            
+        }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
          Search();
+    }
+    public XtNguyenVongXetTuyenBUS getBUS(){
+        return NVBUS;
     }
 
 }

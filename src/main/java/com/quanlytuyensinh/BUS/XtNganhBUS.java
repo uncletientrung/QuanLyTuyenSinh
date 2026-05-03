@@ -174,4 +174,15 @@ public class XtNganhBUS {
         if (flag == null || flag.trim().isEmpty()) return false;
         return flag.trim().equals("1") || flag.trim().equals("0");
     }
+    public BigDecimal getDiemSanByIdNganhVaIdTH(String maNganh, String maToHop){
+        BigDecimal rs = BigDecimal.ZERO;
+        for(XtNganh nganh : listNganh){
+            if(maNganh.equals(nganh.getManganh()) && maToHop.equals(nganh.getNTohopgoc())){
+                rs = nganh.getNDiemsan();
+                break;
+            }
+        }
+        return rs;
+        
+    }
 }

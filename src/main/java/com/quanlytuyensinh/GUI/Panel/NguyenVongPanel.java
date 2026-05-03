@@ -12,6 +12,7 @@ import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
+import com.quanlytuyensinh.GUI.Dialog.NguyenVongDialog;
 import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -197,7 +198,11 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         Object source = e.getSource();
         
         if(source == mainFunction.btn.get("create") ){
-            
+            new NguyenVongDialog(this, owner, "THÊM NGUYỆN VỌNG", "create",true, () -> {
+                                                                                                                                                    listNV = NVBUS.getAllNguyenVong();
+                                                                                                                                                    loadDataTable(listNV);
+                                                                                                                                                }, null
+            );
         }
     }
 

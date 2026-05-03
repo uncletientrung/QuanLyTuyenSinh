@@ -220,7 +220,6 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         Object source = e.getSource();
         
         if(source == mainFunction.btn.get("create") ){
-            System.err.println("chạy");
             new ThiSinhDialog(this, owner, "THÊM THÍ SINH", "create",true, () -> {
                                                                                                                                                     listTS = TSBUS.getAllThiSinh();
                                                                                                                                                     loadDataTable(listTS);

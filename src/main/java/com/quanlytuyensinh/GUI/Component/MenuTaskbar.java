@@ -6,6 +6,7 @@ package com.quanlytuyensinh.GUI.Component;
 
 import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
 import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
+import com.quanlytuyensinh.GUI.Panel.DiemThiPanel;
 import com.quanlytuyensinh.GUI.Panel.NganhPanel;
 import com.quanlytuyensinh.GUI.Panel.TaiKhoanPanel;
 import com.quanlytuyensinh.GUI.Panel.TrangChuPanel;
@@ -118,6 +119,9 @@ public class MenuTaskbar extends JPanel{
                             break;
                         case 1:
                             main.setPanel(new ThiSinhPanel(main));
+                            break;
+                        case 2:
+                            main.setPanel(new DiemThiPanel(main));
                             break;
                         case 3:
                             main.setPanel(new NguyenVongPanel(main));

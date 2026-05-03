@@ -15,9 +15,6 @@ public class XtDiemThiXetTuyen {
     @Column(name = "cccd", nullable = false, unique = true, length = 20)
     private String cccd;
 
-    @Column(name = "sobaodanh", length = 45)
-    private String sobaodanh;
-
     @Column(name = "d_phuongthuc", length = 10)
     private String dPhuongthuc;
 
@@ -41,6 +38,9 @@ public class XtDiemThiXetTuyen {
 
     @Column(name = "VA", precision = 8, scale = 2)
     private BigDecimal va;
+
+    @Column(name = "GDCD", precision = 8, scale = 2)
+    private BigDecimal gdcd;
 
     @Column(name = "N1_THI", precision = 8, scale = 2)
     private BigDecimal n1Thi;
@@ -69,6 +69,18 @@ public class XtDiemThiXetTuyen {
     @Column(name = "NK2", precision = 8, scale = 2)
     private BigDecimal nk2;
 
+    @Column(name = "NK3", precision = 8, scale = 2)
+    private BigDecimal nk3;
+
+    @Column(name = "NK4", precision = 8, scale = 2)
+    private BigDecimal nk4;
+
+    @Column(name = "NK5", precision = 8, scale = 2)
+    private BigDecimal nk5;
+
+    @Column(name = "NK6", precision = 8, scale = 2)
+    private BigDecimal nk6;
+
     public XtDiemThiXetTuyen() {}
 
     // ==================== GETTER & SETTER ====================
@@ -87,14 +99,6 @@ public class XtDiemThiXetTuyen {
 
     public void setCccd(String cccd) {
         this.cccd = cccd;
-    }
-
-    public String getSobaodanh() {
-        return sobaodanh;
-    }
-
-    public void setSobaodanh(String sobaodanh) {
-        this.sobaodanh = sobaodanh;
     }
 
     public String getDPhuongthuc() {
@@ -155,6 +159,14 @@ public class XtDiemThiXetTuyen {
 
     public BigDecimal getVa() {
         return va;
+    }
+
+    public BigDecimal getGdcd() {
+        return gdcd;
+    }
+
+    public void setGdcd(BigDecimal gdcd) {
+        this.gdcd = gdcd;
     }
 
     public void setVa(BigDecimal va) {
@@ -233,12 +245,43 @@ public class XtDiemThiXetTuyen {
         this.nk2 = nk2;
     }
 
+    public BigDecimal getNk3() {
+        return nk3;
+    }
+
+    public void setNk3(BigDecimal nk3) {
+        this.nk3 = nk3;
+    }
+
+    public BigDecimal getNk4() {
+        return nk4;
+    }
+
+    public void setNk4(BigDecimal nk4) {
+        this.nk4 = nk4;
+    }
+
+    public BigDecimal getNk5() {
+        return nk5;
+    }
+
+    public void setNk5(BigDecimal nk5) {
+        this.nk5 = nk5;
+    }
+
+    public BigDecimal getNk6() {
+        return nk6;
+    }
+
+    public void setNk6(BigDecimal nk6) {
+        this.nk6 = nk6;
+    }
+
     @Override
     public String toString() {
         return "XtDiemThiXetTuyen{" +
                 "iddiemthi=" + iddiemthi +
                 ", cccd='" + cccd + '\'' +
-                ", sobaodanh='" + sobaodanh + '\'' +
                 ", dPhuongthuc='" + dPhuongthuc + '\'' +
                 ", to=" + to +
                 ", li=" + li +

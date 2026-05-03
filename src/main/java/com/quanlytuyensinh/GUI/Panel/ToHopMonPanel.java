@@ -199,22 +199,6 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
     
     @Override
     public void actionPerformed(ActionEvent e) {
-//        } else if (e.getSource() == mainFunction.btn.get("delete")) {
-//            XtBangQuyDoi selected = getSelectedQuyDoi();
-//            if (selected != null) {
-//                int confirm = JOptionPane.showConfirmDialog(this,
-//                        "Xóa bảng quy đổi ID=" + selected.getIdqd() + "?",
-//                        "Xác nhận", JOptionPane.YES_NO_OPTION);
-//                if (confirm == JOptionPane.YES_OPTION) {
-//                    if (qdBUS.deleteQuyDoi(selected.getIdqd())) {
-//                        JOptionPane.showMessageDialog(this, "Xóa thành công!");
-//                        listQD = qdBUS.getAllQuyDoi();
-//                        loadDataTable(listQD);
-//                    } else {
-//                        JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-//                    }
-//                }
-//            }
         if (e.getSource() == mainFunction.btn.get("import")) {
             importExcel();
         } else if (e.getSource() == mainFunction.btn.get("create")) {
@@ -360,8 +344,6 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
     
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-            performSearch();
-        }
+        return;
     }
 }

@@ -58,7 +58,6 @@ public class XtToHopMonThi {
     @Override
     public String toString() {
         return "XtToHopMonThi{" +
-                "idtohop=" + idtohop +
                 ", matohop='" + matohop + '\'' +
                 ", mon1='" + mon1 + '\'' +
                 ", mon2='" + mon2 + '\'' +

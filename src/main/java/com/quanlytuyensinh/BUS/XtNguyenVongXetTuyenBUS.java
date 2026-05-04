@@ -33,8 +33,34 @@ public class XtNguyenVongXetTuyenBUS {
         return false;
     }
     
-    
+    public boolean updateNguyenVong(XtNguyenVongXetTuyen nvUpdate){
+        if (nvUpdate == null) return false;
+        boolean rs = nvDAO.update(nvUpdate);
+        if(rs){
+            for (XtNguyenVongXetTuyen nv : listNV) {
+                if (nvUpdate.getIdnv()== nv.getIdnv()) {
+                    nv.setNnCccd(nvUpdate.getNnCccd());
+                    nv.setNvManganh(nvUpdate.getNvManganh());
+                    nv.setNvTt(nvUpdate.getNvTt());
 
+                    nv.setDiemThxt(nvUpdate.getDiemThxt());
+                    nv.setDiemUtqd(nvUpdate.getDiemUtqd());
+                    nv.setDiemCong(nvUpdate.getDiemCong());
+                    nv.setDiemXettuyen(nvUpdate.getDiemXettuyen());
+
+                    nv.setNvKetqua(nvUpdate.getNvKetqua());
+                    nv.setNvKeys(nvUpdate.getNvKeys());
+                    nv.setTtPhuongthuc(nvUpdate.getTtPhuongthuc());
+                    nv.setTtThm(nvUpdate.getTtThm());
+                    break;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+   
 
     public List<XtNguyenVongXetTuyen> searchNguyenVong(String keyword, String searchType) {
         if (keyword == null || keyword.trim().isEmpty()) {

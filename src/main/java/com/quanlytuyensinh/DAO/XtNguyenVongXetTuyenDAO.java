@@ -27,31 +27,21 @@ public class XtNguyenVongXetTuyenDAO {
             }
             e.printStackTrace();
         }
-
         return false;
     }
 
     // ================= UPDATE =================
     public boolean update(XtNguyenVongXetTuyen nv) {
-
         Transaction transaction = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
-
             session.merge(nv);
-
             transaction.commit();
-
             return true;
-
         } catch (Exception e) {
-
             if (transaction != null) {
                 transaction.rollback();
             }
-
             e.printStackTrace();
         }
 

@@ -257,6 +257,17 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                                                                                                                                                     loadDataTable(listNV);
                                                                                                                                                 }, NguyenVongDuocChon
                 );
+            } else if(source == mainFunction.btn.get("update") ){
+                if(NguyenVongDuocChon.getNvKetqua() == null  || NguyenVongDuocChon.getNvKetqua().trim().equals("Đang xét") ){
+                    new NguyenVongDialog(this, owner, "SỬA NGUYỆN VỌNG " + "NV-" +NguyenVongDuocChon.getIdnv(), "update",true, () -> {
+                                                                                                                                                    listNV = NVBUS.getAllNguyenVong();
+                                                                                                                                                    loadDataTable(listNV);
+                                                                                                                                                }, NguyenVongDuocChon
+                    );
+                }else{
+                    JOptionPane.showMessageDialog(this, "Kết quả nguyện vọng đã công bố không thể sửa", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                }
+                
             }
         }
     }

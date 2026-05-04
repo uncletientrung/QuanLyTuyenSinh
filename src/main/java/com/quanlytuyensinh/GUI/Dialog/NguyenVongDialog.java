@@ -98,7 +98,7 @@ public class NguyenVongDialog extends JDialog{
         initMainPanel();
         initButtonPanel();
         setFieldsDisable();
-        if(this.type.equals("detail")){
+        if(!this.type.equals("create")){
             this.setNguyenVongData(currentNV);
         }
         
@@ -161,7 +161,7 @@ public class NguyenVongDialog extends JDialog{
         right.add(txtDiemCong);
         right.add(txtDiemXetTuyen);
         right.add(txtNV_Key);
-        if(!this.type.equals("create")){
+        if(this.type.equals("detail")){
             right.add(txtKetQua);
         }
         
@@ -424,7 +424,7 @@ public class NguyenVongDialog extends JDialog{
         // Check  dữ liệu
         List<XtNguyenVongXetTuyen> listNVCheckTrung = NVBUS.getListNVByCCCD(cccd);
         for (XtNguyenVongXetTuyen nv : listNVCheckTrung) {
-            if (type.equals("edit") && nv.getNvKeys().equals(txtNV_Key.getText())) { // Bỏ qua nếu đang sửa nó
+            if ("update".equals(type)  && currentNV != null  && nv.getIdnv() == currentNV.getIdnv()) {
                 continue;
             }
             if (nv.getNnCccd().equals(cccd) && nv.getNvManganh().equals(maNganh)) {
@@ -435,6 +435,7 @@ public class NguyenVongDialog extends JDialog{
                 JOptionPane.showMessageDialog(this, "Thứ tự nguyện vọng đã tồn tại");
                 return false;
             }
+
         }
         return true;
     }
@@ -454,9 +455,7 @@ public class NguyenVongDialog extends JDialog{
         nv.setDiemCong(diemCong);
         BigDecimal diemXT =new BigDecimal(this.txtDiemXetTuyen.getText().trim());
         nv.setDiemXettuyen(diemXT);
-        if(this.type.equals("create")){
-            nv.setNvKetqua("Đang xét");
-        }
+        nv.setNvKetqua("Đang xét");
         nv.setTtPhuongthuc("THPT");
         nv.setNvKeys(this.txtNV_Key.getText().trim());
         nv.setTtThm(this.txtTHXet.getText().trim());
@@ -469,6 +468,15 @@ public class NguyenVongDialog extends JDialog{
                         onSuccess.run();
                     }
                     dispose();
+                }
+            }else if (this.type.equals("update")) {
+                nv.setIdnv(this.currentNV.getIdnv()); // Gán id cho nv mới tạo là id sửa
+                if(NVBUS.updateNguyenVong(nv)){
+                    JOptionPane.showMessageDialog(this, "Sửa thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        if (onSuccess != null) {
+                            onSuccess.run();
+                        }
+                        dispose();
                 }
             }
         }catch (Exception ex) {

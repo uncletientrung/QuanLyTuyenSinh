@@ -833,6 +833,7 @@ CREATE TABLE `xt_diemthixettuyen` (
   `SU` decimal(8,2) DEFAULT 0.00,
   `DI` decimal(8,2) DEFAULT 0.00,
   `VA` decimal(8,2) DEFAULT 0.00,
+  `GDCD` decimal(8,2) DEFAULT 0.00,
   `N1_THI` decimal(8,2) DEFAULT NULL COMMENT 'Điểm thi gốc',
   `N1_CC` decimal(8,2) DEFAULT 0.00 COMMENT 'max(N1_Thi, N1_QD)',
   `CNCN` decimal(8,2) DEFAULT 0.00 COMMENT 'Công nghệ công nghiệp',
@@ -841,7 +842,11 @@ CREATE TABLE `xt_diemthixettuyen` (
   `KTPL` decimal(8,2) DEFAULT 0.00 COMMENT 'Kinh tế và pháp luật',
   `NL1` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng lực 1',
   `NK1` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 1',
-  `NK2` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 2'
+  `NK2` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 2',
+  `NK3` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 3',
+  `NK4` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 4',
+  `NK5` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 5',
+  `NK6` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 6'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1072,7 +1077,7 @@ INSERT INTO `xt_thisinhxettuyen25` (`idthisinh`, `cccd`, `sobaodanh`, `ho`, `ten
 --
 
 CREATE TABLE `xt_tohop_monthi` (
-  `idtohop` int(11) NOT NULL AUTO_INCREMENT,
+  `idtohop` int(11) NOT NULL,
   `matohop` varchar(45) NOT NULL,
   `mon1` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `mon2` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,

@@ -5,6 +5,7 @@
 package com.quanlytuyensinh.GUI.Dialog;
 
 import com.quanlytuyensinh.BUS.XtDiemCongXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtDiemThiXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtNganhBUS;
 import com.quanlytuyensinh.BUS.XtNganhToHopBUS;
 import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
@@ -12,6 +13,7 @@ import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
 import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
@@ -46,14 +48,16 @@ public class NguyenVongDialog extends JDialog{
     private JPanel pnlMain, pnlButtons;
     
     // Tác vụ thêm để xử lý
-    private XtNganhBUS NganhBUS =new XtNganhBUS();
-   private List<XtNganh> listNganh;
-    private XtNganhToHopBUS NganhTHBUS = new XtNganhToHopBUS() ;
+    private XtNganhBUS NganhBUS;
+    private List<XtNganh> listNganh;
+    private XtNganhToHopBUS NganhTHBUS;
     private List<XtNganhToHop> listNganhTH;
-    private XtDiemCongXetTuyenBUS DiemCongBUS = new XtDiemCongXetTuyenBUS();
+    private XtDiemCongXetTuyenBUS DiemCongBUS;
     private List<XtDiemCongXetTuyen> listDiemCong;
-    private XtThisinhXetTuyen25BUS TSBUS = new XtThisinhXetTuyen25BUS();
+    private XtThisinhXetTuyen25BUS TSBUS ;
     private List<XtThisinhXetTuyen25> listTS;
+    private XtDiemThiXetTuyenBUS DTBUS;
+     private List<XtDiemThiXetTuyen> listDT;
     
     public NguyenVongDialog(NguyenVongPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess, XtNguyenVongXetTuyen nv){
          super(owner, title, modal);
@@ -63,10 +67,17 @@ public class NguyenVongDialog extends JDialog{
         this.onSuccess = onSuccess;
         this.setTitle(title);
         
-        this.listDiemCong = DiemCongBUS.getAllDiemCong();
-        this.listNganhTH = NganhTHBUS.getAll();
-        this.listNganh = NganhBUS.getAllNganh();
-        this.listTS = this.TSBUS.getAllThiSinh();
+        this.NganhBUS = parent.getNganhBUS();
+        this.NganhTHBUS = parent.getNganhTHBUS();
+        this.DiemCongBUS = parent.getDiemCongBUS();
+        this.TSBUS = parent.getTSBUS();
+        this.DTBUS = parent.getDTBUS();
+        
+        this.listDiemCong = parent.getListDiemCong();
+        this.listNganhTH = parent.getListNganhTH();
+        this.listNganh = parent.getListNganh();
+        this.listTS = parent.getListTS();
+        this.listDT = parent.getListDT();
 
         initComponents();
     }
@@ -99,20 +110,20 @@ public class NguyenVongDialog extends JDialog{
         right.setBackground(Color.WHITE);
         // ==================== ĐỊNH NGHĨA CÁC THUỘC TÍNH ====================
         String[] listStrCCCD = new String[this.listTS.size()+1]; // Danh sách CCCD String
-        listStrCCCD[0] = "Chọn thí sinh";
+        listStrCCCD[0] = "-- Chọn thí sinh --";
         for (int i = 0; i < listTS.size(); i++) {
-            listStrCCCD[i + 1] = listTS.get(i).getCccd();
+            listStrCCCD[i + 1] = listTS.get(i).getCccd() + " - " + listTS.get(i).getHo() + " " + listTS.get(i).getTen();
         }
         
          String[] listStrMaNganh = new String[this.listNganh.size()+1]; // Danh sách CCCD String
-         listStrMaNganh[0] = "Chọn mã ngành";
+         listStrMaNganh[0] = "-- Chọn mã ngành --";
         for (int i = 0; i < listNganh.size(); i++) {
-            listStrMaNganh[i+1] = listNganh.get(i).getManganh();
+            listStrMaNganh[i+1] = listNganh.get(i).getManganh() + " - " + listNganh.get(i).getTennganh();
         }
         
         this.cbbCCCD = new VerticalComboBoxForm("CCCD", listStrCCCD);
         this.cbbMaNganh = new VerticalComboBoxForm("Mã Ngành", listStrMaNganh); 
-        this.cbbPhuongThuc = new VerticalComboBoxForm("Phương thức xét tuyển", new String[]{"THPT", "DGNL", "VSAT", "Tuyển thẳng"}); 
+        this.cbbPhuongThuc = new VerticalComboBoxForm("Phương thức xét tuyển", new String[]{"THPT", "DGNL", "VSAT"}); 
         this.txtThuTu = new VerticalInputForm("Thứ tự nguyện vọng");
         this.txtDanhSachTH =  new VerticalInputForm("Danh sách tổ hợp");
         this.txtTHXet = new VerticalInputForm("Tổ hợp xét tuyển (Cao nhất)"); 
@@ -139,6 +150,8 @@ public class NguyenVongDialog extends JDialog{
         right.add(txtKetQua);
         right.add(txtNV_Key);
         
+        // Gắn listener SAU khi tất cả field đã tạo xong
+        bindListeners();
         
         // =======================
         pnlMain.add(left);
@@ -162,17 +175,46 @@ public class NguyenVongDialog extends JDialog{
         pnlButtons.add(btnLuu);
         pnlButtons.add(btnHuy);
     }
+        private void bindListeners() {
+            this.cbbMaNganh.getComboBox().addActionListener(e -> updateNVKey());
+            
+            this.cbbCCCD.getComboBox().addActionListener(e -> updateNVKey());
+            
+            this.txtThuTu.addTextChangeListener(() -> updateNVKey());
+        }
+    
+    
     private void setFieldsDisable(){
         VerticalInputForm[] listInputCreate = {txtDanhSachTH, txtTHXet, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtKetQua,
                 txtNV_Key};
-        
         for (VerticalInputForm f : listInputCreate) {
             f.setDisable();
         }
-        
-//        cbbCCCD.setDisable();
-//        cbbMaNganh.setDisable();
-//        cbbPhuongThuc.setDisable();
+    }
+    
+    private void updateNVKey(){
+        String cccd = getSelectedCCCD();
+        String maNganh = getSelectedMaNganh();
+        String thuTuNV = this.txtThuTu.getText();
+        if (maNganh == null || cccd == null || thuTuNV.equals("")) {
+            this.txtNV_Key.setText("");
+        } else {
+            this.txtNV_Key.setText( cccd+ "_" + maNganh+ "_" +thuTuNV );
+        }
+    }
+
+    private String getSelectedCCCD() {
+        Object sel = this.cbbCCCD.getSelectedValue();
+        if (sel == null || sel.toString().startsWith("--")) return null;
+        String value = sel.toString();
+        return value.split(" ")[0];
+    }
+
+    private String getSelectedMaNganh() {
+         Object sel = this.cbbMaNganh.getSelectedValue();
+        if (sel == null || sel.toString().startsWith("--")) return null;
+        String value = sel.toString();
+        return value.split(" ")[0];
     }
     
 }

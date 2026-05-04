@@ -4,8 +4,18 @@
  */
 package com.quanlytuyensinh.GUI.Panel;
 
+import com.quanlytuyensinh.BUS.XtDiemCongXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtDiemThiXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtNganhBUS;
+import com.quanlytuyensinh.BUS.XtNganhToHopBUS;
 import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtNganh;
+import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
 import com.quanlytuyensinh.GUI.Component.PaginatedTable;
@@ -48,10 +58,29 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     List<XtNguyenVongXetTuyen> listNV;
     Color BackgroundColor = new Color(240, 247, 250);
     
+     // Tác vụ thêm để xử lý
+    private XtNganhBUS NganhBUS =new XtNganhBUS();
+    private List<XtNganh> listNganh;
+    private XtNganhToHopBUS NganhTHBUS = new XtNganhToHopBUS() ;
+    private List<XtNganhToHop> listNganhTH;
+    private XtDiemCongXetTuyenBUS DiemCongBUS = new XtDiemCongXetTuyenBUS();
+    private List<XtDiemCongXetTuyen> listDiemCong;
+    private XtThisinhXetTuyen25BUS TSBUS = new XtThisinhXetTuyen25BUS();
+    private List<XtThisinhXetTuyen25> listTS;
+    private XtDiemThiXetTuyenBUS DTBUS = new XtDiemThiXetTuyenBUS();
+     private List<XtDiemThiXetTuyen> listDT;
+    
     public NguyenVongPanel(Main mainF) {
         this.mainFrame = mainF;
         NVBUS = new XtNguyenVongXetTuyenBUS();
         listNV = NVBUS.getAllNguyenVong();
+        
+        this.listDiemCong = DiemCongBUS.getAllDiemCong();
+        this.listNganhTH = NganhTHBUS.getAll();
+        this.listNganh = NganhBUS.getAllNganh();
+        this.listTS = this.TSBUS.getAllThiSinh();
+        this.listDT = DTBUS.getList();
+           
         initComponent();
         loadDataTable(listNV);
     }
@@ -212,6 +241,94 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     }
     public XtNguyenVongXetTuyenBUS getBUS(){
         return NVBUS;
+    }
+    // XtNganhBUS
+    public XtNganhBUS getNganhBUS() {
+        return NganhBUS;
+    }
+
+    public void setNganhBUS(XtNganhBUS NganhBUS) {
+        this.NganhBUS = NganhBUS;
+    }
+
+    // List<XtNganh>
+    public List<XtNganh> getListNganh() {
+        return listNganh;
+    }
+
+    public void setListNganh(List<XtNganh> listNganh) {
+        this.listNganh = listNganh;
+    }
+
+    // XtNganhToHopBUS
+    public XtNganhToHopBUS getNganhTHBUS() {
+        return NganhTHBUS;
+    }
+
+    public void setNganhTHBUS(XtNganhToHopBUS NganhTHBUS) {
+        this.NganhTHBUS = NganhTHBUS;
+    }
+
+    // List<XtNganhToHop>
+    public List<XtNganhToHop> getListNganhTH() {
+        return listNganhTH;
+    }
+
+    public void setListNganhTH(List<XtNganhToHop> listNganhTH) {
+        this.listNganhTH = listNganhTH;
+    }
+
+    // XtDiemCongXetTuyenBUS
+    public XtDiemCongXetTuyenBUS getDiemCongBUS() {
+        return DiemCongBUS;
+    }
+
+    public void setDiemCongBUS(XtDiemCongXetTuyenBUS DiemCongBUS) {
+        this.DiemCongBUS = DiemCongBUS;
+    }
+
+    // List<XtDiemCongXetTuyen>
+    public List<XtDiemCongXetTuyen> getListDiemCong() {
+        return listDiemCong;
+    }
+
+    public void setListDiemCong(List<XtDiemCongXetTuyen> listDiemCong) {
+        this.listDiemCong = listDiemCong;
+    }
+
+    // XtThisinhXetTuyen25BUS
+    public XtThisinhXetTuyen25BUS getTSBUS() {
+        return TSBUS;
+    }
+
+    public void setTSBUS(XtThisinhXetTuyen25BUS TSBUS) {
+        this.TSBUS = TSBUS;
+    }
+
+    // List<XtThisinhXetTuyen25>
+    public List<XtThisinhXetTuyen25> getListTS() {
+        return listTS;
+    }
+
+    public void setListTS(List<XtThisinhXetTuyen25> listTS) {
+        this.listTS = listTS;
+    }
+    // XtDiemThiXetTuyenBUS
+    public XtDiemThiXetTuyenBUS getDTBUS() {
+        return DTBUS;
+    }
+
+    public void setDTBUS(XtDiemThiXetTuyenBUS DTBUS) {
+        this.DTBUS = DTBUS;
+    }
+
+    // List<XtDiemThiXetTuyen>
+    public List<XtDiemThiXetTuyen> getListDT() {
+        return listDT;
+    }
+
+    public void setListDT(List<XtDiemThiXetTuyen> listDT) {
+        this.listDT = listDT;
     }
 
 }

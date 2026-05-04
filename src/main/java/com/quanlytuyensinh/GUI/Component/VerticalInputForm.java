@@ -3,6 +3,8 @@ package com.quanlytuyensinh.GUI.Component;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class VerticalInputForm extends JPanel {
 
@@ -31,6 +33,14 @@ public class VerticalInputForm extends JPanel {
         this.add(lblTitle, BorderLayout.NORTH);
         this.add(txtForm, BorderLayout.CENTER);
     }
+    
+    public void addTextChangeListener(Runnable callback) {
+        txtForm.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { callback.run(); }
+            public void removeUpdate(DocumentEvent e) { callback.run(); }
+            public void changedUpdate(DocumentEvent e) { callback.run(); }
+        });
+}
 
     public String getText() { return txtForm.getText(); }
     public void setText(String text) { txtForm.setText(text); }

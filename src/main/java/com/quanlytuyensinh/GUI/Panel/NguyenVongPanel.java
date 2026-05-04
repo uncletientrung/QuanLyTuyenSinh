@@ -330,5 +330,11 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     public void setListDT(List<XtDiemThiXetTuyen> listDT) {
         this.listDT = listDT;
     }
+    public List<XtNguyenVongXetTuyen> getListNV() {
+        return listNV;
+    }
 
+    public void setListNV(List<XtNguyenVongXetTuyen> listNV) {
+        this.listNV = listNV;
+    }
 }

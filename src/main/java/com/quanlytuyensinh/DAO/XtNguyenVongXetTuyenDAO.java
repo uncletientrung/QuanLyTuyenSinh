@@ -15,25 +15,16 @@ public class XtNguyenVongXetTuyenDAO {
 
     // ================= INSERT =================
     public boolean insert(XtNguyenVongXetTuyen nv) {
-
         Transaction transaction = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
-
             session.persist(nv);
-
             transaction.commit();
-
             return true;
-
         } catch (Exception e) {
-
             if (transaction != null) {
                 transaction.rollback();
             }
-
             e.printStackTrace();
         }
 

@@ -17,6 +17,23 @@ public class XtNguyenVongXetTuyenBUS {
         return listNV;
     }
     
+    public List<XtNguyenVongXetTuyen> getListNVByCCCD(String cccd){
+        List<XtNguyenVongXetTuyen> rs = new ArrayList<>();
+        rs = nvDAO.findByCCCD(cccd);
+        return rs;
+    }
+    
+    public boolean insertNguyenVong(XtNguyenVongXetTuyen nvNew){
+        if(nvNew== null) return false;
+        boolean rs = nvDAO.insert(nvNew);
+        if(rs){
+            listNV.add(nvNew);
+            return true;
+        }
+        return false;
+    }
+    
+    
 
 
     public List<XtNguyenVongXetTuyen> searchNguyenVong(String keyword, String searchType) {

@@ -40,11 +40,12 @@ import javax.swing.border.EmptyBorder;
 public class NguyenVongDialog extends JDialog{
     private NguyenVongPanel parent;
     private XtNguyenVongXetTuyenBUS NVBUS;
+    private List<XtNguyenVongXetTuyen> listNV;
     private String type; // "create" hoặc "edit"
     private Runnable onSuccess; // Lưu hàm chạy sau khi xong
     
     // Form fields
-    private VerticalInputForm txtThuTu, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtKetQua, txtDanhSachTH, txtTHXet, txtNV_Key;
+    private VerticalInputForm txtThuTu, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtDoLech, txtDanhSachTH, txtTHXet, txtNV_Key;
     private VerticalComboBoxForm cbbPhuongThuc, cbbCCCD, cbbMaNganh;
     private ButtonCustom btnLuu, btnHuy;
     private JPanel pnlMain, pnlButtons;
@@ -65,6 +66,7 @@ public class NguyenVongDialog extends JDialog{
          super(owner, title, modal);
         this.parent = parent;
         NVBUS = parent.getBUS();
+        listNV = parent.getListNV();
         this.type = type;
         this.onSuccess = onSuccess;
         this.setTitle(title);
@@ -129,11 +131,11 @@ public class NguyenVongDialog extends JDialog{
         this.txtThuTu = new VerticalInputForm("Thứ tự nguyện vọng");
         this.txtDanhSachTH =  new VerticalInputForm("Danh sách tổ hợp");
         this.txtTHXet = new VerticalInputForm("Tổ hợp xét tuyển (Cao nhất)"); 
-        this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển");
+        this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển (Đã cộng độ lệch)");
         this.txtDiemUT =  new VerticalInputForm("Điểm ưu tiên");
         this.txtDiemCong = new VerticalInputForm("Điểm cộng"); 
         this.txtDiemXetTuyen = new VerticalInputForm("Điểm xét tuyển"); 
-        this.txtKetQua =  new VerticalInputForm("Kết quả");  
+        this.txtDoLech =  new VerticalInputForm("Độ lệch");  
         this.txtNV_Key= new VerticalInputForm("Nguyện vọng Key"); 
         
         // ==================== LEFT COLUMN ====================
@@ -146,10 +148,10 @@ public class NguyenVongDialog extends JDialog{
         
         // ==================== RIGHT COLUMN ====================
         right.add(txtDiemTHXT);
+        right.add(txtDoLech);
         right.add(txtDiemUT);
         right.add(txtDiemCong);
         right.add(txtDiemXetTuyen);
-        right.add(txtKetQua);
         right.add(txtNV_Key);
         
         // Gắn listener SAU khi tất cả field đã tạo xong
@@ -165,9 +167,14 @@ public class NguyenVongDialog extends JDialog{
         pnlButtons.setBackground(Color.WHITE);
         pnlButtons.setBorder(new EmptyBorder(0, 0, 25, 0));
 
-        String btnText = "create".equals(type) ? "Thêm thí sinh" : "Lưu chỉnh sửa";
+        String btnText = "create".equals(type) ? "Thêm nguyện vọng" : "Lưu chỉnh sửa";
 
         btnLuu = new ButtonCustom(btnText, "success", 15);
+        btnLuu.addActionListener(e -> {
+            if (validateInput()) {
+                 saveNguyenVong();
+            }
+        });
         btnHuy = new ButtonCustom("Hủy bỏ", "danger", 15);
 
         btnLuu.setPreferredSize(new Dimension(160, 48));
@@ -177,32 +184,35 @@ public class NguyenVongDialog extends JDialog{
         pnlButtons.add(btnLuu);
         pnlButtons.add(btnHuy);
     }
-        private void bindListeners() {
-            this.cbbMaNganh.getComboBox().addActionListener(e -> {
-                    updateNVKey();
-                    upadateField();
-                });
-            
-            this.cbbCCCD.getComboBox().addActionListener(e -> {
-                    updateNVKey();
-                    upadateField();
-                });
-            
-            this.txtThuTu.addTextChangeListener(() -> {
-                    updateNVKey();
-                }
-            );
-        }
     
+    // Gắn sự kiện cho cbb và textfield
+    private void bindListeners() { 
+        this.cbbMaNganh.getComboBox().addActionListener(e -> {
+                updateNVKey();
+                upadateField();
+            });
+
+        this.cbbCCCD.getComboBox().addActionListener(e -> {
+                updateNVKey();
+                upadateField();
+            });
+
+        this.txtThuTu.addTextChangeListener(() -> {
+                updateNVKey();
+            }
+        );
+    }
     
+    // Set các field là disable
     private void setFieldsDisable(){
-        VerticalInputForm[] listInputCreate = {txtDanhSachTH, txtTHXet, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtKetQua,
+        VerticalInputForm[] listInputCreate = {txtDanhSachTH, txtTHXet, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtDoLech,
                 txtNV_Key};
         for (VerticalInputForm f : listInputCreate) {
             f.setDisable();
         }
     }
     
+    // Cập nhật Key
     private void updateNVKey(){
         String cccd = getSelectedCCCD();
         String maNganh = getSelectedMaNganh();
@@ -214,6 +224,7 @@ public class NguyenVongDialog extends JDialog{
         }
     }
     
+     // Hàm trung chuyển tính toán set các field
     private void upadateField(){
         String cccd = getSelectedCCCD();
         String maNganh = getSelectedMaNganh();
@@ -224,12 +235,15 @@ public class NguyenVongDialog extends JDialog{
             txtDiemCong.setText("");
             txtDiemUT.setText("");
             txtDiemXetTuyen.setText("");
+            txtDoLech.setText("");
             return;
         }
         this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
-        getToHopCaoNhat(maNganh, cccd);
+        getToHopCaoNhatVaTinhDiem(maNganh, cccd);
     }
-    private String getDanhSachToHop(String maNganh){ // Danh sách tổ hợp, có Gốc
+    
+    // Danh sách tổ hợp, có Gốc
+    private String getDanhSachToHop(String maNganh){ 
         this.listNganhTH = this.NganhTHBUS.getNTHByMaNganh(maNganh);
         String toHopGoc = this.NganhBUS.getNganhByMaNganh(maNganh).getNTohopgoc();
         if (listNganhTH == null || listNganhTH.isEmpty()) {
@@ -245,13 +259,36 @@ public class NguyenVongDialog extends JDialog{
         }
         return result.toString();
     } 
-    private BigDecimal getMon(Boolean flag, BigDecimal diem) {
-        if (flag != null && flag == true && diem != null) {
-            return diem;
+    
+    private BigDecimal getDiemSafe(BigDecimal val) {
+        return val == null ? BigDecimal.ZERO : val;
+    }
+    private BigDecimal getDiemByMon(String monHoc, XtDiemThiXetTuyen d) {
+        if (monHoc == null) return BigDecimal.ZERO;
+        switch (monHoc) {
+            case "TO": return getDiemSafe(d.getTo());
+            case "LI": return getDiemSafe(d.getLi());
+            case "HO": return getDiemSafe(d.getHo());
+            case "SI": return getDiemSafe(d.getSi());
+            case "VA": return getDiemSafe(d.getVa());
+            case "SU": return getDiemSafe(d.getSu());
+            case "DI": return getDiemSafe(d.getDi());
+            case "TI": return getDiemSafe(d.getTi());
+            case "GDCD": return getDiemSafe(d.getGdcd());
+            case "KTPL": return getDiemSafe(d.getKtpl());
+            case "CNCN": return getDiemSafe(d.getCncn());
+            case "CNNN": return getDiemSafe(d.getCnnn());
+            case "N1":
+                if (d.getN1Cc() != null && d.getN1Thi() != null)
+                    return d.getN1Cc().compareTo(d.getN1Thi()) > 0 ? d.getN1Cc() : d.getN1Thi();
+                return getDiemSafe(d.getN1Cc());
         }
+        
         return BigDecimal.ZERO;
     }
-    private void getToHopCaoNhat(String maNganh, String cccd) {
+   
+    // Lấy tính điểm và lấy tổ hợp cao nhất
+    private void getToHopCaoNhatVaTinhDiem(String maNganh, String cccd) {
         List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
         XtDiemThiXetTuyen diemThi = DTBUS.getDiemThiByCCCD(cccd);
 
@@ -261,74 +298,59 @@ public class NguyenVongDialog extends JDialog{
         String bestToHop = "";
 
         BigDecimal bestDiemTH = BigDecimal.ZERO;
+        BigDecimal diemDoLech = BigDecimal.ZERO;
         BigDecimal bestDiemCong = BigDecimal.ZERO;
         BigDecimal bestDiemUT = BigDecimal.ZERO;
 
         for (XtNganhToHop nth : listTH) {
-
-            // ====================
-            // 1. TÍNH ĐIỂM 3 MÔN
-            // ====================
             BigDecimal tong = BigDecimal.ZERO;
-            if (diemThi.getN1Cc().compareTo(diemThi.getN1Thi()) > 0) {
-                tong = tong = tong.add(getMon(nth.getN1(), diemThi.getN1Cc()));
-            }else{
-                tong = tong = tong.add(getMon(nth.getN1(), diemThi.getN1Thi()));
-            }
-            tong = tong.add(getMon(nth.getTo(), diemThi.getTo()));
-            tong = tong.add(getMon(nth.getLi(), diemThi.getLi()));
-            tong = tong.add(getMon(nth.getHo(), diemThi.getHo()));
-            tong = tong.add(getMon(nth.getSi(), diemThi.getSi()));
-            tong = tong.add(getMon(nth.getVa(), diemThi.getVa()));
-            tong = tong.add(getMon(nth.getSu(), diemThi.getSu()));
-            tong = tong.add(getMon(nth.getDi(), diemThi.getDi()));
-            tong = tong.add(getMon(nth.getTi(), diemThi.getTi()));
-            tong = tong.add(getMon(nth.getTi(), diemThi.getTi()));
-            tong = tong.add(getMon(nth.getKtpl(), diemThi.getKtpl()));
+            // Môn 1
+            BigDecimal m1 = getDiemByMon(nth.getThMon1(), diemThi);
+            tong = tong.add(m1.multiply(BigDecimal.valueOf(nth.getHsMon1())));
 
-            // ====================
-            // 2. + ĐỘ LỆCH
-            // ====================
-            BigDecimal diemTH = tong.add(nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech());
+            // Môn 2
+            BigDecimal m2 = getDiemByMon(nth.getThMon2(), diemThi);
+            tong = tong.add(m2.multiply(BigDecimal.valueOf(nth.getHsMon2())));
 
-            // ====================
-            // 3. LẤY ĐIỂM CỘNG + ƯU TIÊN
-            // ====================
+            // Môn 3
+            BigDecimal m3 = getDiemByMon(nth.getThMon3(), diemThi);
+            tong = tong.add(m3.multiply(BigDecimal.valueOf(nth.getHsMon3())));
+
+            // Độ lệch
+            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+
+            // Điểm cộng và ưu tiên
             XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = BigDecimal.ZERO;
             BigDecimal diemUT = BigDecimal.ZERO;
-
             if (dc != null) {
                 diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
                 diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
             }
 
-            // ====================
-            // 4. ĐIỂM XÉT TUYỂN
-            // ====================
+           // Điểm xét tuyển
+            BigDecimal diemTH = tong.add(doLech);
             BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
 
-            // ====================
-            // 5. LẤY MAX
-            // ====================
-             JOptionPane.showMessageDialog(this, "Điểm tổ hợp: " +nth.getMatohop() + " -  " + diemXT , "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+            // Lấy Max
+//             JOptionPane.showMessageDialog(this, "Điểm tổ hợp: " +nth.getMatohop() + " -  " + diemXT , "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
             if (diemXT.compareTo(maxDiemXT) > 0) {
                 maxDiemXT = diemXT;
                 bestToHop = nth.getMatohop();
                 bestDiemTH = diemTH;
                 bestDiemCong = diemCong;
                 bestDiemUT = diemUT;
+                diemDoLech = doLech;
             }
         }
 
-        // ====================
-        // 6. SET UI
-        // ====================
+        // Set UI
         txtTHXet.setText(bestToHop);
-        txtDiemTHXT.setText(bestDiemTH.toString());
-        txtDiemCong.setText(bestDiemCong.toString());
-        txtDiemUT.setText(bestDiemUT.toString());
-        txtDiemXetTuyen.setText(maxDiemXT.toString());
+        txtDiemTHXT.setText(bestDiemTH.setScale(5).toString());
+        txtDiemCong.setText(bestDiemCong.setScale(2).toString());
+        txtDiemUT.setText(bestDiemUT.setScale(5).toString());
+        txtDiemXetTuyen.setText(maxDiemXT.setScale(5).toString());
+        txtDoLech.setText(diemDoLech.setScale(2).toString());
     }
 
     private String getSelectedCCCD() {
@@ -345,4 +367,93 @@ public class NguyenVongDialog extends JDialog{
         return value.split(" ")[0];
     }
     
+    private boolean validateInput() {
+        String cccd = getSelectedCCCD();
+        String maNganh = getSelectedMaNganh();
+        String thuTuStr = txtThuTu.getText();
+
+        // Check rỗng
+        if (cccd == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn thí sinh");
+            return false;
+        }
+        if (maNganh == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn mã ngành");
+            return false;
+        }
+        if (thuTuStr == null || thuTuStr.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập thứ tự nguyện vọng");
+            return false;
+        }
+
+        // Check  hợp lệ
+        int thuTu;
+        try {
+            thuTu = Integer.parseInt(thuTuStr.trim());
+            if (thuTu <= 0) {
+                JOptionPane.showMessageDialog(this, "Thứ tự nguyện vọng phải > 0");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Thứ tự nguyện vọng phải là số");
+            return false;
+        }
+
+        // Check  dữ liệu
+        List<XtNguyenVongXetTuyen> listNVCheckTrung = NVBUS.getListNVByCCCD(cccd);
+        for (XtNguyenVongXetTuyen nv : listNVCheckTrung) {
+            if (type.equals("edit") && nv.getNvKeys().equals(txtNV_Key.getText())) { // Bỏ qua nếu đang sửa nó
+                continue;
+            }
+            if (nv.getNnCccd().equals(cccd) && nv.getNvManganh().equals(maNganh)) {
+                JOptionPane.showMessageDialog(this, "Ngành này đã tồn tại trong nguyện vọng");
+                return false;
+            }
+            if (nv.getNnCccd().equals(cccd) && nv.getNvTt()== thuTu) {
+                JOptionPane.showMessageDialog(this, "Thứ tự nguyện vọng đã tồn tại");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void saveNguyenVong(){
+        XtNguyenVongXetTuyen nv = new XtNguyenVongXetTuyen();
+        nv.setNnCccd(this.getSelectedCCCD());
+        nv.setNvManganh(this.getSelectedMaNganh());
+        int thuTu = Integer.parseInt(this.txtThuTu.getText().trim());
+        nv.setNvTt(thuTu);
+        BigDecimal diemTHXT = new BigDecimal(this.txtDiemTHXT.getText().trim());
+        nv.setDiemThxt(diemTHXT);
+        BigDecimal diemUT = new BigDecimal(this.txtDiemUT.getText().trim());
+        nv.setDiemUtqd(diemUT);
+        BigDecimal diemCong = new BigDecimal(this.txtDiemCong.getText().trim());
+        nv.setDiemCong(diemCong);
+        BigDecimal diemXT =new BigDecimal(this.txtDiemXetTuyen.getText().trim());
+        nv.setDiemXettuyen(diemXT);
+        if(this.type.equals("create")){
+            nv.setNvKetqua("Đang xét");
+        }
+        nv.setTtPhuongthuc("THPT");
+        nv.setNvKeys(this.txtNV_Key.getText().trim());
+        nv.setTtThm(this.txtTHXet.getText().trim());
+        
+        try{
+            if ("create".equals(type)) {
+                if (NVBUS.insertNguyenVong(nv)) {
+                    JOptionPane.showMessageDialog(this, "Thêm nguyện vọng thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
+                    dispose();
+                }
+            }
+        }catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lưu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+        
+    }
+
+
 }

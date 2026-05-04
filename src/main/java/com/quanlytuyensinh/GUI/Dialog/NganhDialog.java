@@ -112,8 +112,9 @@ public class NganhDialog extends JDialog {
         pnlLeft.add(txtToHopGoc);
         pnlLeft.add(cbbTuyenThang);
         pnlLeft.add(cbbDgnl);
+         pnlLeft.add(cbbVsat);
         pnlLeft.add(cbbThpt);
-        pnlLeft.add(cbbVsat);
+       
         
         
         //cot phai
@@ -124,6 +125,8 @@ public class NganhDialog extends JDialog {
         pnlRight.add(txtSlDgnl);
         pnlRight.add(txtSlVsat);
         pnlRight.add(txtSlThpt);
+        
+        
 
         
         pnlMain.add(pnlLeft);

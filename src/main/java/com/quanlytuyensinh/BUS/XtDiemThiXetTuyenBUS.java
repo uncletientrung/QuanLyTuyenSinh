@@ -20,4 +20,14 @@ public class XtDiemThiXetTuyenBUS {
     public XtDiemThiXetTuyen findById(int id) {
         return diemDAO.findById(id);
     }
+    public XtDiemThiXetTuyen getDiemThiByCCCD(String cccd){
+        XtDiemThiXetTuyen rs = null;
+        for(XtDiemThiXetTuyen dt : listDiem){
+            if(dt.getCccd().equals(cccd)){
+                rs = dt;
+                break;
+            }
+        }
+        return rs;
+    }
 }

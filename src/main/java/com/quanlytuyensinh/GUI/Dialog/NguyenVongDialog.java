@@ -25,9 +25,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -176,11 +178,20 @@ public class NguyenVongDialog extends JDialog{
         pnlButtons.add(btnHuy);
     }
         private void bindListeners() {
-            this.cbbMaNganh.getComboBox().addActionListener(e -> updateNVKey());
+            this.cbbMaNganh.getComboBox().addActionListener(e -> {
+                    updateNVKey();
+                    upadateField();
+                });
             
-            this.cbbCCCD.getComboBox().addActionListener(e -> updateNVKey());
+            this.cbbCCCD.getComboBox().addActionListener(e -> {
+                    updateNVKey();
+                    upadateField();
+                });
             
-            this.txtThuTu.addTextChangeListener(() -> updateNVKey());
+            this.txtThuTu.addTextChangeListener(() -> {
+                    updateNVKey();
+                }
+            );
         }
     
     
@@ -201,6 +212,123 @@ public class NguyenVongDialog extends JDialog{
         } else {
             this.txtNV_Key.setText( cccd+ "_" + maNganh+ "_" +thuTuNV );
         }
+    }
+    
+    private void upadateField(){
+        String cccd = getSelectedCCCD();
+        String maNganh = getSelectedMaNganh();
+        if (maNganh == null || cccd == null) {
+            this.txtDanhSachTH.setText("");
+            txtTHXet.setText("");
+            txtDiemTHXT.setText("");
+            txtDiemCong.setText("");
+            txtDiemUT.setText("");
+            txtDiemXetTuyen.setText("");
+            return;
+        }
+        this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
+        getToHopCaoNhat(maNganh, cccd);
+    }
+    private String getDanhSachToHop(String maNganh){ // Danh sách tổ hợp, có Gốc
+        this.listNganhTH = this.NganhTHBUS.getNTHByMaNganh(maNganh);
+        String toHopGoc = this.NganhBUS.getNganhByMaNganh(maNganh).getNTohopgoc();
+        if (listNganhTH == null || listNganhTH.isEmpty()) {
+            return "";
+        }
+        StringBuilder result = new StringBuilder();
+        result.append(toHopGoc).append(" (Gốc)"); // Cái gốc đứng đầu
+        for (XtNganhToHop th : listNganhTH) {
+            String maTH = th.getMatohop();
+            if (!maTH.equals(toHopGoc)) {
+                result.append(", ").append(maTH);
+            }
+        }
+        return result.toString();
+    } 
+    private BigDecimal getMon(Boolean flag, BigDecimal diem) {
+        if (flag != null && flag == true && diem != null) {
+            return diem;
+        }
+        return BigDecimal.ZERO;
+    }
+    private void getToHopCaoNhat(String maNganh, String cccd) {
+        List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
+        XtDiemThiXetTuyen diemThi = DTBUS.getDiemThiByCCCD(cccd);
+
+        if (listTH == null || diemThi == null) return;
+
+        BigDecimal maxDiemXT = BigDecimal.ZERO;
+        String bestToHop = "";
+
+        BigDecimal bestDiemTH = BigDecimal.ZERO;
+        BigDecimal bestDiemCong = BigDecimal.ZERO;
+        BigDecimal bestDiemUT = BigDecimal.ZERO;
+
+        for (XtNganhToHop nth : listTH) {
+
+            // ====================
+            // 1. TÍNH ĐIỂM 3 MÔN
+            // ====================
+            BigDecimal tong = BigDecimal.ZERO;
+            if (diemThi.getN1Cc().compareTo(diemThi.getN1Thi()) > 0) {
+                tong = tong = tong.add(getMon(nth.getN1(), diemThi.getN1Cc()));
+            }else{
+                tong = tong = tong.add(getMon(nth.getN1(), diemThi.getN1Thi()));
+            }
+            tong = tong.add(getMon(nth.getTo(), diemThi.getTo()));
+            tong = tong.add(getMon(nth.getLi(), diemThi.getLi()));
+            tong = tong.add(getMon(nth.getHo(), diemThi.getHo()));
+            tong = tong.add(getMon(nth.getSi(), diemThi.getSi()));
+            tong = tong.add(getMon(nth.getVa(), diemThi.getVa()));
+            tong = tong.add(getMon(nth.getSu(), diemThi.getSu()));
+            tong = tong.add(getMon(nth.getDi(), diemThi.getDi()));
+            tong = tong.add(getMon(nth.getTi(), diemThi.getTi()));
+            tong = tong.add(getMon(nth.getTi(), diemThi.getTi()));
+            tong = tong.add(getMon(nth.getKtpl(), diemThi.getKtpl()));
+
+            // ====================
+            // 2. + ĐỘ LỆCH
+            // ====================
+            BigDecimal diemTH = tong.add(nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech());
+
+            // ====================
+            // 3. LẤY ĐIỂM CỘNG + ƯU TIÊN
+            // ====================
+            XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
+            BigDecimal diemCong = BigDecimal.ZERO;
+            BigDecimal diemUT = BigDecimal.ZERO;
+
+            if (dc != null) {
+                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
+                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+            }
+
+            // ====================
+            // 4. ĐIỂM XÉT TUYỂN
+            // ====================
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+
+            // ====================
+            // 5. LẤY MAX
+            // ====================
+             JOptionPane.showMessageDialog(this, "Điểm tổ hợp: " +nth.getMatohop() + " -  " + diemXT , "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
+            if (diemXT.compareTo(maxDiemXT) > 0) {
+                maxDiemXT = diemXT;
+                bestToHop = nth.getMatohop();
+                bestDiemTH = diemTH;
+                bestDiemCong = diemCong;
+                bestDiemUT = diemUT;
+            }
+        }
+
+        // ====================
+        // 6. SET UI
+        // ====================
+        txtTHXet.setText(bestToHop);
+        txtDiemTHXT.setText(bestDiemTH.toString());
+        txtDiemCong.setText(bestDiemCong.toString());
+        txtDiemUT.setText(bestDiemUT.toString());
+        txtDiemXetTuyen.setText(maxDiemXT.toString());
     }
 
     private String getSelectedCCCD() {

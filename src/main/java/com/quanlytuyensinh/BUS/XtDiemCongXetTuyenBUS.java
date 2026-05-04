@@ -170,4 +170,15 @@ public class XtDiemCongXetTuyenBUS {
             throw new IllegalArgumentException("Dữ liệu xét tuyển cho thí sinh này với ngành và tổ hợp này đã tồn tại.");
         }
     }
+    
+    public XtDiemCongXetTuyen getDiemCongByKey(String cccd, String maNganh, String maTH){
+        XtDiemCongXetTuyen rs =null;
+        for(XtDiemCongXetTuyen dc : this.listDiemCong){
+            if(dc.getTsCccd().equals(cccd) && dc.getMaNganh().equals(maNganh) && dc.getMaToHop().equals(maTH)){
+                rs = dc;
+                break;
+            }
+        }
+        return rs;
+    }
 }

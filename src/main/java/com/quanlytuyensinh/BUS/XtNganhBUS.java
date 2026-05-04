@@ -185,4 +185,14 @@ public class XtNganhBUS {
         return rs;
         
     }
+    public XtNganh getNganhByMaNganh(String maNganh){
+        XtNganh rs = null;
+         for(XtNganh nganh : listNganh){
+             if(maNganh.equals(nganh.getManganh())){
+                 rs = nganh;
+                 break;
+             }
+         }
+         return rs;
+    }
 }

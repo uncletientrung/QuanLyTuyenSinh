@@ -6,6 +6,7 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtNganhToHopDAO;
 import com.quanlytuyensinh.ENTITY.XtNganhToHop;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,5 +79,14 @@ public class XtNganhToHopBUS {
              
         }).toList();
                 
+    }
+    public List<XtNganhToHop> getNTHByMaNganh(String maNganh){
+        List<XtNganhToHop> rs = new ArrayList<>();
+        for(XtNganhToHop nth: this.listNTH){
+            if(nth.getManganh().equals(maNganh)){
+                rs.add(nth);
+            }
+        }
+        return rs;
     }
 }

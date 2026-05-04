@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 28, 2026 at 12:27 PM
+-- Generation Time: May 04, 2026 at 06:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -833,7 +833,6 @@ CREATE TABLE `xt_diemthixettuyen` (
   `SU` decimal(8,2) DEFAULT 0.00,
   `DI` decimal(8,2) DEFAULT 0.00,
   `VA` decimal(8,2) DEFAULT 0.00,
-  `GDCD` decimal(8,2) DEFAULT 0.00,
   `N1_THI` decimal(8,2) DEFAULT NULL COMMENT 'Điểm thi gốc',
   `N1_CC` decimal(8,2) DEFAULT 0.00 COMMENT 'max(N1_Thi, N1_QD)',
   `CNCN` decimal(8,2) DEFAULT 0.00 COMMENT 'Công nghệ công nghiệp',
@@ -842,11 +841,7 @@ CREATE TABLE `xt_diemthixettuyen` (
   `KTPL` decimal(8,2) DEFAULT 0.00 COMMENT 'Kinh tế và pháp luật',
   `NL1` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng lực 1',
   `NK1` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 1',
-  `NK2` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 2',
-  `NK3` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 3',
-  `NK4` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 4',
-  `NK5` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 5',
-  `NK6` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 6'
+  `NK2` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 2'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -945,7 +940,8 @@ INSERT INTO `xt_nganh` (`idnganh`, `manganh`, `tennganh`, `n_tohopgoc`, `n_chiti
 (33, 'ưeqwe', 'eqweqe', '123', 12, 12.00, 16.00, '0', '0', '1', '0', 13, 123, 132, 123),
 (38, '800001', 'Test ngành 1', 'A00', 100, 10.00, 20.00, '1', '0', '1', '1', 10, 0, 10, 12),
 (39, '800002', 'Test ngành 2', 'A08', 199, 18.00, 30.00, '1', '1', '0', '0', 100, 30, 0, 0),
-(40, '800003', 'Test ngành 3', 'A01', 188, 13.00, 23.00, '0', '1', '0', '0', 0, 67, 0, 0);
+(40, '800003', 'Test ngành 3', 'A01', 188, 13.00, 23.00, '0', '1', '0', '0', 0, 67, 0, 0),
+(42, '9991111', 'Nganh Teest 009', 'A00', 19, 12.00, 19.00, '1', '1', '0', '0', 10, 199, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -973,8 +969,16 @@ CREATE TABLE `xt_nganh_tohop` (
   `SU` tinyint(1) DEFAULT NULL,
   `DI` tinyint(1) DEFAULT NULL,
   `TI` tinyint(1) DEFAULT NULL,
-  `KHAC` tinyint(1) DEFAULT NULL,
+  `GDCD` tinyint(1) DEFAULT NULL,
   `KTPL` tinyint(1) DEFAULT NULL,
+  `CNCN` tinyint(1) DEFAULT NULL,
+  `CNNN` tinyint(1) DEFAULT NULL,
+  `NK1` tinyint(1) DEFAULT NULL,
+  `NK2` tinyint(1) DEFAULT NULL,
+  `NK3` tinyint(1) DEFAULT NULL,
+  `NK4` tinyint(1) DEFAULT NULL,
+  `NK5` tinyint(1) DEFAULT NULL,
+  `NK6` tinyint(1) DEFAULT NULL,
   `dolech` decimal(6,2) DEFAULT 0.00 COMMENT 'Nhập tay chứ không phải thiết kế hệ thống'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -982,19 +986,28 @@ CREATE TABLE `xt_nganh_tohop` (
 -- Dumping data for table `xt_nganh_tohop`
 --
 
-INSERT INTO `xt_nganh_tohop` (`id`, `manganh`, `matohop`, `th_mon1`, `hsmon1`, `th_mon2`, `hsmon2`, `th_mon3`, `hsmon3`, `tb_keys`, `N1`, `TO`, `LI`, `HO`, `SI`, `VA`, `SU`, `DI`, `TI`, `KHAC`, `KTPL`, `dolech`) VALUES
-(1, '7480201', 'A00', 'TO', 2, 'LI', 1, 'HO', 1, '7480201_A00', 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0.00),
-(2, '7480201', 'A01', 'TO', 2, 'LI', 1, 'N1', 1, '7480201_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0.25),
-(3, '7480201', 'D01', 'TO', 2, 'VA', 1, 'N1', 1, '7480201_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.50),
-(4, '7340101', 'A01', 'TO', 1, 'LI', 1, 'N1', 2, '7340101_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
-(5, '7340101', 'D01', 'TO', 1, 'VA', 1, 'N1', 2, '7340101_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.00),
-(6, '7340101', 'C00', 'VA', 2, 'SU', 1, 'DI', 1, '7340101_C00', 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0.50),
-(7, '7220201', 'D01', 'TO', 1, 'VA', 1, 'N1', 2, '7220201_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.00),
-(8, '7220201', 'A01', 'TO', 1, 'LI', 1, 'N1', 2, '7220201_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0.25),
-(9, '7520201', 'A00', 'TO', 2, 'LI', 1, 'HO', 1, '7520201_A00', 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0.00),
-(10, '7520201', 'A01', 'TO', 2, 'LI', 1, 'N1', 1, '7520201_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0.25),
-(11, '7140201', 'C00', 'VA', 2, 'SU', 1, 'DI', 1, '7140201_C00', 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0.00),
-(12, '7140201', 'D01', 'TO', 1, 'VA', 2, 'N1', 1, '7140201_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0.30);
+INSERT INTO `xt_nganh_tohop` (`id`, `manganh`, `matohop`, `th_mon1`, `hsmon1`, `th_mon2`, `hsmon2`, `th_mon3`, `hsmon3`, `tb_keys`, `N1`, `TO`, `LI`, `HO`, `SI`, `VA`, `SU`, `DI`, `TI`, `GDCD`, `KTPL`, `CNCN`, `CNNN`, `NK1`, `NK2`, `NK3`, `NK4`, `NK5`, `NK6`, `dolech`) VALUES
+(1, '7480201', 'A00', 'TO', 2, 'LI', 1, 'HO', 1, '7480201_A00', 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(2, '7480201', 'A01', 'TO', 2, 'LI', 1, 'N1', 1, '7480201_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.25),
+(3, '7480201', 'D01', 'TO', 2, 'VA', 1, 'N1', 1, '7480201_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.50),
+(4, '7340101', 'A01', 'TO', 1, 'LI', 1, 'N1', 2, '7340101_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(5, '7340101', 'D01', 'TO', 1, 'VA', 1, 'N1', 2, '7340101_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(6, '7340101', 'A00', 'TO', 2, 'LI', 1, 'HO', 1, '7340101_A00', 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.50),
+(7, '7220201', 'D01', 'TO', 1, 'VA', 1, 'N1', 2, '7220201_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(8, '7220201', 'A01', 'TO', 1, 'LI', 1, 'N1', 2, '7220201_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.25),
+(9, '7520201', 'A00', 'TO', 2, 'LI', 1, 'HO', 1, '7520201_A00', 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(10, '7520201', 'A01', 'TO', 2, 'LI', 1, 'N1', 1, '7520201_A01', 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.25),
+(11, '7140201', 'C00', 'VA', 2, 'SU', 1, 'DI', 1, '7140201_C00', 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(12, '7140201', 'D01', 'TO', 1, 'VA', 2, 'N1', 1, '7140201_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.30),
+(14, '7480204', 'D10', 'TO', 1, 'DI', 1, 'N1', 2, '7480204_D10', 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.80),
+(15, '9000110', 'A00', 'TO', 2, 'LI', 1, 'HO', 1, '9000110_A00', 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(16, '9000111', 'D01', 'TO', 1, 'VA', 1, 'N1', 2, '9000111_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.00),
+(17, '9991111', 'B00', 'TO', 1, 'HO', 1, 'SI', 2, '9991111_B00', 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.00),
+(18, '7520201', 'D99', 'HO', 1, 'NK2', 2, 'NK5', 1, '7520201_D99', 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1.00),
+(19, '7520201', 'C03', 'VA', 1, 'TO', 2, 'SU', 1, '7520201_C03', 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.90),
+(23, '7510301', 'D99', 'HO', 1, 'NK2', 3, 'NK5', 3, '7510301_D99', 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1.00),
+(24, '7480202', 'C02', 'VA', 1, 'TO', 1, 'HO', 2, '7480202_C02', 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.00),
+(29, '7510302', 'D01', 'TO', 1, 'VA', 1, 'N1', 1, '7510302_D01', 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.00);
 
 -- --------------------------------------------------------
 
@@ -1104,7 +1117,9 @@ INSERT INTO `xt_tohop_monthi` (`idtohop`, `matohop`, `mon1`, `mon2`, `mon3`, `te
 (12, 'D09', 'TO', 'SU', 'N1', 'Toán, Lịch sử, Tiếng Anh'),
 (13, 'D10', 'TO', 'DI', 'N1', 'Toán, Địa lí, Tiếng Anh'),
 (14, 'D14', 'VA', 'SU', 'N1', 'Ngữ văn, Lịch sử, Tiếng Anh'),
-(15, 'D15', 'VA', 'DI', 'N1', 'Ngữ văn, Địa lí, Tiếng Anh');
+(15, 'D15', 'VA', 'DI', 'N1', 'Ngữ văn, Địa lí, Tiếng Anh'),
+(16, 'D99', 'HO', 'NK2', 'NK5', 'Hóa học, Hát – Nhạc, Hát – Nhạc cụ'),
+(17, 'D88', 'NK6', 'CNCN', 'CNNN', 'Xướng âm - Thẩm âm - Tiết tấu, Công nghệ công nghiệp, Công nghệ nông nghiệp');
 
 --
 -- Indexes for dumped tables
@@ -1246,13 +1261,13 @@ ALTER TABLE `xt_khuvuc`
 -- AUTO_INCREMENT for table `xt_nganh`
 --
 ALTER TABLE `xt_nganh`
-  MODIFY `idnganh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `idnganh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `xt_nganh_tohop`
 --
 ALTER TABLE `xt_nganh_tohop`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `xt_nguyenvongxettuyen`
@@ -1270,7 +1285,7 @@ ALTER TABLE `xt_thisinhxettuyen25`
 -- AUTO_INCREMENT for table `xt_tohop_monthi`
 --
 ALTER TABLE `xt_tohop_monthi`
-  MODIFY `idtohop` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `idtohop` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables

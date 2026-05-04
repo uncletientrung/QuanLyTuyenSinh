@@ -267,7 +267,26 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                 }else{
                     JOptionPane.showMessageDialog(this, "Kết quả nguyện vọng đã công bố không thể sửa", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 }
-                
+            }else if(source == mainFunction.btn.get("delete") ){
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "<html>"
+                            + "Xóa nguyện vọng:<br>"
+                            + "<b>Thứ tự:</b> " + NguyenVongDuocChon.getNvTt() + "<br>"
+                            + "<b>CCCD:</b> " + NguyenVongDuocChon.getNnCccd() + "<br>"
+                            + "<b>Mã ngành:</b> " + NguyenVongDuocChon.getNvManganh()
+                        + "</html>",
+                        "Xác nhận xóa",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                        if (NVBUS.deleteNguyenVong(NguyenVongDuocChon.getIdnv())) {
+                            JOptionPane.showMessageDialog(this, "Xóa nguyện vọng thành công!");
+                            listNV = NVBUS.getAllNguyenVong();
+                            loadDataTable(listNV);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
             }
         }
     }

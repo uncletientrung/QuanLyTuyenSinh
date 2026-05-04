@@ -50,32 +50,21 @@ public class XtNguyenVongXetTuyenDAO {
 
     // ================= DELETE =================
     public boolean delete(int idnv) {
-
         Transaction transaction = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
-
             XtNguyenVongXetTuyen nv = session.get(XtNguyenVongXetTuyen.class, idnv);
-
             if (nv != null) {
                 session.remove(nv);
             }
-
             transaction.commit();
-
             return true;
-
         } catch (Exception e) {
-
             if (transaction != null) {
                 transaction.rollback();
             }
-
             e.printStackTrace();
         }
-
         return false;
     }
 

@@ -59,6 +59,15 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;
     }
+    public boolean deleteNguyenVong(int idNV){
+        if(idNV <=0) return false;
+        boolean rs = nvDAO.delete(idNV);
+        if (rs) {
+            listNV.removeIf(nv -> nv.getIdnv()== idNV);
+            return true;
+        }
+        return false;  
+    }
     
    
 

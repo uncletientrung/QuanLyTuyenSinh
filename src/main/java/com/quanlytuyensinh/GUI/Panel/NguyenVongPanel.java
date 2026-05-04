@@ -270,12 +270,13 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             }else if(source == mainFunction.btn.get("delete") ){
                 int confirm = JOptionPane.showConfirmDialog(this,
                         "<html>"
-                            + "Xóa nguyện vọng:<br>"
-                            + "<b>Thứ tự:</b> " + NguyenVongDuocChon.getNvTt() + "<br>"
+                            + "<h3 style='color:red;'>Xác nhận xóa nguyện vọng</h3>"
+                            + "<hr>"
+                            + "<b>Thứ tự nguyện vọng:</b> " + NguyenVongDuocChon.getNvTt() + "<br>"
                             + "<b>CCCD:</b> " + NguyenVongDuocChon.getNnCccd() + "<br>"
                             + "<b>Mã ngành:</b> " + NguyenVongDuocChon.getNvManganh()
                         + "</html>",
-                        "Xác nhận xóa",
+                        "Xác nhận",
                         JOptionPane.YES_NO_OPTION
                 );
                 if (confirm == JOptionPane.YES_OPTION) {

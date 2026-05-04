@@ -246,9 +246,18 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
                                                                                                                                                 }, thiSinhDuocChon
                 );
             }else if(source == mainFunction.btn.get("delete") ){
-                int confirm = JOptionPane.showConfirmDialog(this,
-                        "Xóa thí sinh số báo danh: " + thiSinhDuocChon.getSobaodanh()+ "?",
-                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+               int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "<html>"
+                    + "<h3 style='color:red;'>Xác nhận xóa thí sinh</h3>"
+                    + "<hr>"
+                    + "<b>Họ tên:</b> " + thiSinhDuocChon.getHo() + " " + thiSinhDuocChon.getTen() + "<br>"
+                    + "<b>CCCD:</b> " + thiSinhDuocChon.getCccd() + "<br>"
+                    + "<b>Số báo danh:</b> " + thiSinhDuocChon.getSobaodanh()
+                    + "</html>",
+                    "Xác nhận",
+                    JOptionPane.YES_NO_OPTION
+            );
                 if (confirm == JOptionPane.YES_OPTION) {
                         if (TSBUS.deleteThiSinh(thiSinhDuocChon.getIdthisinh())) {
                             JOptionPane.showMessageDialog(this, "Xóa thành công!");

@@ -37,7 +37,7 @@ public class XtNganhToHopBUS {
     public boolean updateNTH(XtNganhToHop nth) {
 
         if (nganhToHopDAO.update(nth)) {
-            for (int i = 0; i <= listNTH.size(); i++) {
+            for (int i = 0; i < listNTH.size(); i++) {
                 if (listNTH.get(i).getId()== nth.getId()) {
                     listNTH.set(i, nth);
                     break;

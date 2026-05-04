@@ -33,6 +33,9 @@ public class NganhToHopDialog extends JDialog {
     private JPanel pnlBoolMon;
     private JLabel lblBoolMonDisplay;
 
+    // Panel hiển thị chi tiết NK khi xem (view mode)
+    private JPanel pnlNkDetail;
+
     private ButtonCustom btnLuu, btnHuy;
 
     private XtNganhToHopBUS bus      = new XtNganhToHopBUS();
@@ -60,7 +63,7 @@ public class NganhToHopDialog extends JDialog {
 
 
     private void init(String type) {
-        setSize(680, 680);
+        setSize(680, 720);
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);
         getContentPane().setBackground(Color.WHITE);
@@ -123,9 +126,9 @@ public class NganhToHopDialog extends JDialog {
         txtMon3   = new VerticalInputForm("Môn 3");
         txtHsMon3 = new VerticalInputForm("Hệ số môn 3");
 
-        // Tên môn tự điền từ DB → chỉ đọc
+        // Tên môn tự điền từ DB, chỉ đọc
         setReadOnly(txtMon1, txtMon2, txtMon3);
-        // Hệ số → chỉ nhập số
+        // Hệ số , chỉ nhập số
         setNumericFilter(txtHsMon1, txtHsMon2, txtHsMon3);
 
         pnlMonThi.add(buildMonRow(txtMon1, txtHsMon1));
@@ -143,6 +146,12 @@ public class NganhToHopDialog extends JDialog {
         lblBoolMonDisplay.setBorder(new EmptyBorder(6, 10, 6, 10));
         pnlBoolMon.add(lblBoolMonDisplay, BorderLayout.CENTER);
 
+        // --- Panel chi tiết NK (chỉ hiển thị khi xem/sửa bản ghi có NK) ---
+        pnlNkDetail = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 6));
+        pnlNkDetail.setBackground(Color.WHITE);
+        pnlNkDetail.setBorder(buildTitledBorder("Chi tiết NK trong DB"));
+        pnlNkDetail.setVisible(false); // ẩn mặc định, hiện khi fillData
+
         // Gắn listener SAU khi tất cả field đã tạo xong
         bindListeners();
 
@@ -157,6 +166,8 @@ public class NganhToHopDialog extends JDialog {
         pnlMain.add(pnlMonThi);
         pnlMain.add(Box.createVerticalStrut(14));
         pnlMain.add(pnlBoolMon);
+        pnlMain.add(Box.createVerticalStrut(8));
+        pnlMain.add(pnlNkDetail);
     }
 
 
@@ -277,9 +288,10 @@ public class NganhToHopDialog extends JDialog {
         txtHsMon1.setText(currentRecord.getHsMon1() != null ? String.valueOf(currentRecord.getHsMon1()) : "");
         txtHsMon2.setText(currentRecord.getHsMon2() != null ? String.valueOf(currentRecord.getHsMon2()) : "");
         txtHsMon3.setText(currentRecord.getHsMon3() != null ? String.valueOf(currentRecord.getHsMon3()) : "");
+
     }
 
-    //ham luu doi tuong
+
 
     private void luuNTH(String type) {
         XtNganhToHop nth = new XtNganhToHop();
@@ -295,23 +307,32 @@ public class NganhToHopDialog extends JDialog {
         nth.setThMon3(txtMon3.getText().trim());
         nth.setHsMon3(parseInteger(txtHsMon3.getText()));
 
-        // Lấy 3 tên môn đang được chọn từ tổ hợp
+        // Lấy 3 tên môn đang được chọn từ tổ hợp (uppercase để so sánh)
         String mon1 = txtMon1.getText().trim().toUpperCase();
         String mon2 = txtMon2.getText().trim().toUpperCase();
         String mon3 = txtMon3.getText().trim().toUpperCase();
 
-        // Set boolean: môn nào nằm trong 3 môn của tổ hợp thif true, còn lại thi false
-        nth.setN1(mon1.equals("N1")   || mon2.equals("N1")   || mon3.equals("N1"));
-        nth.setTo(mon1.equals("TO")   || mon2.equals("TO")   || mon3.equals("TO"));
-        nth.setLi(mon1.equals("LI")   || mon2.equals("LI")   || mon3.equals("LI"));
-        nth.setHo(mon1.equals("HO")   || mon2.equals("HO")   || mon3.equals("HO"));
-        nth.setSi(mon1.equals("SI")   || mon2.equals("SI")   || mon3.equals("SI"));
-        nth.setVa(mon1.equals("VA")   || mon2.equals("VA")   || mon3.equals("VA"));
-        nth.setSu(mon1.equals("SU")   || mon2.equals("SU")   || mon3.equals("SU"));
-        nth.setDi(mon1.equals("DI")   || mon2.equals("DI")   || mon3.equals("DI"));
-        nth.setTi(mon1.equals("TI")   || mon2.equals("TI")   || mon3.equals("TI"));
-        nth.setKhac(mon1.equals("KHAC") || mon2.equals("KHAC") || mon3.equals("KHAC"));
+        // Set boolean: môn nào nằm trong 3 môn của tổ hợp thì true, còn lại thì false
+        nth.setN1  (mon1.equals("N1")   || mon2.equals("N1")   || mon3.equals("N1"));
+        nth.setTo  (mon1.equals("TO")   || mon2.equals("TO")   || mon3.equals("TO"));
+        nth.setLi  (mon1.equals("LI")   || mon2.equals("LI")   || mon3.equals("LI"));
+        nth.setHo  (mon1.equals("HO")   || mon2.equals("HO")   || mon3.equals("HO"));
+        nth.setSi  (mon1.equals("SI")   || mon2.equals("SI")   || mon3.equals("SI"));
+        nth.setVa  (mon1.equals("VA")   || mon2.equals("VA")   || mon3.equals("VA"));
+        nth.setSu  (mon1.equals("SU")   || mon2.equals("SU")   || mon3.equals("SU"));
+        nth.setDi  (mon1.equals("DI")   || mon2.equals("DI")   || mon3.equals("DI"));
+        nth.setTi  (mon1.equals("TI")   || mon2.equals("TI")   || mon3.equals("TI"));
+        nth.setGdcd(mon1.equals("GDCD") || mon2.equals("GDCD") || mon3.equals("GDCD")); 
         nth.setKtpl(mon1.equals("KTPL") || mon2.equals("KTPL") || mon3.equals("KTPL"));
+        nth.setCncn(mon1.equals("CNCN")|| mon2.equals("CNCN") || mon3.equals("CNCN"));
+        nth.setCnnn(mon1.equals("CNNN")|| mon2.equals("CNNN") || mon3.equals("CNNN"));
+        // NK1-NK6: mỗi cột độc lập theo tên môn
+        nth.setNk1 (mon1.equals("NK1")  || mon2.equals("NK1")  || mon3.equals("NK1"));
+        nth.setNk2 (mon1.equals("NK2")  || mon2.equals("NK2")  || mon3.equals("NK2"));
+        nth.setNk3 (mon1.equals("NK3")  || mon2.equals("NK3")  || mon3.equals("NK3"));
+        nth.setNk4 (mon1.equals("NK4")  || mon2.equals("NK4")  || mon3.equals("NK4"));
+        nth.setNk5 (mon1.equals("NK5")  || mon2.equals("NK5")  || mon3.equals("NK5"));
+        nth.setNk6 (mon1.equals("NK6")  || mon2.equals("NK6")  || mon3.equals("NK6"));
 
         if (type.equals("create")) {
             if (bus.addNTH(nth)) {

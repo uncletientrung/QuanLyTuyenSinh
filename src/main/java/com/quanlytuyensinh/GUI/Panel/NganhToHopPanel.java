@@ -47,7 +47,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         String[] header = {
             "ID", "Mã Ngành", "Mã Tổ Hợp",
             "Môn 1", "HS 1", "Môn 2", "HS 2", "Môn 3", "HS 3",
-            "TB Keys", "N1", "TO", "LI", "HO", "SI", "VA", "SU", "DI", "TI", "KHAC", "KTPL",
+            "N1", "TO", "LI", "HO", "SI", "VA", "SU", "DI", "TI", "GDCD", "KTPL", "CNCN", "CNNN", "NK",
             "Độ Lệch"
         };
 
@@ -74,29 +74,35 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         table.setAutoCreateRowSorter(false);
 
  
-        Comparator<Object>[] comps = new Comparator[22];
-        comps[0]  = TableSorter.INTEGER_COMPARATOR;        // ID
-        comps[1]  = TableSorter.STRING_COMPARATOR;         // Mã Ngành
-        comps[2]  = TableSorter.STRING_COMPARATOR;         // Mã Tổ Hợp
-        comps[3]  = TableSorter.STRING_COMPARATOR;         // Môn 1
-        comps[4]  = TableSorter.INTEGER_COMPARATOR;        // HS 1
-        comps[5]  = TableSorter.STRING_COMPARATOR;         // Môn 2
-        comps[6]  = TableSorter.INTEGER_COMPARATOR;        // HS 2
-        comps[7]  = TableSorter.STRING_COMPARATOR;         // Môn 3
-        comps[8]  = TableSorter.INTEGER_COMPARATOR;        // HS 3
-        comps[9]  = TableSorter.STRING_COMPARATOR;         // TB Keys
-        comps[10] = TableSorter.STRING_COMPARATOR;         // N1
-        comps[11] = TableSorter.STRING_COMPARATOR;         // TO
-        comps[12] = TableSorter.STRING_COMPARATOR;         // LI
-        comps[13] = TableSorter.STRING_COMPARATOR;         // HO
-        comps[14] = TableSorter.STRING_COMPARATOR;         // SI
-        comps[15] = TableSorter.STRING_COMPARATOR;         // VA
-        comps[16] = TableSorter.STRING_COMPARATOR;         // SU
-        comps[17] = TableSorter.STRING_COMPARATOR;         // DI
-        comps[18] = TableSorter.STRING_COMPARATOR;         // TI
-        comps[19] = TableSorter.STRING_COMPARATOR;         // KHAC
-        comps[20] = TableSorter.STRING_COMPARATOR;         // KTPL
-        comps[21] = TableSorter.BIG_DECIMAL_COMPARATOR;   // Độ Lệch
+        Comparator<Object>[] comps = new Comparator[24];
+
+        comps[0]  = TableSorter.INTEGER_COMPARATOR;
+        comps[1]  = TableSorter.STRING_COMPARATOR;
+        comps[2]  = TableSorter.STRING_COMPARATOR;
+        comps[3]  = TableSorter.STRING_COMPARATOR;
+        comps[4]  = TableSorter.INTEGER_COMPARATOR;
+        comps[5]  = TableSorter.STRING_COMPARATOR;
+        comps[6]  = TableSorter.INTEGER_COMPARATOR;
+        comps[7]  = TableSorter.STRING_COMPARATOR;
+        comps[8]  = TableSorter.INTEGER_COMPARATOR;
+
+        comps[9]  = TableSorter.STRING_COMPARATOR; // N1
+        comps[10] = TableSorter.STRING_COMPARATOR; // TO
+        comps[11] = TableSorter.STRING_COMPARATOR; // LI
+        comps[12] = TableSorter.STRING_COMPARATOR; // HO
+        comps[13] = TableSorter.STRING_COMPARATOR; // SI
+        comps[14] = TableSorter.STRING_COMPARATOR; // VA
+        comps[15] = TableSorter.STRING_COMPARATOR; // SU
+        comps[16] = TableSorter.STRING_COMPARATOR; // DI
+        comps[17] = TableSorter.STRING_COMPARATOR; // TI
+
+        comps[18] = TableSorter.STRING_COMPARATOR; // GDCD
+        comps[19] = TableSorter.STRING_COMPARATOR; // KTPL
+        comps[20] = TableSorter.STRING_COMPARATOR; // CNCN
+        comps[21] = TableSorter.STRING_COMPARATOR; // CNNN
+        comps[22] = TableSorter.STRING_COMPARATOR; // NK
+
+        comps[23] = TableSorter.BIG_DECIMAL_COMPARATOR; // Độ lệch
 
         paginatedTable.enableFullDataSorting(comps);
 
@@ -164,19 +170,12 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         table.getColumnModel().getColumn(5).setPreferredWidth(80);   // Môn 2
         table.getColumnModel().getColumn(6).setPreferredWidth(55);   // HS 2
         table.getColumnModel().getColumn(7).setPreferredWidth(80);   // Môn 3
-        table.getColumnModel().getColumn(8).setPreferredWidth(55);   // HS 3
-        table.getColumnModel().getColumn(9).setPreferredWidth(100);  // TB Keys
-        table.getColumnModel().getColumn(10).setPreferredWidth(50);  // N1
-        table.getColumnModel().getColumn(11).setPreferredWidth(50);  // TO
-        table.getColumnModel().getColumn(12).setPreferredWidth(50);  // LI
-        table.getColumnModel().getColumn(13).setPreferredWidth(50);  // HO
-        table.getColumnModel().getColumn(14).setPreferredWidth(50);  // SI
-        table.getColumnModel().getColumn(15).setPreferredWidth(50);  // VA
-        table.getColumnModel().getColumn(16).setPreferredWidth(50);  // SU
-        table.getColumnModel().getColumn(17).setPreferredWidth(50);  // DI
-        table.getColumnModel().getColumn(18).setPreferredWidth(50);  // TI
-        table.getColumnModel().getColumn(19).setPreferredWidth(60);  // KHAC
-        table.getColumnModel().getColumn(20).setPreferredWidth(60);  // KTPL
+        table.getColumnModel().getColumn(8).setPreferredWidth(55);
+        // HS 3
+        for (int i = 9; i <= 22; i++) {
+            table.getColumnModel().getColumn(i).setPreferredWidth(45);//cac mon
+        } 
+        
         table.getColumnModel().getColumn(21).setPreferredWidth(80);  // Độ Lệch
     }
 
@@ -188,6 +187,14 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
     }
 
     private Object[] buildRow(XtNganhToHop nth) {
+        // NK = true nếu bất kỳ NK1-NK6 nào là true
+        boolean hasNk = Boolean.TRUE.equals(nth.getNk1())
+                     || Boolean.TRUE.equals(nth.getNk2())
+                     || Boolean.TRUE.equals(nth.getNk3())
+                     || Boolean.TRUE.equals(nth.getNk4())
+                     || Boolean.TRUE.equals(nth.getNk5())
+                     || Boolean.TRUE.equals(nth.getNk6());
+
         return new Object[]{
             "NTH-" + nth.getId(),
             nth.getManganh(),
@@ -198,7 +205,6 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
             nth.getHsMon2(),
             nth.getThMon3(),
             nth.getHsMon3(),
-            nth.getTbKeys(),
             boolToText(nth.getN1()),
             boolToText(nth.getTo()),
             boolToText(nth.getLi()),
@@ -208,8 +214,11 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
             boolToText(nth.getSu()),
             boolToText(nth.getDi()),
             boolToText(nth.getTi()),
-            boolToText(nth.getKhac()),
+            boolToText(nth.getGdcd()),
             boolToText(nth.getKtpl()),
+            boolToText(nth.getCncn()),
+            boolToText(nth.getCnnn()),
+            boolToText(hasNk),
             nth.getDolech()
         };
     }
@@ -224,7 +233,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         if (value == null) return "";
         //return value ? "Có" : "Không";
         //return value ? "✔" : "✘";
-        return value ? "✔" : "";
+        return value != null && value ? "✔" : "";
     }
 
 
@@ -381,8 +390,14 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
                     nth.setSu  (mon1.equals("SU")   || mon2.equals("SU")   || mon3.equals("SU"));
                     nth.setDi  (mon1.equals("DI")   || mon2.equals("DI")   || mon3.equals("DI"));
                     nth.setTi  (mon1.equals("TI")   || mon2.equals("TI")   || mon3.equals("TI"));
-                    nth.setKhac(mon1.equals("KHAC") || mon2.equals("KHAC") || mon3.equals("KHAC"));
+                    nth.setGdcd(mon1.equals("GDCD") || mon2.equals("GDCD") || mon3.equals("GDCD"));
                     nth.setKtpl(mon1.equals("KTPL") || mon2.equals("KTPL") || mon3.equals("KTPL"));
+                    nth.setNk1 (mon1.equals("NK1")  || mon2.equals("NK1")  || mon3.equals("NK1"));
+                    nth.setNk2 (mon1.equals("NK2")  || mon2.equals("NK2")  || mon3.equals("NK2"));
+                    nth.setNk3 (mon1.equals("NK3")  || mon2.equals("NK3")  || mon3.equals("NK3"));
+                    nth.setNk4 (mon1.equals("NK4")  || mon2.equals("NK4")  || mon3.equals("NK4"));
+                    nth.setNk5 (mon1.equals("NK5")  || mon2.equals("NK5")  || mon3.equals("NK5"));
+                    nth.setNk6 (mon1.equals("NK6")  || mon2.equals("NK6")  || mon3.equals("NK6"));
 
                     if (nganhToHopBUS.addNTH(nth)) {
                         successCount++;
@@ -467,5 +482,39 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         if (e.getStateChange() == ItemEvent.SELECTED) {
             performSearch();
         }
+    }
+    
+    // Gán giá trị true cho cột môn học tương ứng
+    private void setSubjectBoolean(XtNganhToHop nth, String mon) {
+        switch (mon) {
+            case "N1":   nth.setN1(true); break;
+            case "TO":   nth.setTo(true); break;
+            case "LI":   nth.setLi(true); break;
+            case "HO":   nth.setHo(true); break;
+            case "SI":   nth.setSi(true); break;
+            case "VA":   nth.setVa(true); break;
+            case "SU":   nth.setSu(true); break;
+            case "DI":   nth.setDi(true); break;
+            case "TI":   nth.setTi(true); break;
+            case "GDCD": nth.setGdcd(true); break;
+            case "KTPL": nth.setKtpl(true); break;
+            case "CNCN": nth.setCncn(true); break;
+            case "CNNN": nth.setCnnn(true); break;
+            case "NK1":  nth.setNk1(true); break;
+            case "NK2":  nth.setNk2(true); break;
+            case "NK3":  nth.setNk3(true); break;
+            case "NK4":  nth.setNk4(true); break;
+            case "NK5":  nth.setNk5(true); break;
+            case "NK6":  nth.setNk6(true); break;
+        }
+    }
+
+    // Reset các trường boolean về false trước khi set (tránh null)
+    private void resetBooleanFields(XtNganhToHop nth) {
+        nth.setN1(false); nth.setTo(false); nth.setLi(false); nth.setHo(false);
+        nth.setSi(false); nth.setVa(false); nth.setSu(false); nth.setDi(false);
+        nth.setTi(false); nth.setGdcd(false); nth.setKtpl(false); nth.setCncn(false);
+        nth.setCnnn(false); nth.setNk1(false); nth.setNk2(false); nth.setNk3(false);
+        nth.setNk4(false); nth.setNk5(false); nth.setNk6(false);
     }
 }

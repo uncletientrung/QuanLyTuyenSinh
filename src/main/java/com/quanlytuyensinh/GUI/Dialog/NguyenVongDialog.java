@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Label;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.swing.JDialog;
@@ -41,11 +42,13 @@ public class NguyenVongDialog extends JDialog{
     private NguyenVongPanel parent;
     private XtNguyenVongXetTuyenBUS NVBUS;
     private List<XtNguyenVongXetTuyen> listNV;
+    private XtNguyenVongXetTuyen currentNV;
     private String type; // "create" hoặc "edit"
     private Runnable onSuccess; // Lưu hàm chạy sau khi xong
     
     // Form fields
     private VerticalInputForm txtThuTu, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtDoLech, txtDanhSachTH, txtTHXet, txtNV_Key;
+    private VerticalInputForm txtKetQua;
     private VerticalComboBoxForm cbbPhuongThuc, cbbCCCD, cbbMaNganh;
     private ButtonCustom btnLuu, btnHuy;
     private JPanel pnlMain, pnlButtons;
@@ -67,6 +70,7 @@ public class NguyenVongDialog extends JDialog{
         this.parent = parent;
         NVBUS = parent.getBUS();
         listNV = parent.getListNV();
+        this.currentNV = nv;
         this.type = type;
         this.onSuccess = onSuccess;
         this.setTitle(title);
@@ -93,10 +97,11 @@ public class NguyenVongDialog extends JDialog{
 
         initMainPanel();
         initButtonPanel();
-        
-        if(this.type.equals("create")){
-            setFieldsDisable();
+        setFieldsDisable();
+        if(this.type.equals("detail")){
+            this.setNguyenVongData(currentNV);
         }
+        
 
         this.add(pnlMain, BorderLayout.CENTER);
         this.add(pnlButtons, BorderLayout.SOUTH);
@@ -137,6 +142,8 @@ public class NguyenVongDialog extends JDialog{
         this.txtDiemXetTuyen = new VerticalInputForm("Điểm xét tuyển"); 
         this.txtDoLech =  new VerticalInputForm("Độ lệch");  
         this.txtNV_Key= new VerticalInputForm("Nguyện vọng Key"); 
+        this.txtKetQua= new VerticalInputForm("Kết quả xét tuyển"); 
+        Label lbHide = new Label();
         
         // ==================== LEFT COLUMN ====================
         left.add(txtThuTu);
@@ -145,6 +152,7 @@ public class NguyenVongDialog extends JDialog{
         left.add(cbbPhuongThuc);
         left.add(txtDanhSachTH);
         left.add(txtTHXet);
+        left.add(lbHide);
         
         // ==================== RIGHT COLUMN ====================
         right.add(txtDiemTHXT);
@@ -153,6 +161,9 @@ public class NguyenVongDialog extends JDialog{
         right.add(txtDiemCong);
         right.add(txtDiemXetTuyen);
         right.add(txtNV_Key);
+        if(!this.type.equals("create")){
+            right.add(txtKetQua);
+        }
         
         // Gắn listener SAU khi tất cả field đã tạo xong
         bindListeners();
@@ -181,8 +192,11 @@ public class NguyenVongDialog extends JDialog{
         btnHuy.setPreferredSize(new Dimension(160, 48));
         btnHuy.addActionListener(e -> dispose());
         
-        pnlButtons.add(btnLuu);
+        if(!this.type.equals("detail")){
+            pnlButtons.add(btnLuu);
+        }
         pnlButtons.add(btnHuy);
+
     }
     
     // Gắn sự kiện cho cbb và textfield
@@ -209,6 +223,13 @@ public class NguyenVongDialog extends JDialog{
                 txtNV_Key};
         for (VerticalInputForm f : listInputCreate) {
             f.setDisable();
+        }
+        if(this.type.equals("detail")){
+            this.txtThuTu.setDisable();
+            this.cbbCCCD.setDisable();
+            this.cbbMaNganh.setDisable();
+            this.cbbPhuongThuc.setDisable();
+            this.txtKetQua.setDisable();
         }
     }
     
@@ -367,6 +388,7 @@ public class NguyenVongDialog extends JDialog{
         return value.split(" ")[0];
     }
     
+    // Kiểm tra điều kiện
     private boolean validateInput() {
         String cccd = getSelectedCCCD();
         String maNganh = getSelectedMaNganh();
@@ -417,6 +439,7 @@ public class NguyenVongDialog extends JDialog{
         return true;
     }
 
+    // Hàm thực hiện khi ấn lưu
     private void saveNguyenVong(){
         XtNguyenVongXetTuyen nv = new XtNguyenVongXetTuyen();
         nv.setNnCccd(this.getSelectedCCCD());
@@ -455,5 +478,29 @@ public class NguyenVongDialog extends JDialog{
         
     }
 
-
+    // Set dữ liệu nguyện nếu detail hoặc update
+    private void setNguyenVongData(XtNguyenVongXetTuyen nv){
+        String itemCbbCCCD = "-- Chọn thí sinh --";
+        for(XtThisinhXetTuyen25 ts : listTS){
+            if(ts.getCccd().equals(nv.getNnCccd())){
+                itemCbbCCCD = ts.getCccd() +" - " + ts.getHo() + " " + ts.getTen();
+                break;
+            }
+               
+        }
+        String itemCbbMaNganh =  "-- Chọn mã ngành --";
+        for(XtNganh n : listNganh){
+            if(n.getManganh().equals(nv.getNvManganh())){
+                itemCbbMaNganh = n.getManganh()+" - " + n.getTennganh();
+                break;
+            }
+                
+        }
+        this.txtThuTu.setText(String.valueOf(nv.getNvTt()));
+        this.cbbCCCD.getComboBox().setSelectedItem(itemCbbCCCD);
+        this.cbbMaNganh.getComboBox().setSelectedItem(itemCbbMaNganh);
+        this.cbbPhuongThuc.getComboBox().setSelectedItem(nv.getTtPhuongthuc());
+        this.txtKetQua.setText(nv.getNvKetqua());
+        // Sau khi set 3 cái txThuTu với cbbMaNganh và cbbCCCD thì nó chạy hàm upadateField và upadateKeys đỡ viết
+    }
 }

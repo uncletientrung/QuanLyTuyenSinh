@@ -220,6 +220,20 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             } 
             paginatedTable.setData(data);
         }
+    private XtNguyenVongXetTuyen getSelectedNguyenVong() {
+        int row = paginatedTable.getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một nguyện vọng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);// Mục đích là để lấy model lấy dữ liệu gốc để nếu chọn hàng đó mà sort thì nó thay đổi theo
+        String idStr  = paginatedTable.getTable().getModel().getValueAt(modelRow, 0).toString();
+        int id = Integer.parseInt(idStr.replace("NV-", ""));
+        for (XtNguyenVongXetTuyen nv : listNV) {
+            if (nv.getIdnv()== id) return nv;
+        }
+        return null;        
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -232,6 +246,18 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                                                                                                                                                     loadDataTable(listNV);
                                                                                                                                                 }, null
             );
+        }else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
+                            source == mainFunction.btn.get("delete")){
+            XtNguyenVongXetTuyen NguyenVongDuocChon = getSelectedNguyenVong();
+             if (NguyenVongDuocChon == null) return;
+                
+            if(source == mainFunction.btn.get("detail") ){
+                new NguyenVongDialog(this, owner, "XEM CHI TIẾT NGUYỆN VỌNG " + "NV-" +NguyenVongDuocChon.getIdnv(), "detail",true, () -> {
+                                                                                                                                                    listNV = NVBUS.getAllNguyenVong();
+                                                                                                                                                    loadDataTable(listNV);
+                                                                                                                                                }, NguyenVongDuocChon
+                );
+            }
         }
     }
 
@@ -337,4 +363,6 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     public void setListNV(List<XtNguyenVongXetTuyen> listNV) {
         this.listNV = listNV;
     }
+
+
 }

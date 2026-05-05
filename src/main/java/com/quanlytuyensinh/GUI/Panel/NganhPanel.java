@@ -249,7 +249,7 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
             org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
 
             // Row 0 = tiêu đề bảng, Row 1 = header cột -> dữ liệu từ row 2
-            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 if (row == null) continue;
 

@@ -2,6 +2,7 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -68,6 +69,21 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;  
     }
+        public boolean approveNguyenVong(XtNguyenVongXetTuyen nvXetTuyen, BigDecimal diemTT){
+            if(nvXetTuyen == null || diemTT == null) return false;
+            boolean rs= false;
+            String ketQuaStr = nvXetTuyen.getDiemXettuyen().compareTo(diemTT) >= 0 ? "Trúng tuyển"  : "Không trúng tuyển";
+            rs = nvDAO.approve(nvXetTuyen.getIdnv(), ketQuaStr);
+            if(rs){
+                for(XtNguyenVongXetTuyen nv : listNV){
+                    if(nv.getIdnv() == nvXetTuyen.getIdnv()){
+                        nv.setNvKetqua(ketQuaStr);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     
    
 

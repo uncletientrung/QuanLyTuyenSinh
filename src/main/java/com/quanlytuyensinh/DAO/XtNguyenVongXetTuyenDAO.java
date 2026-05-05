@@ -101,4 +101,20 @@ public class XtNguyenVongXetTuyenDAO {
                     .list();
         }
     }
+    // SỬA TRẠNG THÁI KẾT QUẢ
+    public boolean approve(int idnv, String ketQua) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            XtNguyenVongXetTuyen nv = session.get(XtNguyenVongXetTuyen.class, idnv);
+            if (nv == null) return false;
+            nv.setNvKetqua(ketQua);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

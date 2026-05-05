@@ -35,6 +35,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
@@ -247,7 +248,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                                                                                                                                                 }, null
             );
         }else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
-                            source == mainFunction.btn.get("delete")){
+                            source == mainFunction.btn.get("delete") || source == mainFunction.btn.get("approve")){
             XtNguyenVongXetTuyen NguyenVongDuocChon = getSelectedNguyenVong();
              if (NguyenVongDuocChon == null) return;
                 
@@ -288,6 +289,30 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                             JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
                     }
+            }else if(source == mainFunction.btn.get("approve") ){
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "<html>"
+                            + "<h3 style='color:blue;'>XÁC NHẬN XÉT TUYỂN</h3>"
+                            + "<hr>"
+                            + "<b>Thứ tự nguyện vọng:</b> " + NguyenVongDuocChon.getNvTt() + "<br>"
+                            + "<b>CCCD:</b> " + NguyenVongDuocChon.getNnCccd() + "<br>"
+                            + "<b>Mã ngành:</b> " + NguyenVongDuocChon.getNvManganh()
+                        + "</html>",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    //Xử lý truyển dữ liệu vào để tính xét tuyển
+                    BigDecimal diemTT = NganhBUS.getNganhByMaNganh(NguyenVongDuocChon.getNvManganh()).getNDiemtrungtuyen();
+                    
+                    if (NVBUS.approveNguyenVong(NguyenVongDuocChon, diemTT)) {
+                        JOptionPane.showMessageDialog(this, "Xét tuyển nguyện vọng thành công!");
+                        listNV = NVBUS.getAllNguyenVong();
+                        loadDataTable(listNV);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Xét tuyển nguyện vọng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
         }
     }

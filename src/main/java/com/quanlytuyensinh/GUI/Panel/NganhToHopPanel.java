@@ -318,6 +318,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
     }
     
  
+
     private void importExcel() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
@@ -327,7 +328,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         int successCount = 0;
         java.util.List<String> errorLines = new java.util.ArrayList<>();
 
-        // Lấy danh sách tb_keys đã tồn tại để kiểm tra trùng
+        // Cache tb_keys đã tồn tại để kiểm tra trùng
         java.util.Set<String> existingKeys = new java.util.HashSet<>();
         for (XtNganhToHop nth : nganhToHopBUS.getAll()) {
             if (nth.getTbKeys() != null) {
@@ -338,76 +339,105 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook
                 = new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.FileInputStream(file))) {
 
+            // Cần FormulaEvaluator để đọc giá trị ô công thức (tb_keys = B2&"_"&F2)
+            org.apache.poi.ss.usermodel.FormulaEvaluator evaluator =
+                    workbook.getCreationHelper().createFormulaEvaluator();
+
             org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
 
-            // Row 0 = tiêu đề bảng, Row 1 = header cột → dữ liệu từ row 2
-            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
+            // Dòng 0 = header → dữ liệu bắt đầu từ dòng 1 (index 1)
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 if (row == null) continue;
 
-                int excelRow = i + 1; // số dòng hiển thị cho user (Excel đếm từ 1)
+                int excelRow = i + 1; // số dòng hiển thị theo Excel (1-based)
                 try {
-                    // Cột 0: STT - bỏ qua | Cột 1+: dữ liệu
-                    String maNganh = getCellString(row.getCell(1)).trim();
-                    String maToHop = getCellString(row.getCell(2)).trim();
-                    if (maNganh.isEmpty() || maToHop.isEmpty()) continue;
+                    // Cột 1: MANGANH
+                    String maNganh = getCellString(row.getCell(1), evaluator).trim();
 
-                    // Kiểm tra trùng dựa vào tb_keys = manganh_matohop
-                    String tbKeys = maNganh + "_" + maToHop;
+                    // Cột 3: MA_TO_HOP dạng "D07(TO-3,HO-5,N1-1)"
+                    String maToHopRaw = getCellString(row.getCell(3), evaluator).trim();
+
+                    if (maNganh.isEmpty() || maToHopRaw.isEmpty()) continue;
+
+                    // --- Tách mã tổ hợp và phần môn+hệ số ---
+                    // Ví dụ: "D07(TO-3,HO-5,N1-1)"
+                    //   → maToHop = "D07"
+                    //   → monHsList = ["TO-3", "HO-5", "N1-1"]
+                    String maToHop;
+                    String[] monHsParts; // mảng "MON-HS"
+
+                    int parenOpen = maToHopRaw.indexOf('(');
+                    if (parenOpen > 0 && maToHopRaw.endsWith(")")) {
+                        maToHop = maToHopRaw.substring(0, parenOpen).trim().toUpperCase();
+                        String inner = maToHopRaw.substring(parenOpen + 1, maToHopRaw.length() - 1);
+                        monHsParts = inner.split(",");
+                    } else {
+                        // Không có dấu ngoặc → chỉ lấy mã, không có môn
+                        maToHop = maToHopRaw.toUpperCase();
+                        monHsParts = new String[0];
+                    }
+
+                    // Parse tối đa 3 môn và hệ số
+                    String mon1 = "", mon2 = "", mon3 = "";
+                    int    hs1  = 1,  hs2  = 1,  hs3  = 1;
+
+                    for (int k = 0; k < monHsParts.length && k < 3; k++) {
+                        String part = monHsParts[k].trim(); // "TO-3"
+                        int dash = part.lastIndexOf('-');
+                        String tenMon = (dash > 0) ? part.substring(0, dash).trim().toUpperCase() : part.toUpperCase();
+                        int    heSo  = 1;
+                        if (dash > 0) {
+                            try { heSo = Integer.parseInt(part.substring(dash + 1).trim()); }
+                            catch (NumberFormatException ignored) {}
+                        }
+                        if      (k == 0) { mon1 = tenMon; hs1 = heSo; }
+                        else if (k == 1) { mon2 = tenMon; hs2 = heSo; }
+                        else             { mon3 = tenMon; hs3 = heSo; }
+                    }
+
+                    // Cột 4: tb_keys (công thức Excel → FormulaEvaluator đọc được)
+                    String tbKeys = getCellString(row.getCell(4), evaluator).trim();
+                    // Fallback nếu ô trống: tự ghép
+                    if (tbKeys.isEmpty()) tbKeys = maNganh + "_" + maToHop;
+
+                    // Cột 7: Độ lệch
+                    java.math.BigDecimal dolech = getCellDecimal(row.getCell(7), evaluator);
+
+                    // Kiểm tra trùng tb_keys
                     if (existingKeys.contains(tbKeys.toLowerCase())) {
                         errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Đã tồn tại, bỏ qua.");
                         continue;
                     }
 
-                    // Đọc 3 môn và hệ số
-                    String mon1 = getCellString(row.getCell(3)).trim().toUpperCase();
-                    int    hs1  = getCellInt(row.getCell(4));
-                    String mon2 = getCellString(row.getCell(5)).trim().toUpperCase();
-                    int    hs2  = getCellInt(row.getCell(6));
-                    String mon3 = getCellString(row.getCell(7)).trim().toUpperCase();
-                    int    hs3  = getCellInt(row.getCell(8));
-                    java.math.BigDecimal dolech = getCellDecimal(row.getCell(9));
-
+                    // Xây dựng entity
                     XtNganhToHop nth = new XtNganhToHop();
                     nth.setManganh(maNganh);
                     nth.setMatohop(maToHop);
                     nth.setTbKeys(tbKeys);
-                    nth.setThMon1(mon1);
+                    nth.setThMon1(mon1.isEmpty() ? null : mon1);
                     nth.setHsMon1(hs1);
-                    nth.setThMon2(mon2);
+                    nth.setThMon2(mon2.isEmpty() ? null : mon2);
                     nth.setHsMon2(hs2);
-                    nth.setThMon3(mon3);
+                    nth.setThMon3(mon3.isEmpty() ? null : mon3);
                     nth.setHsMon3(hs3);
                     nth.setDolech(dolech);
 
-                    // Set boolean: môn nào nằm trong 3 môn → true, còn lại → false
-                    nth.setN1  (mon1.equals("N1")   || mon2.equals("N1")   || mon3.equals("N1"));
-                    nth.setTo  (mon1.equals("TO")   || mon2.equals("TO")   || mon3.equals("TO"));
-                    nth.setLi  (mon1.equals("LI")   || mon2.equals("LI")   || mon3.equals("LI"));
-                    nth.setHo  (mon1.equals("HO")   || mon2.equals("HO")   || mon3.equals("HO"));
-                    nth.setSi  (mon1.equals("SI")   || mon2.equals("SI")   || mon3.equals("SI"));
-                    nth.setVa  (mon1.equals("VA")   || mon2.equals("VA")   || mon3.equals("VA"));
-                    nth.setSu  (mon1.equals("SU")   || mon2.equals("SU")   || mon3.equals("SU"));
-                    nth.setDi  (mon1.equals("DI")   || mon2.equals("DI")   || mon3.equals("DI"));
-                    nth.setTi  (mon1.equals("TI")   || mon2.equals("TI")   || mon3.equals("TI"));
-                    nth.setGdcd(mon1.equals("GDCD") || mon2.equals("GDCD") || mon3.equals("GDCD"));
-                    nth.setKtpl(mon1.equals("KTPL") || mon2.equals("KTPL") || mon3.equals("KTPL"));
-                    nth.setNk1 (mon1.equals("NK1")  || mon2.equals("NK1")  || mon3.equals("NK1"));
-                    nth.setNk2 (mon1.equals("NK2")  || mon2.equals("NK2")  || mon3.equals("NK2"));
-                    nth.setNk3 (mon1.equals("NK3")  || mon2.equals("NK3")  || mon3.equals("NK3"));
-                    nth.setNk4 (mon1.equals("NK4")  || mon2.equals("NK4")  || mon3.equals("NK4"));
-                    nth.setNk5 (mon1.equals("NK5")  || mon2.equals("NK5")  || mon3.equals("NK5"));
-                    nth.setNk6 (mon1.equals("NK6")  || mon2.equals("NK6")  || mon3.equals("NK6"));
+                    // Set boolean: môn nào xuất hiện → true, các môn còn lại → false
+                    resetBooleanFields(nth);
+                    if (!mon1.isEmpty()) setSubjectBoolean(nth, mon1);
+                    if (!mon2.isEmpty()) setSubjectBoolean(nth, mon2);
+                    if (!mon3.isEmpty()) setSubjectBoolean(nth, mon3);
 
                     if (nganhToHopBUS.addNTH(nth)) {
                         successCount++;
-                        existingKeys.add(tbKeys.toLowerCase()); // cập nhật cache tránh trùng trong cùng file
+                        existingKeys.add(tbKeys.toLowerCase());
                     } else {
-                        errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Thêm thất bại.");
+                        errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Thêm vào DB thất bại.");
                     }
 
                 } catch (Exception ex) {
-                    errorLines.add("  • Dòng " + excelRow + ": Lỗi đọc dữ liệu - " + ex.getMessage());
+                    errorLines.add("  • Dòng " + excelRow + ": Lỗi xử lý - " + ex.getMessage());
                 }
             }
 
@@ -422,34 +452,51 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         StringBuilder sb = new StringBuilder();
         sb.append("Import hoàn tất!\n");
         sb.append("Thành công: ").append(successCount).append(" dòng\n");
-        sb.append("Bỏ qua: ").append(errorLines.size()).append(" dòng");
-
+        sb.append("Bỏ qua/Lỗi: ").append(errorLines.size()).append(" dòng");
         if (!errorLines.isEmpty()) {
-            sb.append("\n\nChi tiết các dòng bỏ qua:\n");
-            for (String err : errorLines) {
-                sb.append(err).append("\n");
-            }
+            sb.append("\n\nChi tiết:\n");
+            errorLines.forEach(e -> sb.append(e).append("\n"));
         }
 
-        JOptionPane.showMessageDialog(this, sb.toString(),
-                "Kết quả Import",
+        JOptionPane.showMessageDialog(this, sb.toString(), "Kết quả Import",
                 errorLines.isEmpty() ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
 
         listNganhToHop = nganhToHopBUS.getAll();
         loadDataTable(listNganhToHop);
     }
 
-    // ==================== HELPER CELLS ====================
 
-    private String getCellString(org.apache.poi.ss.usermodel.Cell cell) {
+
+    private String getCellString(org.apache.poi.ss.usermodel.Cell cell,
+                                  org.apache.poi.ss.usermodel.FormulaEvaluator evaluator) {
         if (cell == null) return "";
-        switch (cell.getCellType()) {
-            case STRING:  return cell.getStringCellValue();
-            case NUMERIC: double d = cell.getNumericCellValue();
+        org.apache.poi.ss.usermodel.CellValue cv = evaluator.evaluate(cell);
+        if (cv == null) return "";
+        switch (cv.getCellType()) {
+            case STRING:  return cv.getStringValue();
+            case NUMERIC: double d = cv.getNumberValue();
                           return (d == Math.floor(d)) ? String.valueOf((long) d) : String.valueOf(d);
+            case BOOLEAN: return String.valueOf(cv.getBooleanValue());
             default:      return "";
         }
     }
+
+    private java.math.BigDecimal getCellDecimal(org.apache.poi.ss.usermodel.Cell cell,
+                                                 org.apache.poi.ss.usermodel.FormulaEvaluator evaluator) {
+        if (cell == null) return java.math.BigDecimal.ZERO;
+        try {
+            org.apache.poi.ss.usermodel.CellValue cv = evaluator.evaluate(cell);
+            if (cv == null) return java.math.BigDecimal.ZERO;
+            switch (cv.getCellType()) {
+                case NUMERIC: return java.math.BigDecimal.valueOf(cv.getNumberValue());
+                case STRING:  String s = cv.getStringValue().trim();
+                              return s.isEmpty() ? java.math.BigDecimal.ZERO : new java.math.BigDecimal(s);
+                default:      return java.math.BigDecimal.ZERO;
+            }
+        } catch (Exception e) { return java.math.BigDecimal.ZERO; }
+    }
+
+
 
     private int getCellInt(org.apache.poi.ss.usermodel.Cell cell) {
         if (cell == null) return 0;
@@ -463,18 +510,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         } catch (Exception e) { return 0; }
     }
 
-    private java.math.BigDecimal getCellDecimal(org.apache.poi.ss.usermodel.Cell cell) {
-        if (cell == null) return java.math.BigDecimal.ZERO;
-        try {
-            switch (cell.getCellType()) {
-                case NUMERIC: return java.math.BigDecimal.valueOf(cell.getNumericCellValue());
-                case STRING:  String s = cell.getStringCellValue().trim();
-                              return s.isEmpty() ? java.math.BigDecimal.ZERO : new java.math.BigDecimal(s);
-                default:      return java.math.BigDecimal.ZERO;
-            }
-        } catch (Exception e) { return java.math.BigDecimal.ZERO; }
-    }
-
+ 
     
 
     @Override

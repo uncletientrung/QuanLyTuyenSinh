@@ -793,8 +793,7 @@ INSERT INTO `xt_bangquydoi` (`idqd`, `d_phuongthuc`, `d_tohop`, `d_mon`, `d_diem
 (783, 'VSAT', NULL, 'N1', 78.50, 85.50, 5.00, 5.25, 'VSAT_N1_70', '70'),
 (784, 'VSAT', NULL, 'N1', 70.50, 78.50, 4.50, 5.00, 'VSAT_N1_80', '80'),
 (785, 'VSAT', NULL, 'N1', 60.00, 70.50, 4.00, 4.50, 'VSAT_N1_90', '90'),
-(786, 'VSAT', NULL, 'N1', 20.50, 60.00, 1.25, 4.00, 'VSAT_N1_>90', '>90'),
-(787, 'VSAT', NULL, 'AO1', 12.00, 17.00, 12.00, 18.00, 'VSAT_AO1_12', '12');
+(786, 'VSAT', NULL, 'N1', 20.50, 60.00, 1.25, 4.00, 'VSAT_N1_>90', '>90');
 
 -- --------------------------------------------------------
 
@@ -1205,7 +1204,7 @@ ALTER TABLE `xt_nguyenvongxettuyen`
 -- Indexes for table `xt_thisinhxettuyen25`
 --
 ALTER TABLE `xt_thisinhxettuyen25`
-  ADD PRIMARY KEY (`idthisinh`),
+  ADD PRIMARY KEY (`idthisinh`);
 
 --
 -- Indexes for table `xt_tohop_monthi`

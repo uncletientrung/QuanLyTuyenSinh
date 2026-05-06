@@ -1172,8 +1172,7 @@ ALTER TABLE `xt_diemcongxetuyen`
 -- Indexes for table `xt_diemthixettuyen`
 --
 ALTER TABLE `xt_diemthixettuyen`
-  ADD PRIMARY KEY (`iddiemthi`),
-  ADD UNIQUE KEY `cccd_UNIQUE` (`cccd`);
+  ADD PRIMARY KEY (`iddiemthi`);
 
 --
 -- Indexes for table `xt_khuvuc`
@@ -1205,7 +1204,8 @@ ALTER TABLE `xt_nguyenvongxettuyen`
 -- Indexes for table `xt_thisinhxettuyen25`
 --
 ALTER TABLE `xt_thisinhxettuyen25`
-  ADD PRIMARY KEY (`idthisinh`);
+  ADD PRIMARY KEY (`idthisinh`),
+  ADD UNIQUE KEY `cccd_UNIQUE` (`cccd`);
 
 --
 -- Indexes for table `xt_tohop_monthi`

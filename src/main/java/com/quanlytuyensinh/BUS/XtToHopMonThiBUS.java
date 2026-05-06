@@ -105,6 +105,5 @@ public class XtToHopMonThiBUS {
     
     public void importToDB(List<XtToHopMonThi> list) {
         tohopDAO.importToDB(list);
-        return;
     }
 }

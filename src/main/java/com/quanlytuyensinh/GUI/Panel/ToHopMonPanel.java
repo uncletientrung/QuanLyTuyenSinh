@@ -96,7 +96,6 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
         table.setFocusable(false);
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         table.getTableHeader().setPreferredSize(new Dimension(0, 40));
-        table.setAutoCreateRowSorter(true);
         TableSorter.configureTableColumnSorter(table, 0, TableSorter.INTEGER_COMPARATOR);
         
         DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
@@ -107,9 +106,8 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
         for (int i = 0; i < table.getColumnCount() - 1; i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
-        table.getColumnModel().getColumn(table.getColumnCount() - 1).setPreferredWidth(300);;
+        table.getColumnModel().getColumn(table.getColumnCount() - 1).setPreferredWidth(300);
         
-        table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[10];
         comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
         comps[1] = TableSorter.STRING_COMPARATOR;      // Mã tổ hợp
@@ -244,7 +242,6 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
         SwingWorker<Void, Integer> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                System.out.println("Import started");
                 java.io.File file = fileChooser.getSelectedFile();
                 try {
                     Map<String, XtToHopMonThi> monMap = new LinkedHashMap<>();
@@ -291,25 +288,25 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
                             toImport.add(th);
                         }
                     }
-
-                    System.out.println("Done checking existing");
-                    System.out.println("Starting import");
-                    System.out.println(toImport.isEmpty());
                 
                     if (!toImport.isEmpty())
                         monBUS.importToDB(toImport);
                     
-                    return null;
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(mainFrame,
-                                "Lỗi đọc file Excel: " + ex.getMessage(),
-                                "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return null;
+                        System.out.println(ex.getMessage());
                     }
+                return null;
             }
 
             @Override
             protected void done() {
+                try {
+                    get();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(mainFrame,
+                                "Lỗi đọc file Excel: " + e.getMessage(),
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
                 dialog.dispose();
                 listToHop = monBUS.refreshList();
                 loadDataTable(listToHop);

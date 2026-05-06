@@ -18,7 +18,7 @@ public class XtDiemThiXetTuyen {
     @Column(name = "d_phuongthuc", length = 10)
     private String dPhuongthuc;
 
-    @Column(name = "TO", precision = 8, scale = 2)
+    @Column(name = "[TO]", precision = 8, scale = 2)
     private BigDecimal to;
 
     @Column(name = "LI", precision = 8, scale = 2)
@@ -80,6 +80,34 @@ public class XtDiemThiXetTuyen {
 
     @Column(name = "NK6", precision = 8, scale = 2)
     private BigDecimal nk6;
+
+    //Constructor cho THPT
+    public XtDiemThiXetTuyen(String cccd, String dPhuongthuc, BigDecimal to, BigDecimal li, BigDecimal ho,
+            BigDecimal si, BigDecimal su, BigDecimal di, BigDecimal va, BigDecimal gdcd, BigDecimal n1Thi,
+            BigDecimal cncn, BigDecimal cnnn, BigDecimal ti, BigDecimal ktpl, BigDecimal nk1, BigDecimal nk2,
+            BigDecimal nk3, BigDecimal nk4, BigDecimal nk5, BigDecimal nk6) {
+        this.cccd = cccd;
+        this.dPhuongthuc = dPhuongthuc;
+        this.to = to;
+        this.li = li;
+        this.ho = ho;
+        this.si = si;
+        this.su = su;
+        this.di = di;
+        this.va = va;
+        this.gdcd = gdcd;
+        this.n1Thi = n1Thi;
+        this.cncn = cncn;
+        this.cnnn = cnnn;
+        this.ti = ti;
+        this.ktpl = ktpl;
+        this.nk1 = nk1;
+        this.nk2 = nk2;
+        this.nk3 = nk3;
+        this.nk4 = nk4;
+        this.nk5 = nk5;
+        this.nk6 = nk6;
+    }
 
     public XtDiemThiXetTuyen() {}
 

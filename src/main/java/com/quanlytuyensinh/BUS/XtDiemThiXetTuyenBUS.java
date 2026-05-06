@@ -49,6 +49,10 @@ public class XtDiemThiXetTuyenBUS {
         return rs;
     }
 
+    public void updateCert(String cccd, String diem) {
+        diemDAO.updateCert(cccd, diem);
+    }
+
     public XtDiemThiXetTuyen findByCCCDAndPT(String cccd, String pt) {
         return diemDAO.findByCCCDAndPT(cccd, pt);
     }

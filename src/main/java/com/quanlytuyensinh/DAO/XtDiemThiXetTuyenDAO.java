@@ -133,6 +133,28 @@ public class XtDiemThiXetTuyenDAO {
         }
     }
 
+    public void updateCert(String cccd, String diem) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.createQuery("update XtDiemThiXetTuyen t set t.n1Cc = :diem where t.cccd = :cccd and t.dPhuongthuc = 'THPT'", XtDiemThiXetTuyen.class)
+                        .setParameter("cccd", cccd)
+                        .setParameter("diem", diem)
+                        .executeUpdate();
+        }
+
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.createQuery("update XtDiemThiXetTuyen t set t.n1Cc = :diem where t.cccd = :cccd and t.dPhuongthuc = 'THPT'", XtDiemThiXetTuyen.class)
+                        .setParameter("cccd", cccd)
+                        .setParameter("diem", diem)
+                        .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            e.printStackTrace();
+        }
+    }
+
     public void importToDB(List<XtDiemThiXetTuyen> list) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

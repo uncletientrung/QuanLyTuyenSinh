@@ -206,17 +206,16 @@ public class DiemThiDGNLPanel extends JPanel implements ActionListener{
 
                         Sheet sheet = workbook.getSheetAt(1);
                         boolean headerSkipped = false;
-                        int i = 0;
+                        // int i = 0;
                         for (Row row : sheet) {
                             System.out.println("I found this row");
                             if (!headerSkipped) {
                                 headerSkipped = true;
                                 continue;
                             }
-                            if (i == 50)
-                                break;
-                            i++;
-                            
+                            // if (i == 50)
+                            //     break;
+                            // i++;
                             String cccd = getCellString(row, 1);
                             String cellDiem = getCellString(row, 8);
                             BigDecimal valDiem = cellDiem.isEmpty() ? BigDecimal.ZERO : new BigDecimal(cellDiem);

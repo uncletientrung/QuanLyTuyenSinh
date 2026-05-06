@@ -832,6 +832,7 @@ CREATE TABLE `xt_diemthixettuyen` (
   `SU` decimal(8,2) DEFAULT 0.00,
   `DI` decimal(8,2) DEFAULT 0.00,
   `VA` decimal(8,2) DEFAULT 0.00,
+  `GDCD` decimal(8,2) DEFAULT 0.00,
   `N1_THI` decimal(8,2) DEFAULT NULL COMMENT 'Điểm thi gốc',
   `N1_CC` decimal(8,2) DEFAULT 0.00 COMMENT 'max(N1_Thi, N1_QD)',
   `CNCN` decimal(8,2) DEFAULT 0.00 COMMENT 'Công nghệ công nghiệp',

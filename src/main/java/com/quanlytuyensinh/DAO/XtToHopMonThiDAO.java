@@ -48,6 +48,15 @@ public class XtToHopMonThiDAO {
         }
     }
 
+    public XtToHopMonThi findByMa(String ma) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "select m from XtToHopMonThi m where m.matohop = :ma";
+            return session.createQuery(hql, XtToHopMonThi.class)
+                                .setParameter("ma", ma)
+                                .uniqueResult();
+        }
+    }
+
     public String existToHopMon(List<String> toHop) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "select m.matohop from XtToHopMonThi m where m.mon1 IN (:toHop) AND  m.mon2 IN (:toHop) AND  m.mon3 IN (:toHop)";

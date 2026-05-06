@@ -101,6 +101,8 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
         table.getColumnModel().getColumn(0).setPreferredWidth(60);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         
+        table.setRowSorter(null);
+        table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[22];
         comps[0] = TableSorter.INTEGER_COMPARATOR;
         comps[1] = TableSorter.STRING_COMPARATOR;
@@ -121,11 +123,13 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
         functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
         functionBar.setBackground(Color.WHITE);
 
-        String[] action = {"create", "update", "delete", "import"};
+        String[] action = {"create", "update", "delete", "import", "detail"};
         mainFunction = new MainFunction(1, "nguoiDung", action);
         for (String ac : action) {
             mainFunction.btn.get(ac).addActionListener(this);
         }
+
+        
         functionBar.add(mainFunction);
 
         search = new IntegratedSearch(new String[]{"CCCD"});
@@ -199,8 +203,99 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == mainFunction.btn.get("import")) {
             importExcel();
-        }    
+        } else if (e.getSource() == mainFunction.btn.get("detail")) {
+            // importChungChi();
+        }
     }
+
+    // private void importChungChi() {
+    //     JFileChooser fileChooser = new JFileChooser();
+    //     fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx", "xls"));
+    //     int result = fileChooser.showOpenDialog(this);
+    //     if (result != JFileChooser.APPROVE_OPTION) {
+    //         return;
+    //     }
+
+    //     JProgressBar progressBar = new JProgressBar(0, 100);
+    //     progressBar.setIndeterminate(true);
+    //     JOptionPane pane = new JOptionPane(progressBar, JOptionPane.INFORMATION_MESSAGE);
+    //     JDialog dialog = pane.createDialog(mainFrame, "Importing");
+    //     dialog.setModal(true);
+    //     dialog.pack();
+    
+    //     SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+    //         @Override
+    //         protected Void doInBackground() throws Exception {
+    //             java.io.File file = fileChooser.getSelectedFile();
+    //             try {
+    //                 System.out.println("Please run");
+    //                 Map<String, XtDiemThiXetTuyen> diemMap = new LinkedHashMap<>();
+
+    //                 try (FileInputStream fis = new FileInputStream(file);
+    //                     Workbook workbook = file.getName().toLowerCase().endsWith(".xlsx")
+    //                             ? new XSSFWorkbook(fis) : new HSSFWorkbook(fis)) {
+
+    //                     Sheet sheet = workbook.getSheetAt(0);
+    //                     boolean headerSkipped = false;
+    //                     System.out.println("Still running");
+    //                     for (Row row : sheet) {
+    //                         System.out.println("I found this row");
+    //                         if (!headerSkipped) {
+    //                             headerSkipped = true;
+    //                             continue;
+    //                         }
+
+    //                         String cccd = getCellString(row, 1);
+    //                         System.out.println("With this id: " + cccd);
+    //                         if (cccd.isEmpty() || diemMap.containsKey(cccd)) continue;
+    //                         diemMap.put(cccd, diem);
+    //                     }
+    //                 }
+
+    //                 List<XtDiemThiXetTuyen> toImport = new ArrayList<>();
+    //                 List<XtDiemThiXetTuyen> toUpdate = new ArrayList<>();
+
+    //                 for (XtDiemThiXetTuyen d : diemMap.values()) {
+    //                     XtDiemThiXetTuyen existing = diemBUS.findByCCCDAndPT(d.getCccd(), "THPT");
+    //                     if (existing == null) {
+    //                         toImport.add(d);
+    //                     }
+    //                     else {
+    //                         BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
+    //                         toUpdate.add(existing);
+    //                     }
+    //                 }
+                
+    //                 if (!toImport.isEmpty()) 
+    //                     diemBUS.importToDB(toImport);
+    //                 if(!toUpdate.isEmpty())
+    //                     diemBUS.updateToDB(toUpdate); 
+    //             } catch (Exception ex) {
+    //                 System.out.println(ex.getMessage());
+    //             }
+    //             return null;
+    //         }   
+
+    //         @Override
+    //         protected void done() {
+    //             try {
+    //                 get();
+    //             } catch (Exception e) {
+    //                  JOptionPane.showMessageDialog(mainFrame,
+    //                             "Lỗi đọc file Excel: " + e.getMessage(),
+    //                             "Lỗi", JOptionPane.ERROR_MESSAGE);
+    //             }
+    //             dialog.dispose();
+    //             listDiem = diemBUS.getListTHPT();
+    //             loadDataTable(listDiem);
+    //             JOptionPane.showMessageDialog(mainFrame, "Hoàn tất Import!");
+    //         }
+    //     };
+
+    //     System.out.println("Starting import");
+    //     worker.execute();
+    //     dialog.setVisible(true);
+    // }
 
     private void importExcel() {
         JFileChooser fileChooser = new JFileChooser();
@@ -297,7 +392,7 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
                             toImport.add(d);
                         }
                         else {
-                            // BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
+                            BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
                             toUpdate.add(existing);
                         }
                     }

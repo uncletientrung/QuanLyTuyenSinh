@@ -95,6 +95,8 @@ public class DiemThiDGNLPanel extends JPanel implements ActionListener{
         table.getColumnModel().getColumn(0).setPreferredWidth(60);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         
+        table.setRowSorter(null);
+        table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[4];
         comps[0] = TableSorter.INTEGER_COMPARATOR;
         comps[1] = TableSorter.STRING_COMPARATOR;
@@ -205,13 +207,15 @@ public class DiemThiDGNLPanel extends JPanel implements ActionListener{
                         Sheet sheet = workbook.getSheetAt(1);
                         boolean headerSkipped = false;
                         int i = 0;
-                        System.out.println("Still running");
                         for (Row row : sheet) {
                             System.out.println("I found this row");
                             if (!headerSkipped) {
                                 headerSkipped = true;
                                 continue;
                             }
+                            if (i == 50)
+                                break;
+                            i++;
                             
                             String cccd = getCellString(row, 1);
                             String cellDiem = getCellString(row, 8);
@@ -239,7 +243,7 @@ public class DiemThiDGNLPanel extends JPanel implements ActionListener{
                             toImport.add(d);
                         }
                         else {
-                            // BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
+                            BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
                             toUpdate.add(existing);
                         }
                     }

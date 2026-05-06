@@ -226,6 +226,16 @@ public class PaginatedTable extends JPanel {
 
     private void sortAllData(int colIndex, Comparator<Object> comp) {
         Collections.sort(allData, (o1, o2) -> {
+            boolean isO1Empty = TableSorter.isValueEmpty(o1[colIndex]);
+            boolean isO2Empty = TableSorter.isValueEmpty(o2[colIndex]);
+
+            if (isO1Empty && isO2Empty) {
+                return 0; 
+            }
+
+            if (isO1Empty) return 1;
+            if (isO2Empty) return -1;
+            
             int result = comp.compare(o1[colIndex], o2[colIndex]);
             return ascending ? result : -result;
         });

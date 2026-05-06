@@ -43,6 +43,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.BeanUtils;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -282,10 +283,16 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
                     }
 
                     List<XtToHopMonThi> toImport = new ArrayList<>();
+                    List<XtToHopMonThi> toUpdate = new ArrayList<>();
+
                     for (XtToHopMonThi th : monMap.values()) {
-                        boolean existing = monBUS.existMaToHop(th.getMatohop());
-                        if (existing == false) {
+                        XtToHopMonThi existing = monBUS.findByMa(th.getMatohop());
+                        if (existing == null) {
                             toImport.add(th);
+                        }
+                         else {
+                            BeanUtils.copyProperties(th, existing, "idtohop", "matohop");
+                            toUpdate.add(existing);
                         }
                     }
                 

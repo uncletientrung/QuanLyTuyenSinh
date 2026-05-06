@@ -16,17 +16,22 @@ import java.util.Date;
  * @author DELL
  */
 public class TableSorter {
+    public static boolean isValueEmpty(Object o) {
+        if (o == null) return true;
+        String s = o.toString().trim();
+        return s.isEmpty() || s.equals("---");
+    }
 
     private static int nullCheck(Object o1, Object o2) {
-        if (o1 == o2) {
-            return 0;
-        }
-        if (o1 == null) {
-            return 1;
-        }
-        if (o2 == null) {
-            return -1;
-        }
+        if (o1 == o2) return 0;
+
+        boolean empty1 = isValueEmpty(o1);
+        boolean empty2 = isValueEmpty(o2);
+
+        if (empty1 && empty2) return 0;
+        if (empty1) return 1;
+        if (empty2) return -1;
+
         return 2;
     }
 
@@ -58,12 +63,11 @@ public class TableSorter {
     };
 
     public static final Comparator<Object> BIG_DECIMAL_COMPARATOR = (o1, o2) -> {
-        int res = nullCheck(o1, o2);
-        if (res != 2) {
-            return res;
-        }
+        String s1 = (o1 == null) ? "" : o1.toString().trim();
+        String s2 = (o2 == null) ? "" : o2.toString().trim();
+
         try {
-            return new BigDecimal(o1.toString()).compareTo(new BigDecimal(o2.toString()));
+            return new BigDecimal(s1).compareTo(new BigDecimal(s2));
         } catch (Exception e) {
             return 0;
         }

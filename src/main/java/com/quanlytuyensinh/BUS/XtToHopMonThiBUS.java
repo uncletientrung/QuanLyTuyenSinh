@@ -87,6 +87,10 @@ public class XtToHopMonThiBUS {
         return tohopDAO.existToHopMon(toHop);
     }
 
+    public XtToHopMonThi findByMa(String ma) {
+        return tohopDAO.findByMa(ma);
+    }
+
     public boolean addNewToHop(XtToHopMonThi t) {
         return tohopDAO.addNewToHop(t);
     }

@@ -96,6 +96,8 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
         table.getColumnModel().getColumn(0).setPreferredWidth(60);
         table.getColumnModel().getColumn(1).setPreferredWidth(150);
         
+        table.setRowSorter(null);
+        table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[10];
         comps[0] = TableSorter.INTEGER_COMPARATOR;
         comps[1] = TableSorter.STRING_COMPARATOR;
@@ -129,7 +131,7 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
         search.btnReset.addActionListener(e -> {
             search.txtSearchForm.setText("");
             search.cbxChoose.setSelectedIndex(0);
-            loadDataTable(diemBUS.getListDGNL());
+            loadDataTable(diemBUS.getListVSAT());
         });
         functionBar.add(search);
 
@@ -215,13 +217,16 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
                         Sheet sheet = workbook.getSheetAt(0);
                         boolean headerSkipped = false;
                         System.out.println("Still running");
+                        int i = 0;
                         for (Row row : sheet) {
                             System.out.println("I found this row");
                             if (!headerSkipped) {
                                 headerSkipped = true;
                                 continue;
                             }
-
+                            if (i == 50)
+                                break;
+                            i++;
                             String cccd = getCellString(row, 1);
                             String mon = getCellString(row, 6);
                             String cellDiem = getCellString(row, 8);
@@ -247,7 +252,7 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
                             toImport.add(d);
                         }
                         else {
-                            // BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
+                            BeanUtils.copyProperties(d, existing, "iddiemthi", "cccd", "dPhuongthuc");
                             toUpdate.add(existing);
                         }
                     }
@@ -272,7 +277,7 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
                                 "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
                 dialog.dispose();
-                listDiem = diemBUS.getListDGNL();
+                listDiem = diemBUS.getListVSAT();
                 loadDataTable(listDiem);
                 JOptionPane.showMessageDialog(mainFrame, "Hoàn tất Import!");
             }

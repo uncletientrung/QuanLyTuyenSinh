@@ -4,6 +4,7 @@
  */
 package com.quanlytuyensinh.GUI.Dialog;
 
+import com.quanlytuyensinh.BUS.XtBangQuyDoiBUS;
 import com.quanlytuyensinh.BUS.XtDiemCongXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtDiemThiXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtNganhBUS;
@@ -12,6 +13,7 @@ import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
 import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtNganh;
@@ -64,6 +66,17 @@ public class NguyenVongDialog extends JDialog{
     private List<XtThisinhXetTuyen25> listTS;
     private XtDiemThiXetTuyenBUS DTBUS;
      private List<XtDiemThiXetTuyen> listDT;
+    private XtBangQuyDoiBUS BQDBUS = new XtBangQuyDoiBUS();
+    private List<XtBangQuyDoi> listBQD;
+    
+    // Biến lưu tham số hiển thị
+    private BigDecimal maxDiemXT = BigDecimal.ZERO;
+    private String bestToHop = "";
+    private BigDecimal bestDiemTH = BigDecimal.ZERO;
+    private BigDecimal diemDoLech = BigDecimal.ZERO;
+    private BigDecimal bestDiemCong = BigDecimal.ZERO;
+    private BigDecimal bestDiemUT = BigDecimal.ZERO;
+    private String bestPhuongThuc ="";
     
     public NguyenVongDialog(NguyenVongPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess, XtNguyenVongXetTuyen nv){
          super(owner, title, modal);
@@ -86,6 +99,7 @@ public class NguyenVongDialog extends JDialog{
         this.listNganh = parent.getListNganh();
         this.listTS = parent.getListTS();
         this.listDT = parent.getListDT();
+        this.listBQD = parent.getListBQD();
 
         initComponents();
     }
@@ -224,11 +238,11 @@ public class NguyenVongDialog extends JDialog{
         for (VerticalInputForm f : listInputCreate) {
             f.setDisable();
         }
+        this.cbbPhuongThuc.setDisable();
         if(this.type.equals("detail")){
             this.txtThuTu.setDisable();
             this.cbbCCCD.setDisable();
             this.cbbMaNganh.setDisable();
-            this.cbbPhuongThuc.setDisable();
             this.txtKetQua.setDisable();
         }
     }
@@ -247,6 +261,13 @@ public class NguyenVongDialog extends JDialog{
     
      // Hàm trung chuyển tính toán set các field
     private void upadateField(){
+        maxDiemXT = BigDecimal.ZERO;
+        bestToHop = "";
+        bestDiemTH = BigDecimal.ZERO;
+        diemDoLech = BigDecimal.ZERO;
+        bestDiemCong = BigDecimal.ZERO;
+        bestDiemUT = BigDecimal.ZERO;
+        bestPhuongThuc ="";
         String cccd = getSelectedCCCD();
         String maNganh = getSelectedMaNganh();
         if (maNganh == null || cccd == null) {
@@ -260,7 +281,18 @@ public class NguyenVongDialog extends JDialog{
             return;
         }
         this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
-        getToHopCaoNhatVaTinhDiem(maNganh, cccd);
+//        getToHopCaoNhatVaTinhDiem(maNganh, cccd);
+        tinhDiemTHPT(maNganh, cccd);
+        tinhDiemVSAT(maNganh, cccd);
+        txtTHXet.setText(bestToHop);
+        txtDiemTHXT.setText(bestDiemTH.setScale(5).toString());
+        txtDiemCong.setText(bestDiemCong.setScale(2).toString());
+        txtDiemUT.setText(bestDiemUT.setScale(5).toString());
+        txtDiemXetTuyen.setText(maxDiemXT.setScale(5).toString());
+        txtDoLech.setText(diemDoLech.setScale(2).toString());   
+        this.cbbPhuongThuc.setSelectedValue(this.bestPhuongThuc.toString());
+        
+        
     }
     
     // Danh sách tổ hợp, có Gốc
@@ -302,7 +334,7 @@ public class NguyenVongDialog extends JDialog{
             case "N1":
                 if (d.getN1Cc() != null && d.getN1Thi() != null)
                     return d.getN1Cc().compareTo(d.getN1Thi()) > 0 ? d.getN1Cc() : d.getN1Thi();
-                return getDiemSafe(d.getN1Cc());
+                return getDiemSafe(d.getN1Thi());
         }
         
         return BigDecimal.ZERO;
@@ -314,14 +346,6 @@ public class NguyenVongDialog extends JDialog{
         XtDiemThiXetTuyen diemThi = DTBUS.getDiemThiByCCCD(cccd);
 
         if (listTH == null || diemThi == null) return;
-
-        BigDecimal maxDiemXT = BigDecimal.ZERO;
-        String bestToHop = "";
-
-        BigDecimal bestDiemTH = BigDecimal.ZERO;
-        BigDecimal diemDoLech = BigDecimal.ZERO;
-        BigDecimal bestDiemCong = BigDecimal.ZERO;
-        BigDecimal bestDiemUT = BigDecimal.ZERO;
 
         for (XtNganhToHop nth : listTH) {
             BigDecimal tong = BigDecimal.ZERO;
@@ -374,6 +398,104 @@ public class NguyenVongDialog extends JDialog{
         txtDoLech.setText(diemDoLech.setScale(2).toString());
     }
 
+    // Tính điểm THPT Cao nhất
+    private void tinhDiemTHPT(String maNganh, String cccd){
+        
+        List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
+        XtDiemThiXetTuyen diemThiTHPT = DTBUS.getDiemThiTHPTByCCCD(cccd);
+        if (listTH == null || diemThiTHPT == null) return;
+        for (XtNganhToHop nth : listTH) {
+            BigDecimal tong = BigDecimal.ZERO;
+            // Môn 1
+            BigDecimal m1 = getDiemByMon(nth.getThMon1(), diemThiTHPT);
+            tong = tong.add(m1.multiply(BigDecimal.valueOf(nth.getHsMon1())));
+
+            // Môn 2
+            BigDecimal m2 = getDiemByMon(nth.getThMon2(), diemThiTHPT);
+            tong = tong.add(m2.multiply(BigDecimal.valueOf(nth.getHsMon2())));
+
+            // Môn 3
+            BigDecimal m3 = getDiemByMon(nth.getThMon3(), diemThiTHPT);
+            tong = tong.add(m3.multiply(BigDecimal.valueOf(nth.getHsMon3())));
+
+            // Độ lệch
+            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+
+            // Điểm cộng và ưu tiên
+            XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
+            BigDecimal diemCong = BigDecimal.ZERO;
+            BigDecimal diemUT = BigDecimal.ZERO;
+            if (dc != null) {
+                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
+                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+            }
+
+           // Điểm xét tuyển
+            BigDecimal diemTH = tong.add(doLech);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+
+            // Lấy Max
+            if (diemXT.compareTo(maxDiemXT) > 0) {
+                maxDiemXT = diemXT;
+                bestToHop = nth.getMatohop();
+                bestDiemTH = diemTH;
+                bestDiemCong = diemCong;
+                bestDiemUT = diemUT;
+                diemDoLech = doLech;
+                bestPhuongThuc = "THPT";
+            }
+        }
+    } 
+    // Tính điểm VSAT Cao nhất
+    private void tinhDiemVSAT(String maNganh, String cccd){
+        List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
+        XtDiemThiXetTuyen diemThiVSAT = DTBUS.getDiemThiVSATByCCCD(cccd);
+        if (listTH == null || diemThiVSAT == null) return;
+        XtDiemThiXetTuyen diemThiVSATQuyDoi = this.BQDBUS.getDiemThiVSATQuyDoi(diemThiVSAT);
+        for (XtNganhToHop nth : listTH) {
+            BigDecimal tong = BigDecimal.ZERO;
+            // Môn 1
+            
+            BigDecimal m1 = getDiemByMon(nth.getThMon1(), diemThiVSATQuyDoi);
+            tong = tong.add(m1.multiply(BigDecimal.valueOf(nth.getHsMon1())));
+
+            // Môn 2
+            BigDecimal m2 = getDiemByMon(nth.getThMon2(), diemThiVSATQuyDoi);
+            tong = tong.add(m2.multiply(BigDecimal.valueOf(nth.getHsMon2())));
+
+            // Môn 3
+            BigDecimal m3 = getDiemByMon(nth.getThMon3(), diemThiVSATQuyDoi);
+            tong = tong.add(m3.multiply(BigDecimal.valueOf(nth.getHsMon3())));
+
+            // Độ lệch
+            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+
+            // Điểm cộng và ưu tiên
+            XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
+            BigDecimal diemCong = BigDecimal.ZERO;
+            BigDecimal diemUT = BigDecimal.ZERO;
+            if (dc != null) {
+                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
+                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+            }
+
+           // Điểm xét tuyển
+            BigDecimal diemTH = tong.add(doLech);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            // Lấy Max
+            if (diemXT.compareTo(maxDiemXT) > 0) {
+                maxDiemXT = diemXT;
+                bestToHop = nth.getMatohop();
+                bestDiemTH = diemTH;
+                bestDiemCong = diemCong;
+                bestDiemUT = diemUT;
+                diemDoLech = doLech;
+                bestPhuongThuc = "VSAT";
+            }
+        }
+    } 
+    
+    
     private String getSelectedCCCD() {
         Object sel = this.cbbCCCD.getSelectedValue();
         if (sel == null || sel.toString().startsWith("--")) return null;
@@ -456,7 +578,7 @@ public class NguyenVongDialog extends JDialog{
         BigDecimal diemXT =new BigDecimal(this.txtDiemXetTuyen.getText().trim());
         nv.setDiemXettuyen(diemXT);
         nv.setNvKetqua("Đang xét");
-        nv.setTtPhuongthuc("THPT");
+        nv.setTtPhuongthuc(this.cbbPhuongThuc.getSelectedValue());
         nv.setNvKeys(this.txtNV_Key.getText().trim());
         nv.setTtThm(this.txtTHXet.getText().trim());
         

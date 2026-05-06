@@ -6,9 +6,12 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtBangQuyDoiDAO;
 import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
+import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -163,4 +166,71 @@ public class XtBangQuyDoiBUS {
             throw new IllegalArgumentException("Mã quy đổi '" + qd.getDMaQuyDoi() + "' đã tồn tại trong hệ thống.");
         }
     }
+        public XtBangQuyDoi getBQDByPhuongThucVaMonVaDiem(String phuongThuc, String mon, BigDecimal Diem){
+            return xtbangquydoiDAO.getBQDByPhuongThucVaMonVaDiemDAO(phuongThuc, mon, Diem);
+        }
+        public BigDecimal CongThucQuyDoiVSAT(String mon, BigDecimal Diem){
+            XtBangQuyDoi bangQuyDoi = getBQDByPhuongThucVaMonVaDiem("VSAT", mon, Diem);
+            if(bangQuyDoi == null){
+                JOptionPane.showMessageDialog(null, "THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 10 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
+                return new BigDecimal("10");
+            }
+            BigDecimal  a= bangQuyDoi.getDDiema();
+            BigDecimal  b= bangQuyDoi.getDDiemb();
+            BigDecimal  c= bangQuyDoi.getDDiemc();
+            BigDecimal  d= bangQuyDoi.getDDiemd();
+            BigDecimal  x= Diem;
+            BigDecimal y = c.add(
+                (x.subtract(a))
+                .divide(b.subtract(a), 5, RoundingMode.HALF_UP)
+                .multiply(d.subtract(c))
+            );
+
+            return y.setScale(5, RoundingMode.HALF_UP);
+        }
+        public XtDiemThiXetTuyen getDiemThiVSATQuyDoi(XtDiemThiXetTuyen diemThiVSAT){
+            XtDiemThiXetTuyen diemThiVSATQuyDoi = new XtDiemThiXetTuyen();
+            if(diemThiVSAT == null) return null;
+            diemThiVSATQuyDoi.setCccd(diemThiVSAT.getCccd());
+            // Quy đổi Toán
+            if(diemThiVSAT.getTo() != null && diemThiVSAT.getTo().compareTo(BigDecimal.ZERO) != 0){
+
+                diemThiVSATQuyDoi.setTo(CongThucQuyDoiVSAT("TO", diemThiVSAT.getTo()));
+            }
+              // Lý
+            if(diemThiVSAT.getLi() != null && diemThiVSAT.getLi().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setLi(CongThucQuyDoiVSAT("LI", diemThiVSAT.getLi()));
+            }
+
+            // Hóa
+            if(diemThiVSAT.getHo() != null && diemThiVSAT.getHo().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setHo(CongThucQuyDoiVSAT("HO", diemThiVSAT.getHo()));
+            }
+
+            // Sinh
+            if(diemThiVSAT.getSi() != null && diemThiVSAT.getSi().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setSi(CongThucQuyDoiVSAT("SI", diemThiVSAT.getSi()));
+            }
+
+            // Sử
+            if(diemThiVSAT.getSu() != null && diemThiVSAT.getSu().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setSu(CongThucQuyDoiVSAT("SU", diemThiVSAT.getSu()));
+            }
+
+            // Địa
+            if(diemThiVSAT.getDi() != null && diemThiVSAT.getDi().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setDi(CongThucQuyDoiVSAT("DI", diemThiVSAT.getDi()));
+            }
+
+            // Văn
+            if(diemThiVSAT.getVa()!= null && diemThiVSAT.getVa().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setVa(CongThucQuyDoiVSAT("VA", diemThiVSAT.getVa()));
+            }
+
+            // Anh Văn
+            if(diemThiVSAT.getN1Thi()!= null && diemThiVSAT.getN1Thi().compareTo(BigDecimal.ZERO) != 0){
+                diemThiVSATQuyDoi.setN1Thi(CongThucQuyDoiVSAT("N1", diemThiVSAT.getN1Thi()));
+            }
+            return diemThiVSATQuyDoi;
+        }
 }

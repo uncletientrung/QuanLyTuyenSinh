@@ -67,4 +67,24 @@ public class XtDiemThiXetTuyenBUS {
     public void updateToDB(List<XtDiemThiXetTuyen> list) {
         diemDAO.updateToDB(list);
     }
+    public XtDiemThiXetTuyen getDiemThiTHPTByCCCD(String cccd){
+        XtDiemThiXetTuyen rs = null;
+        for(XtDiemThiXetTuyen dt : listDiem){
+            if(dt.getCccd().equals(cccd) && dt.getDPhuongthuc().equals("THPT")){
+                rs = dt;
+                break;
+            }
+        }
+        return rs;
+    }
+    public XtDiemThiXetTuyen getDiemThiVSATByCCCD(String cccd){
+        XtDiemThiXetTuyen rs = null;
+        for(XtDiemThiXetTuyen dt : listDiem){
+            if(dt.getCccd().equals(cccd) && dt.getDPhuongthuc().equals("VSAT")){
+                rs = dt;
+                break;
+            }
+        }
+        return rs;
+    }
 }

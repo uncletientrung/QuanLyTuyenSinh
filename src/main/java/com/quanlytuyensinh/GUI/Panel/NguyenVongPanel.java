@@ -4,12 +4,14 @@
  */
 package com.quanlytuyensinh.GUI.Panel;
 
+import com.quanlytuyensinh.BUS.XtBangQuyDoiBUS;
 import com.quanlytuyensinh.BUS.XtDiemCongXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtDiemThiXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtNganhBUS;
 import com.quanlytuyensinh.BUS.XtNganhToHopBUS;
 import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
 import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtNganh;
@@ -69,7 +71,9 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     private XtThisinhXetTuyen25BUS TSBUS = new XtThisinhXetTuyen25BUS();
     private List<XtThisinhXetTuyen25> listTS;
     private XtDiemThiXetTuyenBUS DTBUS = new XtDiemThiXetTuyenBUS();
-     private List<XtDiemThiXetTuyen> listDT;
+    private List<XtDiemThiXetTuyen> listDT;
+    private XtBangQuyDoiBUS BQDBUS = new XtBangQuyDoiBUS();
+    private List<XtBangQuyDoi> listBQD;
     
     public NguyenVongPanel(Main mainF) {
         this.mainFrame = mainF;
@@ -81,6 +85,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         this.listNganh = NganhBUS.getAllNganh();
         this.listTS = this.TSBUS.getAllThiSinh();
         this.listDT = DTBUS.getList();
+        this.listBQD = BQDBUS.getAllQuyDoi();
            
         initComponent();
         loadDataTable(listNV);
@@ -447,5 +452,12 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         this.listNV = listNV;
     }
 
+    public List<XtBangQuyDoi> getListBQD() {
+        return listBQD;
+    }
+
+    public void setListBQD(List<XtBangQuyDoi> listBQD) {
+        this.listBQD = listBQD;
+    }
 
 }

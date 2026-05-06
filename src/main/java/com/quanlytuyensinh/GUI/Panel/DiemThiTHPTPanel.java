@@ -228,7 +228,6 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
             protected Void doInBackground() throws Exception {
                 java.io.File file = fileChooser.getSelectedFile();
                 try {
-                    System.out.println("Please run");
                     Map<String, String> diemMap = new LinkedHashMap<>();
 
                     try (FileInputStream fis = new FileInputStream(file);
@@ -237,7 +236,6 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
 
                         Sheet sheet = workbook.getSheetAt(0);
                         boolean headerSkipped = false;
-                        System.out.println("Still running");
                         for (Row row : sheet) {
                             if (!headerSkipped) {
                                 headerSkipped = true;
@@ -277,7 +275,6 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
             }
         };
 
-        System.out.println("Starting import");
         worker.execute();
         dialog.setVisible(true);
     }
@@ -302,7 +299,6 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
             protected Void doInBackground() throws Exception {
                 java.io.File file = fileChooser.getSelectedFile();
                 try {
-                    System.out.println("Please run");
                     Map<String, XtDiemThiXetTuyen> diemMap = new LinkedHashMap<>();
 
                     try (FileInputStream fis = new FileInputStream(file);
@@ -311,16 +307,13 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
 
                         Sheet sheet = workbook.getSheetAt(0);
                         boolean headerSkipped = false;
-                        System.out.println("Still running");
                         for (Row row : sheet) {
-                            System.out.println("I found this row");
                             if (!headerSkipped) {
                                 headerSkipped = true;
                                 continue;
                             }
 
                             String cccd = getCellString(row, 1);
-                            System.out.println("With this id: " + cccd);
                             if (cccd.isEmpty() || diemMap.containsKey(cccd)) continue;
                             
                             String cellToan = getCellString(row, 7);
@@ -408,7 +401,6 @@ public class DiemThiTHPTPanel extends JPanel implements ActionListener{
             }
         };
 
-        System.out.println("Starting import");
         worker.execute();
         dialog.setVisible(true);
     }

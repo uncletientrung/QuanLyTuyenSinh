@@ -134,17 +134,10 @@ public class XtDiemThiXetTuyenDAO {
     }
 
     public void updateCert(String cccd, String diem) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.createQuery("update XtDiemThiXetTuyen t set t.n1Cc = :diem where t.cccd = :cccd and t.dPhuongthuc = 'THPT'", XtDiemThiXetTuyen.class)
-                        .setParameter("cccd", cccd)
-                        .setParameter("diem", diem)
-                        .executeUpdate();
-        }
-
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.createQuery("update XtDiemThiXetTuyen t set t.n1Cc = :diem where t.cccd = :cccd and t.dPhuongthuc = 'THPT'", XtDiemThiXetTuyen.class)
+            session.createMutationQuery("update XtDiemThiXetTuyen t set t.n1Cc = :diem where t.cccd = :cccd and t.dPhuongthuc = 'THPT'")
                         .setParameter("cccd", cccd)
                         .setParameter("diem", diem)
                         .executeUpdate();

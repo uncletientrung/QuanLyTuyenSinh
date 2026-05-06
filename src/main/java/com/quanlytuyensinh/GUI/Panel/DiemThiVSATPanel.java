@@ -207,7 +207,6 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
             protected Void doInBackground() throws Exception {
                 java.io.File file = fileChooser.getSelectedFile();
                 try {
-                    System.out.println("Please run");
                     Map<String, XtDiemThiXetTuyen> diemMap = new LinkedHashMap<>();
 
                     try (FileInputStream fis = new FileInputStream(file);
@@ -216,10 +215,8 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
 
                         Sheet sheet = workbook.getSheetAt(0);
                         boolean headerSkipped = false;
-                        System.out.println("Still running");
                         // int i = 0;
                         for (Row row : sheet) {
-                            System.out.println("I found this row");
                             if (!headerSkipped) {
                                 headerSkipped = true;
                                 continue;
@@ -283,7 +280,6 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener{
             }
         };
 
-        System.out.println("Starting import");
         worker.execute();
         dialog.setVisible(true);
     }

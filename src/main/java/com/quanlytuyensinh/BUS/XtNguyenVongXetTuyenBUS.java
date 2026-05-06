@@ -69,21 +69,36 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;  
     }
-        public boolean approveNguyenVong(XtNguyenVongXetTuyen nvXetTuyen, BigDecimal diemTT){
-            if(nvXetTuyen == null || diemTT == null) return false;
-            boolean rs= false;
-            String ketQuaStr = nvXetTuyen.getDiemXettuyen().compareTo(diemTT) >= 0 ? "Trúng tuyển"  : "Không trúng tuyển";
-            rs = nvDAO.approve(nvXetTuyen.getIdnv(), ketQuaStr);
-            if(rs){
-                for(XtNguyenVongXetTuyen nv : listNV){
-                    if(nv.getIdnv() == nvXetTuyen.getIdnv()){
-                        nv.setNvKetqua(ketQuaStr);
-                        return true;
-                    }
+    public boolean approveNguyenVong(XtNguyenVongXetTuyen nvXetTuyen, BigDecimal diemTT){
+        if(nvXetTuyen == null || diemTT == null) return false;
+        boolean rs= false;
+        String ketQuaStr = nvXetTuyen.getDiemXettuyen().compareTo(diemTT) >= 0 ? "Trúng tuyển"  : "Rớt trúng tuyển";
+        rs = nvDAO.approve(nvXetTuyen.getIdnv(), ketQuaStr);
+        if(rs){
+            for(XtNguyenVongXetTuyen nv : listNV){
+                if(nv.getIdnv() == nvXetTuyen.getIdnv()){
+                    nv.setNvKetqua(ketQuaStr);
+                    return true;
                 }
             }
-            return false;
         }
+        return false;
+    }
+    public boolean undoNguyenVong(XtNguyenVongXetTuyen nvXetTuyen){
+        if(nvXetTuyen == null) return false;
+        boolean rs= false;
+        String ketQuaStr = "Đang xét";
+        rs = nvDAO.approve(nvXetTuyen.getIdnv(), ketQuaStr); // Tái sử dụng
+        if(rs){
+            for(XtNguyenVongXetTuyen nv : listNV){
+                if(nv.getIdnv() == nvXetTuyen.getIdnv()){
+                    nv.setNvKetqua(ketQuaStr);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     
    
 

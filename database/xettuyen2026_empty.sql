@@ -841,7 +841,11 @@ CREATE TABLE `xt_diemthixettuyen` (
   `KTPL` decimal(8,2) DEFAULT 0.00 COMMENT 'Kinh tế và pháp luật',
   `NL1` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng lực 1',
   `NK1` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 1',
-  `NK2` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 2'
+  `NK2` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 2',
+  `NK3` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 3',
+  `NK4` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 4',
+  `NK5` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 5',
+  `NK6` decimal(8,2) DEFAULT NULL COMMENT 'Điểm năng khiếu 6'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1202,7 +1206,6 @@ ALTER TABLE `xt_nguyenvongxettuyen`
 --
 ALTER TABLE `xt_thisinhxettuyen25`
   ADD PRIMARY KEY (`idthisinh`),
-  ADD UNIQUE KEY `cccd_UNIQUE` (`cccd`);
 
 --
 -- Indexes for table `xt_tohop_monthi`

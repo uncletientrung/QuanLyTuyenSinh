@@ -7,11 +7,13 @@ import com.quanlytuyensinh.BUS.TaiKhoanBUS;
 import com.quanlytuyensinh.BUS.XtDiemThiXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.DAO.XtBangQuyDoiDAO;
 import java.util.List;
 import com.quanlytuyensinh.ENTITY.TaiKhoan;
 import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import java.math.BigDecimal;
 
 /**
  *
@@ -27,6 +29,8 @@ public class testGUI {
         List<XtNguyenVongXetTuyen> list2 = NVBUS.getAllNguyenVong();
         XtDiemThiXetTuyenBUS DTBUS = new XtDiemThiXetTuyenBUS();
          List<XtDiemThiXetTuyen> listDT = DTBUS.getList();
+          XtBangQuyDoiDAO xtbangquydoiDAO = XtBangQuyDoiDAO.getInstance();
+          System.out.println(xtbangquydoiDAO.getBQDDGNLByPhuongThucVaMonVaDiemDAO("DGNL", "A01", new BigDecimal("1080")).toString());
         System.out.println("===== DANH SACH TAI KHOAN =====");
 
         for (XtDiemThiXetTuyen nv : listDT) {

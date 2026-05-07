@@ -172,8 +172,8 @@ public class XtBangQuyDoiBUS {
         public BigDecimal CongThucQuyDoiVSAT(String mon, BigDecimal Diem){
             XtBangQuyDoi bangQuyDoi = getBQDByPhuongThucVaMonVaDiem("VSAT", mon, Diem);
             if(bangQuyDoi == null){
-                JOptionPane.showMessageDialog(null, "THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 10 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
-                return new BigDecimal("10");
+                JOptionPane.showMessageDialog(null, "THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 0 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
+                return new BigDecimal("0");
             }
             BigDecimal  a= bangQuyDoi.getDDiema();
             BigDecimal  b= bangQuyDoi.getDDiemb();
@@ -185,7 +185,6 @@ public class XtBangQuyDoiBUS {
                 .divide(b.subtract(a), 5, RoundingMode.HALF_UP)
                 .multiply(d.subtract(c))
             );
-
             return y.setScale(5, RoundingMode.HALF_UP);
         }
         public XtDiemThiXetTuyen getDiemThiVSATQuyDoi(XtDiemThiXetTuyen diemThiVSAT){
@@ -241,8 +240,8 @@ public class XtBangQuyDoiBUS {
         public BigDecimal CongThucQuyDoiDGNL(String MaToHop, BigDecimal Diem){
             XtBangQuyDoi bangQuyDoi = this.xtbangquydoiDAO.getBQDDGNLByPhuongThucVaMonVaDiemDAO("DGNL",MaToHop, Diem);
             if(bangQuyDoi == null){
-                JOptionPane.showMessageDialog(null, "THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 30 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
-                return new BigDecimal("30");
+                JOptionPane.showMessageDialog(null, MaToHop+ " THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 0 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
+                return new BigDecimal("0");
             }
             BigDecimal  a= bangQuyDoi.getDDiema();
             BigDecimal  b= bangQuyDoi.getDDiemb();

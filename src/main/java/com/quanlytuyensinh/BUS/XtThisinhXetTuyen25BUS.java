@@ -2,6 +2,8 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtThisinhXetTuyen25DAO;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -153,6 +155,51 @@ public class XtThisinhXetTuyen25BUS {
         }
 
         return result;
+    }
+   
+    public BigDecimal getDiemUuTienByCCCD( String cccd, BigDecimal diemTongCoDoLech, BigDecimal diemCong ) {
+        if (cccd == null || cccd.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        XtThisinhXetTuyen25 thiSinh = TSDAO.findByCCCD(cccd);
+        if (thiSinh == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal diemUT = BigDecimal.ZERO;
+
+        // Tính điểm đối tượng
+        String dt = thiSinh.getDoiTuong();
+        if (dt != null) {
+            if (dt.equals("01") || dt.equals("02") || dt.equals("03")) { // UT1
+                diemUT = diemUT.add(new BigDecimal("2.0"));
+            } else if (dt.equals("04") || dt.equals("05") || dt.equals("06")) { // UT2
+                diemUT = diemUT.add(new BigDecimal("1.0")); 
+            }
+        }
+
+        // Tính điểm khu vực
+        String kv = thiSinh.getKhuVuc();
+        if (kv != null) {
+            switch (kv) {
+                case "1":
+                    diemUT = diemUT.add(new BigDecimal("0.75"));
+                    break;
+                case "2NT":
+                    diemUT = diemUT.add(new BigDecimal("0.50"));
+                    break;
+                case "2":
+                    diemUT = diemUT.add(new BigDecimal("0.25"));
+                    break;
+            }
+        }
+
+        // Tính tổng điểm ưu tiên
+        BigDecimal tong = diemTongCoDoLech.add(diemCong);
+        BigDecimal heSo = new BigDecimal("30")
+                .subtract(tong)
+                .divide(new BigDecimal("7.5"), 4, RoundingMode.HALF_UP);
+
+        return heSo.multiply(diemUT).setScale(5, RoundingMode.HALF_UP);
     }
 
 }

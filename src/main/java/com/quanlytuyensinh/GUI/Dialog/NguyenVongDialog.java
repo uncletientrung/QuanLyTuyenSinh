@@ -29,6 +29,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -341,64 +342,6 @@ public class NguyenVongDialog extends JDialog{
         return BigDecimal.ZERO;
     }
    
-    // Lấy tính điểm và lấy tổ hợp cao nhất
-    private void getToHopCaoNhatVaTinhDiem(String maNganh, String cccd) {
-        List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
-        XtDiemThiXetTuyen diemThi = DTBUS.getDiemThiByCCCD(cccd);
-
-        if (listTH == null || diemThi == null) return;
-
-        for (XtNganhToHop nth : listTH) {
-            BigDecimal tong = BigDecimal.ZERO;
-            // Môn 1
-            BigDecimal m1 = getDiemByMon(nth.getThMon1(), diemThi);
-            tong = tong.add(m1.multiply(BigDecimal.valueOf(nth.getHsMon1())));
-
-            // Môn 2
-            BigDecimal m2 = getDiemByMon(nth.getThMon2(), diemThi);
-            tong = tong.add(m2.multiply(BigDecimal.valueOf(nth.getHsMon2())));
-
-            // Môn 3
-            BigDecimal m3 = getDiemByMon(nth.getThMon3(), diemThi);
-            tong = tong.add(m3.multiply(BigDecimal.valueOf(nth.getHsMon3())));
-
-            // Độ lệch
-            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
-
-            // Điểm cộng và ưu tiên
-            XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
-            BigDecimal diemCong = BigDecimal.ZERO;
-            BigDecimal diemUT = BigDecimal.ZERO;
-            if (dc != null) {
-                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
-                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
-            }
-
-           // Điểm xét tuyển
-            BigDecimal diemTH = tong.add(doLech);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
-
-            // Lấy Max
-//             JOptionPane.showMessageDialog(this, "Điểm tổ hợp: " +nth.getMatohop() + " -  " + diemXT , "Thông báo lỗi", JOptionPane.ERROR_MESSAGE);
-            if (diemXT.compareTo(maxDiemXT) > 0) {
-                maxDiemXT = diemXT;
-                bestToHop = nth.getMatohop();
-                bestDiemTH = diemTH;
-                bestDiemCong = diemCong;
-                bestDiemUT = diemUT;
-                diemDoLech = doLech;
-            }
-        }
-
-        // Set UI
-        txtTHXet.setText(bestToHop);
-        txtDiemTHXT.setText(bestDiemTH.setScale(5).toString());
-        txtDiemCong.setText(bestDiemCong.setScale(2).toString());
-        txtDiemUT.setText(bestDiemUT.setScale(5).toString());
-        txtDiemXetTuyen.setText(maxDiemXT.setScale(5).toString());
-        txtDoLech.setText(diemDoLech.setScale(2).toString());
-    }
-
     // Tính điểm THPT Cao nhất
     private void tinhDiemTHPT(String maNganh, String cccd){
         
@@ -418,18 +361,28 @@ public class NguyenVongDialog extends JDialog{
             // Môn 3
             BigDecimal m3 = getDiemByMon(nth.getThMon3(), diemThiTHPT);
             tong = tong.add(m3.multiply(BigDecimal.valueOf(nth.getHsMon3())));
+            
+            //Công thức đổi THPT sang THPT hệ 30,  Chia cho tổng hệ số rồi x3
+            BigDecimal tongHeSo = BigDecimal.valueOf(
+                    nth.getHsMon1()
+                    + nth.getHsMon2()
+                    + nth.getHsMon3()
+            );
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE).multiply(new BigDecimal("3"));
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
 
-            // Điểm cộng và ưu tiên
+            // Điểm cộng 
             XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = BigDecimal.ZERO;
-            BigDecimal diemUT = BigDecimal.ZERO;
             if (dc != null) {
-                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
-                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+                diemCong = dc.getDiemTong()== null ? BigDecimal.ZERO : dc.getDiemTong();
             }
+            
+            // Điểm ưu tiên
+             BigDecimal diemUT = BigDecimal.ZERO;
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.add(doLech), diemCong);
 
            // Điểm xét tuyển
             BigDecimal diemTH = tong.add(doLech);
@@ -437,11 +390,11 @@ public class NguyenVongDialog extends JDialog{
 
             // Lấy Max
             if (diemXT.compareTo(maxDiemXT) > 0) {
-                maxDiemXT = diemXT;
+                maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);
                 bestToHop = nth.getMatohop();
-                bestDiemTH = diemTH;
-                bestDiemCong = diemCong;
-                bestDiemUT = diemUT;
+                bestDiemTH = diemTH.setScale(5, RoundingMode.HALF_UP);
+                bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
+                bestDiemUT = diemUT.setScale(5, RoundingMode.HALF_UP);
                 diemDoLech = doLech;
                 bestPhuongThuc = "THPT";
             }
@@ -450,13 +403,13 @@ public class NguyenVongDialog extends JDialog{
     // Tính điểm VSAT Cao nhất
     private void tinhDiemVSAT(String maNganh, String cccd){
         List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
-        XtDiemThiXetTuyen diemThiVSAT = DTBUS.getDiemThiVSATByCCCD(cccd);
+        XtDiemThiXetTuyen diemThiVSAT = DTBUS.getDiemThiVSATByCCCD(cccd); // Điểm VSAT chưa quy đổi
+
         if (listTH == null || diemThiVSAT == null) return;
-        XtDiemThiXetTuyen diemThiVSATQuyDoi = this.BQDBUS.getDiemThiVSATQuyDoi(diemThiVSAT);
+        XtDiemThiXetTuyen diemThiVSATQuyDoi = this.BQDBUS.getDiemThiVSATQuyDoi(diemThiVSAT); // Điểm VSAT đã quy đổi
         for (XtNganhToHop nth : listTH) {
             BigDecimal tong = BigDecimal.ZERO;
             // Môn 1
-            
             BigDecimal m1 = getDiemByMon(nth.getThMon1(), diemThiVSATQuyDoi);
             tong = tong.add(m1.multiply(BigDecimal.valueOf(nth.getHsMon1())));
 
@@ -467,29 +420,39 @@ public class NguyenVongDialog extends JDialog{
             // Môn 3
             BigDecimal m3 = getDiemByMon(nth.getThMon3(), diemThiVSATQuyDoi);
             tong = tong.add(m3.multiply(BigDecimal.valueOf(nth.getHsMon3())));
+            
+            //Công thức đổi VSAT sang THPT hệ 30,  Chia cho tổng hệ số rồi x3
+            BigDecimal tongHeSo = BigDecimal.valueOf(
+                    nth.getHsMon1()
+                    + nth.getHsMon2()
+                    + nth.getHsMon3()
+            );
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE).multiply(new BigDecimal("3"));
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
-
-            // Điểm cộng và ưu tiên
+        
+            // Điểm cộng 
             XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = BigDecimal.ZERO;
-            BigDecimal diemUT = BigDecimal.ZERO;
             if (dc != null) {
-                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
-                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+                diemCong = dc.getDiemTong()== null ? BigDecimal.ZERO : dc.getDiemTong();
             }
+            
+            // Điểm ưu tiên
+             BigDecimal diemUT = BigDecimal.ZERO;
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.add(doLech), diemCong);
 
            // Điểm xét tuyển
             BigDecimal diemTH = tong.add(doLech);
             BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
             // Lấy Max
             if (diemXT.compareTo(maxDiemXT) > 0) {
-                maxDiemXT = diemXT;
+                maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);
                 bestToHop = nth.getMatohop();
-                bestDiemTH = diemTH;
-                bestDiemCong = diemCong;
-                bestDiemUT = diemUT;
+                bestDiemTH = diemTH.setScale(5, RoundingMode.HALF_UP);
+                bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
+                bestDiemUT = diemUT.setScale(5, RoundingMode.HALF_UP);
                 diemDoLech = doLech;
                 bestPhuongThuc = "VSAT";
             }

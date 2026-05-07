@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -35,6 +37,8 @@ public class PaginatedTable extends JPanel {
 
     private int sortColumn = -1;
     private boolean ascending = true;
+    
+    private TableCellRenderer customRowRenderer = null;
     
     public PaginatedTable(String[] columns) {
         setLayout(new BorderLayout(0, 10));
@@ -120,6 +124,21 @@ public class PaginatedTable extends JPanel {
         rightPanel.add(btnNext);
         paginationPanel.add(rightPanel, BorderLayout.EAST);
         add(paginationPanel, BorderLayout.SOUTH);
+        
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                if (customRowRenderer != null) {
+                    return customRowRenderer.getTableCellRendererComponent(
+                            table, value, isSelected, hasFocus, row, column);
+                }
+                return c;
+            }
+        });
     }
 
     // Đổ data
@@ -260,4 +279,20 @@ public class PaginatedTable extends JPanel {
             return label;
         }
     }
+    
+    /**
+     * Thiết lập renderer tô màu hàng (dùng cho NguyenVongPanel)
+     */
+        public void setCustomRowRenderer(TableCellRenderer renderer) {
+            this.customRowRenderer = renderer;
+            table.repaint();
+        }
+
+        /**
+         * Bỏ renderer tùy chỉnh
+         */
+        public void clearCustomRowRenderer() {
+            this.customRowRenderer = null;
+            table.repaint();
+        }
 }

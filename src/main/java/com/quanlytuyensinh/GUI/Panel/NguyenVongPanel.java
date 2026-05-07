@@ -18,6 +18,7 @@ import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import com.quanlytuyensinh.GUI.Component.CustomRowRenderer;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
 import com.quanlytuyensinh.GUI.Component.PaginatedTable;
@@ -90,7 +91,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         initComponent();
         loadDataTable(listNV);
     }
-    
+        
         private void initComponent() {
            this.setBackground(BackgroundColor);
            this.setLayout(new BorderLayout(0, 0));
@@ -100,6 +101,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            String[] header = new String[] { "ID", "CCCD", "Mã ngành", "Thứ tự NV", "Điểm THXT", "Điểm UT", "Điểm cộng", "Điểm xét tuyển","Kết quả", "Phương thức",
                    "Tổ hợp" };
            paginatedTable = new PaginatedTable(header);
+           
            
            JTable table = paginatedTable.getTable();
            table.setFocusable(false);
@@ -112,11 +114,15 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            headerRenderer.setHorizontalAlignment(JLabel.CENTER);
            
            // Table Cell
-           DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-           centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-           for (int i = 0; i < table.getColumnCount(); i++) {
-               table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-           }
+//           DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+//           centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+//           for (int i = 0; i < table.getColumnCount(); i++) {
+//               table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+//           }
+           
+           CustomRowRenderer rowRenderer = new CustomRowRenderer();
+            paginatedTable.setCustomRowRenderer(rowRenderer);
+           
            // Table Sorter
            table.setAutoCreateRowSorter(false);
            Comparator<Object>[] comps = new Comparator[11];
@@ -163,7 +169,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
            functionBar.setBackground(Color.WHITE);
 
-           String[] action = { "create", "approve", "undo","update", "delete", "detail", "import", "export" };
+           String[] action = { "create", "approve", "undo","update", "delete", "detail", "import" };
            mainFunction = new MainFunction(1, "nguyenVong", action); // Sửa khi có nhóm quyền
            for (String ac : action) {
                mainFunction.btn.get(ac).addActionListener(this);

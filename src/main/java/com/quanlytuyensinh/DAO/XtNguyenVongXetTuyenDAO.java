@@ -153,4 +153,25 @@ public class XtNguyenVongXetTuyenDAO {
             return false;
         }
     }
+
+    public boolean undoAll() {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            List<XtNguyenVongXetTuyen> list =this.getAll();
+            
+            for (XtNguyenVongXetTuyen nv : list) {
+                    nv.setNvKetqua("Đang xét");
+                session.merge(nv);
+            }
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -116,6 +116,17 @@ public class XtNguyenVongXetTuyenBUS {
             }
             return false;
         }
+    public boolean undoAllNguyenVong(){
+        boolean rs= false;
+        rs = nvDAO.undoAll();
+        if(rs){
+            for(XtNguyenVongXetTuyen nv : listNV){
+                    nv.setNvKetqua("Đang xét");
+                }
+            return true;
+        }
+        return false;
+    }
     public boolean undoNguyenVong(XtNguyenVongXetTuyen nvXetTuyen){
         if(nvXetTuyen == null) return false;
         boolean rs= false;

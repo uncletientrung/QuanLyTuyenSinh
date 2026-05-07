@@ -195,4 +195,9 @@ public class XtNganhBUS {
          }
          return rs;
     }
+    public BigDecimal getDiemTTByMaNganhBUS(String maNganh){
+        if(maNganh == null || maNganh.equals("")) return null; // Return null nghĩa là chưa public điiểm
+        return this.nganhDAO.getDiemTTByMaNganh(maNganh);
+        
+    }
 }

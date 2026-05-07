@@ -172,7 +172,7 @@ public class XtThisinhXetTuyen25BUS {
         if (dt != null) {
             if (dt.equals("01") || dt.equals("02") || dt.equals("03")) { // UT1
                 diemUT = diemUT.add(new BigDecimal("2.0"));
-            } else if (dt.equals("04") || dt.equals("05") || dt.equals("06")) { // UT2
+            } else if (dt.equals("04") || dt.equals("05") || dt.startsWith("06")) { // UT2
                 diemUT = diemUT.add(new BigDecimal("1.0")); 
             }
         }

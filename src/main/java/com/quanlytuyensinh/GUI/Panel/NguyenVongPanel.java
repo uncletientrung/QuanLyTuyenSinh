@@ -252,7 +252,27 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                                                                                                                                                     loadDataTable(listNV);
                                                                                                                                                 }, null
             );
-        }else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
+        }else if(source == mainFunction.btn.get("approve") ){
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "<html>"
+                            + "<h3 style='color:blue;'>XÁC NHẬN XÉT TUYỂN NGUYỆN VỌNG TẤT CẢ NGUYỆN VỌNG</h3>"
+                            + "<hr>"
+                            + "<b>Số lượng nguyện vọng nguyện vọng:</b> " + listNV.size()+ "<br>"
+                        + "</html>",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    // Xử lý xét duyệt tất cả ngành
+                    if (NVBUS.approveAllNguyenVong(NganhBUS)) {
+                        JOptionPane.showMessageDialog(this, "Xét tuyển tất cả nguyện vọng thành công!");
+                        listNV = NVBUS.getAllNguyenVong();
+                        loadDataTable(listNV);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Xét tất cả tuyển nguyện vọng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
                             source == mainFunction.btn.get("delete") || source == mainFunction.btn.get("approve") || source == mainFunction.btn.get("undo")){
             XtNguyenVongXetTuyen NguyenVongDuocChon = getSelectedNguyenVong();
              if (NguyenVongDuocChon == null) return;

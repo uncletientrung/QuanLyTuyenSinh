@@ -6,10 +6,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class XtNguyenVongXetTuyenBUS {
     private final XtNguyenVongXetTuyenDAO nvDAO = XtNguyenVongXetTuyenDAO.getInstance();
     private List<XtNguyenVongXetTuyen> listNV;
+    private XtNganhBUS NganhBUS;
+    
     public XtNguyenVongXetTuyenBUS() {
 
         listNV = nvDAO.getAll();
@@ -84,6 +87,35 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;
     }
+        public boolean approveAllNguyenVong(XtNganhBUS nganhBUS){
+            if(nganhBUS == null ) return false;
+            this.NganhBUS = nganhBUS;
+            boolean rs= false;
+            
+            rs = nvDAO.approveAll();
+            if(rs){
+                for(XtNguyenVongXetTuyen nv : listNV){
+                    
+                    BigDecimal diemTT = NganhBUS.getDiemTTByMaNganhBUS(nv.getNvManganh()); 
+                    
+                    if (diemTT == null) {
+                        nv.setNvKetqua("Đang xét");
+                        continue;
+                    }
+                    if (nv.getDiemXettuyen() == null) {
+                        nv.setNvKetqua("Chưa có điểm");
+                        continue;
+                    }
+                    if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                        nv.setNvKetqua("Trúng tuyển");
+                    } else {
+                        nv.setNvKetqua("Không trúng tuyển");
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
     public boolean undoNguyenVong(XtNguyenVongXetTuyen nvXetTuyen){
         if(nvXetTuyen == null) return false;
         boolean rs= false;

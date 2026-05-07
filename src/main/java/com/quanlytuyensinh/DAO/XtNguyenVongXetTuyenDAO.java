@@ -2,13 +2,14 @@ package com.quanlytuyensinh.DAO;
 
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
+import java.math.BigDecimal;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
 public class XtNguyenVongXetTuyenDAO {
-
+    private  XtNganhDAO nganhDAO = XtNganhDAO.getInstance();
     public static XtNguyenVongXetTuyenDAO getInstance() {
         return new XtNguyenVongXetTuyenDAO();
     }
@@ -116,5 +117,40 @@ public class XtNguyenVongXetTuyenDAO {
             e.printStackTrace();
         }
         return false;
+    }
+    // SỬA TRẠNG THÁI TẤT CẢ NGUYỆN VỌNG
+    public boolean approveAll() {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            List<XtNguyenVongXetTuyen> list =this.getAll();
+            
+            for (XtNguyenVongXetTuyen nv : list) {
+                BigDecimal diemTT = nganhDAO.getDiemTTByMaNganh(nv.getNvManganh()); 
+                if (diemTT == null) {
+                    nv.setNvKetqua("Đang xét");
+                    continue;
+                }
+                if (nv.getDiemXettuyen() == null) {
+                    nv.setNvKetqua("Chưa có điểm");
+                    continue;
+                }
+
+                if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                    nv.setNvKetqua("Trúng tuyển");
+                } else {
+                    nv.setNvKetqua("Không trúng tuyển");
+                }
+                session.merge(nv);
+            }
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -488,11 +488,11 @@ public class NguyenVongDialog extends JDialog{
             BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
             // Lấy Max
             if (diemXT.compareTo(maxDiemXT) > 0) {
-                maxDiemXT = diemXT;
+               maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);
                 bestToHop = nth.getMatohop();
-                bestDiemTH = diemTH;
-                bestDiemCong = diemCong;
-                bestDiemUT = diemUT;
+                bestDiemTH = diemTH.setScale(5, RoundingMode.HALF_UP);
+                bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
+                bestDiemUT = diemUT.setScale(5, RoundingMode.HALF_UP);
                 diemDoLech = doLech;
                 bestPhuongThuc = "DGNL";
             }

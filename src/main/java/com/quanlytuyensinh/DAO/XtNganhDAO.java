@@ -6,7 +6,12 @@ package com.quanlytuyensinh.DAO;
 
 import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import java.math.BigDecimal;
 import java.util.List;
+import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -100,6 +105,21 @@ public boolean delete(int idnganh) {
                     .setParameter("id", id)
                     .list()
                     .isEmpty();
+        }
+    }
+    public BigDecimal getDiemTTByMaNganh(String maNganh) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<BigDecimal> cq = cb.createQuery(BigDecimal.class);
+            Root<XtNganh> root = cq.from(XtNganh.class);
+            cq.select(root.get("nDiemtrungtuyen"))
+              .where(cb.equal(root.get("manganh"), maNganh));
+            BigDecimal diem = session.createQuery(cq).uniqueResult();
+            return diem != null ? diem : null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

@@ -240,7 +240,7 @@ public class XtBangQuyDoiBUS {
         public BigDecimal CongThucQuyDoiDGNL(String MaToHop, BigDecimal Diem){
             XtBangQuyDoi bangQuyDoi = this.xtbangquydoiDAO.getBQDDGNLByPhuongThucVaMonVaDiemDAO("DGNL",MaToHop, Diem);
             if(bangQuyDoi == null){
-                JOptionPane.showMessageDialog(null, MaToHop+ " THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 0 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, MaToHop+ " THANG ĐIỂM DHNL NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 0 ) HOẶC KHÔNG CÓ", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
                 return new BigDecimal("0");
             }
             BigDecimal  a= bangQuyDoi.getDDiema();

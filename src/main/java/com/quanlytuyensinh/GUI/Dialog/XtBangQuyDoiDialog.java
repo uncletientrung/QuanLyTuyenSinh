@@ -25,7 +25,8 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
     private XtBangQuyDoiPanel jpQD;
     private JPanel pnmain, pnbottom;
     private ButtonCustom btnLuu, btnHuyBo;
-    private InputForm txtToHopMon, txtPhanVi, txtMaQuyDoi;
+    private SelectForm cbxToHopMon;
+    private InputForm txtPhanVi, txtMaQuyDoi;
     private InputForm txtDiemA, txtDiemB, txtDiemC, txtDiemD;
     private SelectForm cbxPhuongThuc;
     private XtBangQuyDoiBUS xtbangquydoiBUS;
@@ -45,6 +46,10 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
         initComponents(type);
     }
 
+    // Hardcode cho Tổ hợp(ĐGNL) & Môn(VSAT)
+    private static final String[] TO_HOP_ARR = {"A00", "A01", "B00", "C00", "C01", "D01"};
+    private static final String[] MON_ARR = {"TO", "VA", "LI", "HO", "SI", "DI", "N1"};
+
     public void initComponents(String type) {
         this.setSize(new Dimension(1000, 480));
         this.setLayout(new BorderLayout(0, 0));
@@ -59,18 +64,13 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
         txtMaQuyDoi = new InputForm("Mã quy đổi");
         txtMaQuyDoi.setEditable(false);
         txtPhanVi = new InputForm("Phân vị");
-        txtToHopMon = new InputForm("Tổ hợp");
+        cbxToHopMon = new SelectForm("Tổ hợp", TO_HOP_ARR);
 
         // Cột 2
         String[] phuongthucArr = {"DGNL", "VSAT"};
         cbxPhuongThuc = new SelectForm("Phương thức", phuongthucArr);
         cbxPhuongThuc.getCbb().addActionListener(e -> {
-            String selected = cbxPhuongThuc.getValue();
-            if ("VSAT".equals(selected)) {
-                txtToHopMon.getLblTitle().setText("Môn");
-            } else {
-                txtToHopMon.getLblTitle().setText("Tổ hợp");
-            }
+            switchToHopMonDropdown(cbxPhuongThuc.getValue());
             updateMaQuyDoi();
         });
         txtDiemA = new InputForm("Điểm thấp nhất");
@@ -86,7 +86,7 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
         pnmain.add(txtMaQuyDoi);
         pnmain.add(cbxPhuongThuc);
         pnmain.add(txtPhuongThucPhu);
-        pnmain.add(txtToHopMon);
+        pnmain.add(cbxToHopMon);
         pnmain.add(txtDiemA);
         pnmain.add(txtDiemC);
         pnmain.add(txtPhanVi);
@@ -95,7 +95,7 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
 
         boolean isDetail = "detail".equals(type);
         if (isDetail) {
-            txtToHopMon.setDisable();
+            cbxToHopMon.setDisable();
             txtPhanVi.setDisable();
             txtDiemA.setDisable();
             txtDiemB.setDisable();
@@ -103,7 +103,7 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
             txtDiemD.setDisable();
             cbxPhuongThuc.setDisable();
         } else {
-            addAutoGenerateListener(txtToHopMon);
+            cbxToHopMon.getCbb().addActionListener(e -> updateMaQuyDoi());
             addAutoGenerateListener(txtPhanVi);
         }
 
@@ -142,12 +142,12 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
     private void loadDataToForm(XtBangQuyDoi qd) {
         if ("DGNL".equals(qd.getDPhuongthuc())) {
             cbxPhuongThuc.getCbb().setSelectedIndex(0);
-            txtToHopMon.getLblTitle().setText("Tổ hợp");
-            txtToHopMon.setText(qd.getDTohop() != null ? qd.getDTohop() : "");
+            switchToHopMonDropdown("DGNL");
+            cbxToHopMon.getCbb().setSelectedItem(qd.getDTohop());
         } else {
             cbxPhuongThuc.getCbb().setSelectedIndex(1);
-            txtToHopMon.getLblTitle().setText("Môn");
-            txtToHopMon.setText(qd.getDMon() != null ? qd.getDMon() : "");
+            switchToHopMonDropdown("VSAT");
+            cbxToHopMon.getCbb().setSelectedItem(qd.getDMon());
         }
 
         txtPhanVi.setText(qd.getDPhanvi() != null ? qd.getDPhanvi() : "");
@@ -176,8 +176,8 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
             }
 
             qd.setDPhuongthuc(cbxPhuongThuc.getValue());
-            qd.setDTohop("VSAT".equals(cbxPhuongThuc.getValue()) ? null : txtToHopMon.getText().trim());
-            qd.setDMon("VSAT".equals(cbxPhuongThuc.getValue()) ? txtToHopMon.getText().trim() : null);
+            qd.setDTohop("VSAT".equals(cbxPhuongThuc.getValue()) ? null : cbxToHopMon.getValue());
+            qd.setDMon("VSAT".equals(cbxPhuongThuc.getValue()) ? cbxToHopMon.getValue() : null);
             try {
                 qd.setDDiema(new BigDecimal(txtDiemA.getText().trim()).setScale(2, java.math.RoundingMode.HALF_UP));
                 qd.setDDiemb(new BigDecimal(txtDiemB.getText().trim()).setScale(2, java.math.RoundingMode.HALF_UP));
@@ -217,10 +217,10 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
 
     private void updateMaQuyDoi() {
         String phuongThuc = cbxPhuongThuc.getValue();
-        String toHopMon = txtToHopMon.getTxtForm().getText().trim().toUpperCase();
+        String toHopMon = cbxToHopMon.getValue();
         String phanVi = txtPhanVi.getTxtForm().getText().trim();
 
-        if (toHopMon.isEmpty() || phanVi.isEmpty()) {
+        if (toHopMon == null || toHopMon.isEmpty() || phanVi.isEmpty()) {
             txtMaQuyDoi.getTxtForm().setText("");
         } else {
             String result = phuongThuc + "_" + toHopMon + "_" + phanVi;
@@ -245,5 +245,31 @@ public class XtBangQuyDoiDialog extends JDialog implements ActionListener {
                 updateMaQuyDoi();
             }
         });
+    }
+
+    private void switchToHopMonDropdown(String phuongThuc) {
+        // Xoá listenr để thêm item vào combobox
+        ActionListener[] listeners = cbxToHopMon.getCbb().getActionListeners();
+        for (ActionListener al : listeners) {
+            cbxToHopMon.getCbb().removeActionListener(al);
+        }
+
+        cbxToHopMon.getCbb().removeAllItems();
+        if ("VSAT".equals(phuongThuc)) {
+            cbxToHopMon.getLblTitle().setText("Môn");
+            for (String mon : MON_ARR) {
+                cbxToHopMon.getCbb().addItem(mon);
+            }
+        } else {
+            cbxToHopMon.getLblTitle().setText("Tổ hợp");
+            for (String tohop : TO_HOP_ARR) {
+                cbxToHopMon.getCbb().addItem(tohop);
+            }
+        }
+
+        // Thêm lại listener
+        for (ActionListener al : listeners) { 
+            cbxToHopMon.getCbb().addActionListener(al);
+        }
     }
 }

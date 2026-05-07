@@ -16,23 +16,24 @@ import java.util.stream.Collectors;
  * @author ASUS
  */
 public class XtToHopMonThiBUS {
+
     private final XtToHopMonThiDAO tohopDAO = XtToHopMonThiDAO.getInstance();
     private List<XtToHopMonThi> listMon;
-    
+
     public XtToHopMonThiBUS() {
         listMon = tohopDAO.getAll();
     }
-    
+
     public List<XtToHopMonThi> getList() {
         return listMon;
     }
-    
+
     public List<XtToHopMonThi> refreshList() {
         return tohopDAO.getAll();
     }
-    
+
     public List<XtToHopMonThi> search(String type, String keyword) {
-         if (keyword == null || keyword.trim().isEmpty()) {
+        if (keyword == null || keyword.trim().isEmpty()) {
             return listMon;
         }
 
@@ -77,11 +78,11 @@ public class XtToHopMonThiBUS {
                         .collect(Collectors.toList());
         }
     }
-    
+
     public boolean existMaToHop(String ma) {
         return tohopDAO.existMaToHop(ma);
     }
-    
+
     public String existToHopMon(String mon1, String mon2, String mon3) {
         List<String> toHop = Arrays.asList(mon1, mon2, mon3);
         return tohopDAO.existToHopMon(toHop);
@@ -106,8 +107,24 @@ public class XtToHopMonThiBUS {
     public boolean deleteToHop(XtToHopMonThi t) {
         return tohopDAO.deleteToHop(t);
     }
-    
+
     public void importToDB(List<XtToHopMonThi> list) {
         tohopDAO.importToDB(list);
+    }
+
+    public boolean hasEnglishSubject(String maToHop) {
+        if (maToHop == null || maToHop.trim().isEmpty()) {
+            return false;
+        }
+
+        XtToHopMonThi toHop = findByMa(maToHop);
+        if (toHop == null) {
+            return false;
+        }
+
+        // Check xem có môn N1 k?
+        return "N1".equals(toHop.getMon1())
+                || "N1".equals(toHop.getMon2())
+                || "N1".equals(toHop.getMon3());
     }
 }

@@ -327,7 +327,8 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
             private List<String> errorRows = new ArrayList<>();
             private List<String> notFoundCCCDs = new ArrayList<>();
             private List<String> updateErrors = new ArrayList<>();
-            private int updatedCount = 0, notFoundCount = 0;
+            private List<String> englishSubjectErrors = new ArrayList<>();
+            private int updatedCount = 0, notFoundCount = 0, englishErrorCount = 0;
             private String errorMessage = null;
 
             @Override
@@ -447,7 +448,13 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
                                         updateErrors.add("CCCD " + cccd + ": Không thể cập nhật vào DB");
                                     }
                                 } catch (IllegalArgumentException ex) {
-                                    updateErrors.add("CCCD " + cccd + ": " + ex.getMessage());
+                                    String errorMsg = ex.getMessage();
+                                    updateErrors.add("CCCD " + cccd + " (Mã tổ hợp: " + dc.getMaToHop() + "): " + errorMsg);
+
+                                    if (errorMsg.contains("có chứa môn tiếng Anh") || errorMsg.contains("N1")) {
+                                        englishErrorCount++;
+                                        englishSubjectErrors.add("CCCD " + cccd + " - Tổ hợp: " + dc.getMaToHop());
+                                    }
                                 }
                             } catch (Exception ex) {
                                 updateErrors.add("CCCD " + cccd + ": Lỗi - " + ex.getMessage());
@@ -488,6 +495,17 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
                 message.append("Tổng số CCCD trong file Excel: ").append(diemCongMap.size()).append("\n");
                 message.append("Số bản ghi đã cập nhật: ").append(updatedCount).append("\n");
                 message.append("Số CCCD không tìm thấy trong hệ thống: ").append(notFoundCount).append("\n");
+
+                if (englishErrorCount > 0) {
+                    message.append("\nKHÔNG THỂ CẬP NHẬT do tổ hợp có môn tiếng Anh: ").append(englishErrorCount).append(" bản ghi\n");
+                    for (int i = 0; i < Math.min(englishSubjectErrors.size(), 10); i++) {
+                        message.append("  • ").append(englishSubjectErrors.get(i)).append("\n");
+                    }
+                    if (englishSubjectErrors.size() > 10) {
+                        message.append("  • ... và ").append(englishSubjectErrors.size() - 10).append(" lỗi khác\n");
+                    }
+                    message.append("Tổ hợp có môn N1 không được cộng điểm chứng chỉ\n");
+                }
 
                 if (!notFoundCCCDs.isEmpty()) {
                     message.append("\nCác CCCD không tìm thấy:\n");

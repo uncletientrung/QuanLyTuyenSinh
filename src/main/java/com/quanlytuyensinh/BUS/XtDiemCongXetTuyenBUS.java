@@ -158,6 +158,16 @@ public class XtDiemCongXetTuyenBUS {
             dc.setDiemTong(MAX);
         }
 
+        // Check Tổ hợp có môn tiếng anh không cho + cc
+        XtToHopMonThiBUS toHopBUS = new XtToHopMonThiBUS();
+        if (toHopBUS.hasEnglishSubject(dc.getMaToHop())) {
+            if (diemCC.compareTo(BigDecimal.ZERO) > 0) {
+                throw new IllegalArgumentException(
+                        "Tổ hợp môn " + dc.getMaToHop() + " có chứa môn tiếng Anh (N1), không được nhập điểm chứng chỉ!"
+                );
+            }
+        }
+
         // Check Key trùng lặp
         String currentKey = (dc.getTsCccd() + "_" + dc.getMaNganh() + "_" + dc.getMaToHop()).toLowerCase();
 
@@ -170,11 +180,11 @@ public class XtDiemCongXetTuyenBUS {
             throw new IllegalArgumentException("Dữ liệu xét tuyển cho thí sinh này với ngành và tổ hợp này đã tồn tại.");
         }
     }
-    
-    public XtDiemCongXetTuyen getDiemCongByKey(String cccd, String maNganh, String maTH){
-        XtDiemCongXetTuyen rs =null;
-        for(XtDiemCongXetTuyen dc : this.listDiemCong){
-            if(dc.getTsCccd().equals(cccd) && dc.getMaNganh().equals(maNganh) && dc.getMaToHop().equals(maTH)){
+
+    public XtDiemCongXetTuyen getDiemCongByKey(String cccd, String maNganh, String maTH) {
+        XtDiemCongXetTuyen rs = null;
+        for (XtDiemCongXetTuyen dc : this.listDiemCong) {
+            if (dc.getTsCccd().equals(cccd) && dc.getMaNganh().equals(maNganh) && dc.getMaToHop().equals(maTH)) {
                 rs = dc;
                 break;
             }

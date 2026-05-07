@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.quanlytuyensinh.DAO.XtDiemThiXetTuyenDAO;
 import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
+import java.math.BigDecimal;
 
 public class XtDiemThiXetTuyenBUS {
     private final XtDiemThiXetTuyenDAO diemDAO = XtDiemThiXetTuyenDAO.getInstance();
@@ -82,6 +83,16 @@ public class XtDiemThiXetTuyenBUS {
         for(XtDiemThiXetTuyen dt : listDiem){
             if(dt.getCccd().equals(cccd) && dt.getDPhuongthuc().equals("VSAT")){
                 rs = dt;
+                break;
+            }
+        }
+        return rs;
+    }
+    public BigDecimal getDiemThiDGNLByCCCD(String cccd){
+        BigDecimal rs = null;
+        for(XtDiemThiXetTuyen dt : listDiem){
+            if(dt.getCccd().equals(cccd) &&dt.getDPhuongthuc().equals("DGNL") &&  dt.getNl1() != null ){
+                rs = dt.getNl1();
                 break;
             }
         }

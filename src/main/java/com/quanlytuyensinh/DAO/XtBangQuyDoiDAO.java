@@ -91,7 +91,7 @@ public class XtBangQuyDoiDAO {
             return false;
         }
     }
-        public XtBangQuyDoi getBQDByPhuongThucVaMonVaDiemDAO(String phuongThuc, String mon, BigDecimal diem) {
+        public XtBangQuyDoi getBQDVSATByPhuongThucVaMonVaDiemDAO(String phuongThuc, String mon, BigDecimal diem) {
             try (Session session = HibernateUtil.getSessionFactory().openSession()) {
                 // 1. Tạo CriteriaBuilder
                 var cb = session.getCriteriaBuilder();
@@ -103,6 +103,33 @@ public class XtBangQuyDoiDAO {
                 var predicate = cb.and(
                         cb.equal(root.get("dPhuongthuc"), phuongThuc),
                         cb.equal(root.get("dMon"), mon),
+                        cb.between(cb.literal(diem), root.get("dDiema"), root.get("dDiemb"))
+                );
+                // 5. Gán điều kiện vào query
+                cq.select(root).where(predicate);
+                // 6. Thực thi query
+                return session.createQuery(cq)
+                        .setMaxResults(1)
+                        .uniqueResult();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+        public XtBangQuyDoi getBQDDGNLByPhuongThucVaMonVaDiemDAO(String PhuongThuc, String MaToHop, BigDecimal diem) {
+            try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+                // 1. Tạo CriteriaBuilder
+                var cb = session.getCriteriaBuilder();
+                // 2. Tạo CriteriaQuery
+                var cq = cb.createQuery(XtBangQuyDoi.class);
+                // 3. Khai báo root
+                var root = cq.from(XtBangQuyDoi.class);
+                // 4. Tạo điều kiện
+                var predicate = cb.and(
+                        cb.equal(root.get("dPhuongthuc"), PhuongThuc),
+                        cb.equal(root.get("dTohop"), MaToHop),
                         cb.between(cb.literal(diem), root.get("dDiema"), root.get("dDiemb"))
                 );
                 // 5. Gán điều kiện vào query

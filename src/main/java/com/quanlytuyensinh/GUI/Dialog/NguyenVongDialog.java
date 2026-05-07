@@ -282,6 +282,7 @@ public class NguyenVongDialog extends JDialog{
         }
         this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
 //        getToHopCaoNhatVaTinhDiem(maNganh, cccd);
+        tinhDiemDGNL(maNganh, cccd);
         tinhDiemTHPT(maNganh, cccd);
         tinhDiemVSAT(maNganh, cccd);
         txtTHXet.setText(bestToHop);
@@ -491,6 +492,46 @@ public class NguyenVongDialog extends JDialog{
                 bestDiemUT = diemUT;
                 diemDoLech = doLech;
                 bestPhuongThuc = "VSAT";
+            }
+        }
+    } 
+    // Tính điểm DGNL
+    private void tinhDiemDGNL(String maNganh, String cccd){
+        List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
+        BigDecimal diemThiDGNL = this.DTBUS.getDiemThiDGNLByCCCD(cccd);
+        if (listTH == null || diemThiDGNL == null) return;
+        for (XtNganhToHop nth : listTH) {
+             BigDecimal tong = BigDecimal.ZERO;
+
+             // Điểm quy đổi DGNL
+            BigDecimal diemThiDGNLQuyDoi = this.BQDBUS.getDiemThiDGNLQuyDoi(nth.getMatohop(), diemThiDGNL);
+
+            // Độ lệch
+            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+
+            // Điểm cộng và ưu tiên
+            XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
+            BigDecimal diemCong = BigDecimal.ZERO;
+            BigDecimal diemUT = BigDecimal.ZERO;
+            
+            if (dc != null) {
+                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
+                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+            }
+
+           // Điểm xét tuyển
+           
+            BigDecimal diemTH = tong.add(doLech).add(diemThiDGNLQuyDoi);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            // Lấy Max
+            if (diemXT.compareTo(maxDiemXT) > 0) {
+                maxDiemXT = diemXT;
+                bestToHop = nth.getMatohop();
+                bestDiemTH = diemTH;
+                bestDiemCong = diemCong;
+                bestDiemUT = diemUT;
+                diemDoLech = doLech;
+                bestPhuongThuc = "DGNL";
             }
         }
     } 

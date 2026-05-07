@@ -167,7 +167,7 @@ public class XtBangQuyDoiBUS {
         }
     }
         public XtBangQuyDoi getBQDByPhuongThucVaMonVaDiem(String phuongThuc, String mon, BigDecimal Diem){
-            return xtbangquydoiDAO.getBQDByPhuongThucVaMonVaDiemDAO(phuongThuc, mon, Diem);
+            return xtbangquydoiDAO.getBQDVSATByPhuongThucVaMonVaDiemDAO(phuongThuc, mon, Diem);
         }
         public BigDecimal CongThucQuyDoiVSAT(String mon, BigDecimal Diem){
             XtBangQuyDoi bangQuyDoi = getBQDByPhuongThucVaMonVaDiem("VSAT", mon, Diem);
@@ -232,5 +232,35 @@ public class XtBangQuyDoiBUS {
                 diemThiVSATQuyDoi.setN1Thi(CongThucQuyDoiVSAT("N1", diemThiVSAT.getN1Thi()));
             }
             return diemThiVSATQuyDoi;
+        }
+        
+        
+        // ĐÁNH GIÁ NĂNG LỰC
+        
+        // Lấy công thức DGNL
+        public BigDecimal CongThucQuyDoiDGNL(String MaToHop, BigDecimal Diem){
+            XtBangQuyDoi bangQuyDoi = this.xtbangquydoiDAO.getBQDDGNLByPhuongThucVaMonVaDiemDAO("DGNL",MaToHop, Diem);
+            if(bangQuyDoi == null){
+                JOptionPane.showMessageDialog(null, "THANG ĐIỂM NẰM NGOÀI QUY ĐỔI (MẶC ĐỊNH = 30 )", "DEBUG DIEM", JOptionPane.INFORMATION_MESSAGE);
+                return new BigDecimal("30");
+            }
+            BigDecimal  a= bangQuyDoi.getDDiema();
+            BigDecimal  b= bangQuyDoi.getDDiemb();
+            BigDecimal  c= bangQuyDoi.getDDiemc();
+            BigDecimal  d= bangQuyDoi.getDDiemd();
+            BigDecimal  x= Diem;
+            BigDecimal y = c.add(
+                (x.subtract(a))
+                .divide(b.subtract(a), 5, RoundingMode.HALF_UP)
+                .multiply(d.subtract(c))
+            );
+            return y.setScale(5, RoundingMode.HALF_UP);
+        }
+        
+        // Lấy điểm thi
+        public BigDecimal getDiemThiDGNLQuyDoi(String MaToHop, BigDecimal diemThiDGNL){
+            if(diemThiDGNL == null) return null;
+            return CongThucQuyDoiDGNL(MaToHop, diemThiDGNL);
+            
         }
 }

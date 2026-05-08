@@ -2,6 +2,9 @@ package com.quanlytuyensinh.DAO;
 
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import java.math.BigDecimal;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -174,4 +177,28 @@ public class XtNguyenVongXetTuyenDAO {
             return false;
         }
     }
+    
+    public boolean kiemTraNVTonTai(String cccd, String maNganh) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+
+            Root<XtNguyenVongXetTuyen> root =
+                    cq.from(XtNguyenVongXetTuyen.class);
+
+            cq.select(cb.count(root));
+
+            cq.where(
+                    cb.and(
+                            cb.equal(root.get("nnCccd"), cccd),
+                            cb.equal(root.get("nvManganh"), maNganh)
+                    )
+            );
+
+            Long count = session.createQuery(cq).getSingleResult();
+
+            return count != null && count > 0;
+        }
+}
 }

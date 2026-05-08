@@ -35,20 +35,17 @@ public class testGUI {
          XtDiemThiXetTuyenDAO DTDAO = XtDiemThiXetTuyenDAO.getInstance();
           XtBangQuyDoiDAO xtbangquydoiDAO = XtBangQuyDoiDAO.getInstance();
           XtNganhDAO nganhDAO = XtNganhDAO.getInstance();
-          System.out.println(nganhDAO.getDiemTTByMaNganh("7480201").toString());
-        System.out.println("===== DANH SACH TAI KHOAN =====");
-
+           System.out.println("===== DANH SACH TAI KHOAN 1=====");
+          System.out.println(NVBUS.checkExistsNV("079201000001", "7480201"));
+          System.out.println(NVBUS.checkExistsNV("079201000022201", "7480201"));
+        System.out.println("===== DANH SACH TAI KHOAN 2 =====");
+        
 //        for (XtDiemThiXetTuyen nv : listDT) {
 //
 //            System.out.println(
 //                    nv.toString()
 //            );
 //        }
-            BigDecimal a = new BigDecimal("0.75");
-            System.out.println(a.negate()); // -0.75
-
-            BigDecimal b = new BigDecimal("-0.75");
-            System.out.println(b.negate()); // 0.75
 
     }
 }

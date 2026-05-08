@@ -1,6 +1,7 @@
 package com.quanlytuyensinh.UTIL;
 
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import java.io.File;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -106,4 +107,42 @@ private static void splitHoTen(String hoTen, XtThisinhXetTuyen25 ts) {
         }
         return gt; // giữ nguyên nếu không match
     }
+    /**
+ * Đọc file Excel nguyện vọng.
+ * Cột bắt buộc (bỏ qua header dòng đầu):
+ *   Col 1 = CCCD, Col 2 = Thứ tự NV, Col 5 = Mã xét tuyển (mã ngành)
+ * Trả về List<String[]> với mỗi phần tử: [cccd, thuTu, maNganh]
+ */
+public static List<String[]> readNguyenVongExcel(File file) throws Exception {
+    List<String[]> result = new ArrayList<>();
+    try (org.apache.poi.ss.usermodel.Workbook wb =
+             org.apache.poi.ss.usermodel.WorkbookFactory.create(file)) {
+
+        org.apache.poi.ss.usermodel.Sheet sheet = wb.getSheetAt(0);
+        boolean isFirstRow = true;
+
+        for (org.apache.poi.ss.usermodel.Row row : sheet) {
+            if (isFirstRow) { isFirstRow = false; continue; } // Bỏ header
+            if (row == null) continue;
+
+            String cccd     = getCellString(row.getCell(1)); // Cột B
+            String thuTu    = getCellString(row.getCell(2)); // Cột C
+            String maNganh  = getCellString(row.getCell(5)); // Cột F (Mã xét tuyển)
+
+            if (cccd.isEmpty() && thuTu.isEmpty() && maNganh.isEmpty()) continue; // dòng trống
+
+            result.add(new String[]{cccd, thuTu, maNganh});
+        }
+    }
+    return result;
+}
+
+private static String getCellString(org.apache.poi.ss.usermodel.Cell cell) {
+    if (cell == null) return "";
+    switch (cell.getCellType()) {
+        case STRING:  return cell.getStringCellValue().trim();
+        case NUMERIC: return String.valueOf((long) cell.getNumericCellValue());
+        default:      return "";
+    }
+}
 }

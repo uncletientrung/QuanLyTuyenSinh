@@ -27,6 +27,10 @@ public class XtNguyenVongXetTuyenBUS {
         return rs;
     }
     
+    public boolean checkExistsNV(String cccd, String maNganh) {
+        return nvDAO.kiemTraNVTonTai(cccd, maNganh);// tùy theo cách bạn implement
+    }
+    
     public boolean insertNguyenVong(XtNguyenVongXetTuyen nvNew){
         if(nvNew== null) return false;
         boolean rs = nvDAO.insert(nvNew);

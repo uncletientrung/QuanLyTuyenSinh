@@ -79,6 +79,7 @@ public class NguyenVongDialog extends JDialog{
     private BigDecimal bestDiemUT = BigDecimal.ZERO;
     private String bestPhuongThuc ="";
     
+    
     public NguyenVongDialog(NguyenVongPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess, XtNguyenVongXetTuyen nv){
          super(owner, title, modal);
         this.parent = parent;
@@ -406,7 +407,7 @@ public class NguyenVongDialog extends JDialog{
         }
     } 
     // Tính điểm VSAT Cao nhất
-    private void tinhDiemVSAT(String maNganh, String cccd){
+    public final void tinhDiemVSAT(String maNganh, String cccd){
         List<XtNganhToHop> listTH = NganhTHBUS.getNTHByMaNganh(maNganh);
         XtDiemThiXetTuyen diemThiVSAT = DTBUS.getDiemThiVSATByCCCD(cccd); // Điểm VSAT chưa quy đổi
 
@@ -651,4 +652,5 @@ public class NguyenVongDialog extends JDialog{
         this.txtKetQua.setText(nv.getNvKetqua());
         // Sau khi set 3 cái txThuTu với cbbMaNganh và cbbCCCD thì nó chạy hàm upadateField và upadateKeys đỡ viết
     }
+    
 }

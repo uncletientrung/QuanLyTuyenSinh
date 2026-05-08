@@ -88,21 +88,21 @@ public class ThiSinhDialog extends JDialog {
         right.setBackground(Color.WHITE);
         // ==================== ĐỊNH NGHĨA CÁC THUỘC TÍNH ====================
         
-        txtCCCD = new VerticalInputForm("CCCD");
-        txtSBD = new VerticalInputForm("Số báo danh (SBD)");
+        txtCCCD = new VerticalInputForm("CCCD*");
+        txtSBD = new VerticalInputForm("Số báo danh (SBD)*");
         txtSBD.setText("Hệ thống tự sinh");
         txtSBD.setDisable();
-        txtHo = new VerticalInputForm("Họ");
-        txtTen = new VerticalInputForm("Tên");
-        txtNgaySinh = new InputDate("Ngày sinh (dd/MM/yyyy)", 300, 40);
+        txtHo = new VerticalInputForm("Họ*");
+        txtTen = new VerticalInputForm("Tên*");
+        txtNgaySinh = new InputDate("Ngày sinh (dd/MM/yyyy)*", 300, 40);
         txtSDT = new VerticalInputForm("Số điện thoại");
-        txtPassword = new VerticalInputForm("Mật khẩu");
-        txtPasswordConfirm = new VerticalInputForm("Xác nhận mật khẩu");
+        txtPassword = new VerticalInputForm("Mật khẩu*");
+        txtPasswordConfirm = new VerticalInputForm("Xác nhận mật khẩu*");
         txtUpdateAt =  new InputDate("Cập nhật lần cuối", 300, 40);
-        cbbGioiTinh = new VerticalComboBoxForm("Giới tính",new String[]{"Nam", "Nữ"});
+        cbbGioiTinh = new VerticalComboBoxForm("Giới tính*",new String[]{"Nam", "Nữ"});
         txtEmail = new VerticalInputForm("Email");
-        txtNoiSinh = new VerticalInputForm("Nơi sinh");
-        cbbKhuVuc = new VerticalComboBoxForm("Khu vực", 
+        txtNoiSinh = new VerticalInputForm("Nơi sinh*");
+        cbbKhuVuc = new VerticalComboBoxForm("Khu vực*", 
             new String[]{"1", "2", "2NT", "3"});
         cbbDoiTuong = new VerticalComboBoxForm("Đối tượng ưu tiên", 
             new String[]{"Không ưu tiên","01", "02", "03", "04","05","06a","06b","07a","07b"});
@@ -287,31 +287,31 @@ public class ThiSinhDialog extends JDialog {
             return false;
         }
 
-        // ===== SĐT =====
-        String sdt = txtSDT.getText().trim();
-        if (Validation.isEmpty(sdt)) {
-            JOptionPane.showMessageDialog(this, "Số điện thoại không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSDT.getTxtForm().requestFocus();
-            return false;
-        }
-        if (!sdt.matches("0\\d{9}")) {
-            JOptionPane.showMessageDialog(this, "SĐT phải gồm 10 số và bắt đầu bằng 0!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSDT.getTxtForm().requestFocus();
-            return false;
-        }
-
-        // ===== Email =====
-        String email = txtEmail.getText().trim();
-        if (Validation.isEmpty(email)) {
-            JOptionPane.showMessageDialog(this, "Email không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtEmail.getTxtForm().requestFocus();
-            return false;
-        }
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            JOptionPane.showMessageDialog(this, "Email không hợp lệ!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtEmail.getTxtForm().requestFocus();
-            return false;
-        }
+//        // ===== SĐT =====
+//        String sdt = txtSDT.getText().trim();
+//        if (Validation.isEmpty(sdt)) {
+//            JOptionPane.showMessageDialog(this, "Số điện thoại không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSDT.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (!sdt.matches("0\\d{9}")) {
+//            JOptionPane.showMessageDialog(this, "SĐT phải gồm 10 số và bắt đầu bằng 0!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSDT.getTxtForm().requestFocus();
+//            return false;
+//        }
+//
+//        // ===== Email =====
+//        String email = txtEmail.getText().trim();
+//        if (Validation.isEmpty(email)) {
+//            JOptionPane.showMessageDialog(this, "Email không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtEmail.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+//            JOptionPane.showMessageDialog(this, "Email không hợp lệ!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtEmail.getTxtForm().requestFocus();
+//            return false;
+//        }
 
         // ===== Password =====
         String pass = txtPassword.getText().trim();
@@ -355,7 +355,7 @@ public class ThiSinhDialog extends JDialog {
         txtTen.setText(ts.getTen());
         txtSBD.setText(ts.getSobaodanh());
        try {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             LocalDate localDate = LocalDate.parse(ts.getNgaySinh(), fmt);
             Date date = java.sql.Date.valueOf(localDate);
             txtNgaySinh.getDateChooser().setDate(date);
@@ -388,8 +388,8 @@ public class ThiSinhDialog extends JDialog {
 
 
         try {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate localDate = LocalDate.parse("2004-05-15", fmt);
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse("05/05/2005", fmt);
             Date date = java.sql.Date.valueOf(localDate);
             txtNgaySinh.getDateChooser().setDate(date);
         } catch (Exception e) {

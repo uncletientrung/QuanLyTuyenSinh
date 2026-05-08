@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class ExcelImportUtil {
 
@@ -27,15 +28,16 @@ public class ExcelImportUtil {
                 if (row == null) continue;
 
                 XtThisinhXetTuyen25 ts = new XtThisinhXetTuyen25();
-
+                
                 try {
                     // Mapping cột theo Excel của bạn
                     ts.setCccd(getStringValue(row.getCell(1)));           // CCCD
                     
                     String hoTen = getStringValue(row.getCell(2));        // Họ Tên
                     splitHoTen(hoTen, ts);                                // Tách Họ - Tên
-
-                    ts.setNgaySinh(getStringValue(row.getCell(3)));       // Ngày sinh
+                    
+                    String ngaySinh = getStringValue(row.getCell(3));
+                    ts.setNgaySinh(ngaySinh);       // Ngày sinh
                    ts.setGioiTinh(normalizeGioiTinh(getStringValue(row.getCell(4))));       // Giới tính
 
                     ts.setDoiTuong(getStringValue(row.getCell(5)));       // ĐTƯT (Đối tượng)
@@ -46,7 +48,7 @@ public class ExcelImportUtil {
                     // Các trường mặc định
                     ts.setDienThoai(null);
                     ts.setEmail(null);
-                    ts.setPassword("123456");           // Mật khẩu mặc định
+                    ts.setPassword(ngaySinh.replace("/", ""));          // Mật khẩu mặc định
                     ts.setUpdatedAt(LocalDate.now());
 
                     list.add(ts);

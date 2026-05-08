@@ -284,69 +284,226 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
     
            // ===================== IMPORT EXCEL =====================
     private void importExcel() {
+
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx", "xls"));
-        
+        fileChooser.setFileFilter(
+                new javax.swing.filechooser.FileNameExtensionFilter(
+                        "Excel Files",
+                        "xlsx",
+                        "xls"
+                )
+        );
+
         int result = fileChooser.showOpenDialog(this);
-        if (result != JFileChooser.APPROVE_OPTION) return;
+
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
         File selectedFile = fileChooser.getSelectedFile();
-        try {
-            List<XtThisinhXetTuyen25> listImport = ExcelImportUtil.readThiSinhFromExcel(selectedFile.getAbsolutePath());
-            
-            if (listImport.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Không tìm thấy dữ liệu hợp lệ trong file Excel!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+
+        // ================= PROGRESS UI =================
+
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setStringPainted(true);
+        progressBar.setValue(0);
+
+        JLabel lblStatus = new JLabel("Đang import dữ liệu...");
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.add(lblStatus, BorderLayout.NORTH);
+        panel.add(progressBar, BorderLayout.CENTER);
+
+        JDialog dialog = new JDialog(
+                (JFrame) SwingUtilities.getWindowAncestor(this),
+                "Import Excel",
+                true
+        );
+
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.getContentPane().add(panel);
+        dialog.setSize(400, 120);
+        dialog.setLocationRelativeTo(this);
+
+        // ================= WORKER =================
+
+        SwingWorker<Void, Integer> worker = new SwingWorker<>() {
 
             int success = 0;
             int skipped = 0;
+
             StringBuilder errors = new StringBuilder();
 
-            for (XtThisinhXetTuyen25 ts : listImport) {
-                // ===== VALIDATION =====
-                String errorMsg = validateThiSinh(ts);
-                if (errorMsg != null) {
-                    errors.append("Dòng ").append(listImport.indexOf(ts) + 2)
-                          .append(" (CCCD: ").append(ts.getCccd()).append("): ")
-                          .append(errorMsg).append("\n");
-                    skipped++;
-                    continue;
-                }
+            @Override
+            protected Void doInBackground() {
 
                 try {
-                    if (TSBUS.insertThiSinh(ts)) {
-                        success++;
-                    } else {
-                        errors.append("Dòng ").append(listImport.indexOf(ts) + 2)
-                              .append(" (CCCD: ").append(ts.getCccd()).append("): Lỗi insert vào DB\n");
-                        skipped++;
+
+                    List<XtThisinhXetTuyen25> listImport =
+                            ExcelImportUtil.readThiSinhFromExcel(
+                                    selectedFile.getAbsolutePath()
+                            );
+
+                    if (listImport.isEmpty()) {
+
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(
+                                    ThiSinhPanel.this,
+                                    "Không có dữ liệu hợp lệ!",
+                                    "Thông báo",
+                                    JOptionPane.WARNING_MESSAGE
+                            );
+                        });
+
+                        return null;
                     }
+
+                    int total = listImport.size();
+                    int current = 0;
+
+                    for (XtThisinhXetTuyen25 ts : listImport) {
+
+                        current++;
+
+                        // ===== VALIDATE =====
+
+                        String errorMsg = validateThiSinh(ts);
+
+                        if (errorMsg != null) {
+
+                            errors.append("Dòng ")
+                                    .append(current + 1)
+                                    .append(" - CCCD: ")
+                                    .append(ts.getCccd())
+                                    .append(" -> ")
+                                    .append(errorMsg)
+                                    .append("\n");
+
+                            skipped++;
+
+                        } else {
+
+                            try {
+
+                                if (TSBUS.insertThiSinh(ts)) {
+                                    success++;
+                                } else {
+
+                                    skipped++;
+
+                                    errors.append("Dòng ")
+                                            .append(current + 1)
+                                            .append(" insert thất bại\n");
+                                }
+
+                            } catch (Exception ex) {
+
+                                skipped++;
+
+                                errors.append("Dòng ")
+                                        .append(current + 1)
+                                        .append(": ")
+                                        .append(ex.getMessage())
+                                        .append("\n");
+                            }
+                        }
+
+                        // ===== UPDATE PROGRESS =====
+
+                        int percent = (current * 100) / total;
+
+                        publish(percent);
+                    }
+
                 } catch (Exception ex) {
-                    errors.append("Dòng ").append(listImport.indexOf(ts) + 2)
-                          .append(" (CCCD: ").append(ts.getCccd()).append("): ").append(ex.getMessage()).append("\n");
-                    skipped++;
+
+                    SwingUtilities.invokeLater(() -> {
+
+                        JOptionPane.showMessageDialog(
+                                ThiSinhPanel.this,
+                                "Lỗi import:\n" + ex.getMessage(),
+                                "Lỗi",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+
+                    });
+
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void process(List<Integer> chunks) {
+
+                int value = chunks.get(chunks.size() - 1);
+
+                progressBar.setValue(value);
+
+                lblStatus.setText("Đang import... " + value + "%");
+            }
+
+            @Override
+            protected void done() {
+
+                dialog.dispose();
+
+                listTS = TSBUS.getAllThiSinh();
+
+                loadDataTable(listTS);
+
+                String message =
+                        "Import hoàn tất!\n\n"
+                        + "Thành công: " + success + "\n"
+                        + "Bỏ qua: " + skipped;
+
+                if (errors.length() > 0) {
+
+                    JTextArea textArea = new JTextArea(errors.toString());
+
+                    textArea.setEditable(false);
+                    textArea.setLineWrap(true);
+                    textArea.setWrapStyleWord(true);
+
+                    JScrollPane scroll = new JScrollPane(textArea);
+
+                    scroll.setPreferredSize(new Dimension(600, 300));
+
+                    JPanel panel = new JPanel(new BorderLayout(10, 10));
+
+                    JLabel lbl = new JLabel(
+                            "<html>"
+                            + "Import hoàn tất!<br>"
+                            + "Thành công: " + success + "<br>"
+                            + "Bỏ qua: " + skipped
+                            + "</html>"
+                    );
+
+                    panel.add(lbl, BorderLayout.NORTH);
+                    panel.add(scroll, BorderLayout.CENTER);
+
+                    JOptionPane.showMessageDialog(
+                            ThiSinhPanel.this,
+                            panel,
+                            "Kết quả Import",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                } else {
+
+                    JOptionPane.showMessageDialog(
+                            ThiSinhPanel.this,
+                            message,
+                            "Kết quả Import",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
                 }
             }
+        };
 
-            String message = "Import hoàn tất!\n" +
-                            "Thành công: " + success + " thí sinh\n" +
-                            "Bỏ qua: " + skipped + " thí sinh\n";
-            
-            if (errors.length() > 0) {
-                message += "\nChi tiết lỗi:\n" + errors;
-            }
+        worker.execute();
 
-            JOptionPane.showMessageDialog(this, message, "Kết quả Import", 
-                success > 0 ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
-
-            // Refresh table
-            listTS = TSBUS.getAllThiSinh();
-            loadDataTable(listTS);
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Import thất bại!\n" + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+        dialog.setVisible(true);
     }
     private String validateThiSinh(XtThisinhXetTuyen25 ts) {
         // CCCD

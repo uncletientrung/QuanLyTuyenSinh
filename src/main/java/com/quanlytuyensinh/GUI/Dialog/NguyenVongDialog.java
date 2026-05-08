@@ -151,7 +151,7 @@ public class NguyenVongDialog extends JDialog{
         this.txtThuTu = new VerticalInputForm("Thứ tự nguyện vọng");
         this.txtDanhSachTH =  new VerticalInputForm("Danh sách tổ hợp");
         this.txtTHXet = new VerticalInputForm("Tổ hợp xét tuyển (Cao nhất)"); 
-        this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển (Đã cộng độ lệch)");
+        this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển (Đã thêm độ lệch)");
         this.txtDiemUT =  new VerticalInputForm("Điểm ưu tiên");
         this.txtDiemCong = new VerticalInputForm("Điểm cộng"); 
         this.txtDiemXetTuyen = new VerticalInputForm("Điểm xét tuyển"); 
@@ -282,10 +282,12 @@ public class NguyenVongDialog extends JDialog{
             return;
         }
         this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
-//        getToHopCaoNhatVaTinhDiem(maNganh, cccd);
-        tinhDiemDGNL(maNganh, cccd);
+        if(!maNganh.startsWith("7140")){ // Nếu không phải ngành sư phạm thì chạy
+            tinhDiemDGNL(maNganh, cccd);
+            tinhDiemVSAT(maNganh, cccd);
+        }
         tinhDiemTHPT(maNganh, cccd);
-        tinhDiemVSAT(maNganh, cccd);
+        
         txtTHXet.setText(bestToHop);
         txtDiemTHXT.setText(bestDiemTH.setScale(5).toString());
         txtDiemCong.setText(bestDiemCong.setScale(2).toString());
@@ -382,11 +384,14 @@ public class NguyenVongDialog extends JDialog{
             
             // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.add(doLech), diemCong);
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong); // Điểm ưu tiên đã if else 22.5 rồi
 
            // Điểm xét tuyển
-            BigDecimal diemTH = tong.add(doLech);
+            BigDecimal diemTH = tong.subtract(doLech);
             BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
+                diemXT = new BigDecimal("30");
+            }
 
             // Lấy Max
             if (diemXT.compareTo(maxDiemXT) > 0) {
@@ -441,11 +446,15 @@ public class NguyenVongDialog extends JDialog{
             
             // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.add(doLech), diemCong);
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
 
            // Điểm xét tuyển
-            BigDecimal diemTH = tong.add(doLech);
+            BigDecimal diemTH = tong.subtract(doLech);
             BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
+                diemXT = new BigDecimal("30");
+            }
+            
             // Lấy Max
             if (diemXT.compareTo(maxDiemXT) > 0) {
                 maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);
@@ -471,21 +480,26 @@ public class NguyenVongDialog extends JDialog{
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
-
-            // Điểm cộng và ưu tiên
+        
+            // Điểm cộng 
             XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = BigDecimal.ZERO;
-            BigDecimal diemUT = BigDecimal.ZERO;
-            
             if (dc != null) {
-                diemCong = dc.getDiemCC() == null ? BigDecimal.ZERO : dc.getDiemCC();
-                diemUT = dc.getDiemUtxt() == null ? BigDecimal.ZERO : dc.getDiemUtxt();
+                diemCong = dc.getDiemTong()== null ? BigDecimal.ZERO : dc.getDiemTong();
             }
+            
+            // Điểm ưu tiên
+             BigDecimal diemUT = BigDecimal.ZERO;
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
 
            // Điểm xét tuyển
            
-            BigDecimal diemTH = tong.add(doLech).add(diemThiDGNLQuyDoi);
+            BigDecimal diemTH = tong.subtract(doLech).add(diemThiDGNLQuyDoi);
             BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
+                diemXT = new BigDecimal("30");
+            }
+            
             // Lấy Max
             if (diemXT.compareTo(maxDiemXT) > 0) {
                maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);

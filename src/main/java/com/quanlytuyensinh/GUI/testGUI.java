@@ -38,12 +38,17 @@ public class testGUI {
           System.out.println(nganhDAO.getDiemTTByMaNganh("7480201").toString());
         System.out.println("===== DANH SACH TAI KHOAN =====");
 
-        for (XtDiemThiXetTuyen nv : listDT) {
+//        for (XtDiemThiXetTuyen nv : listDT) {
+//
+//            System.out.println(
+//                    nv.toString()
+//            );
+//        }
+            BigDecimal a = new BigDecimal("0.75");
+            System.out.println(a.negate()); // -0.75
 
-            System.out.println(
-                    nv.toString()
-            );
-        }
+            BigDecimal b = new BigDecimal("-0.75");
+            System.out.println(b.negate()); // 0.75
 
     }
 }

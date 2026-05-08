@@ -157,7 +157,7 @@ public class XtThisinhXetTuyen25BUS {
         return result;
     }
    
-    public BigDecimal getDiemUuTienByCCCD( String cccd, BigDecimal diemTongCoDoLech, BigDecimal diemCong ) {
+   public BigDecimal getMucDiemUuTienTheoQuyDinh(String cccd){ // Trả về mức điểm ưu tiên
         if (cccd == null || cccd.isEmpty()) {
             return BigDecimal.ZERO;
         }
@@ -170,13 +170,12 @@ public class XtThisinhXetTuyen25BUS {
         // Tính điểm đối tượng
         String dt = thiSinh.getDoiTuong();
         if (dt != null) {
-            if (dt.equals("01") || dt.equals("02") || dt.equals("03")) { // UT1
+            if (dt.equals("01") || dt.equals("02") || dt.equals("03") || dt.equals("04") || dt.equals("05")) { // UT1
                 diemUT = diemUT.add(new BigDecimal("2.0"));
-            } else if (dt.equals("04") || dt.equals("05") || dt.startsWith("06")) { // UT2
+            } else if (dt.startsWith("06") || dt.startsWith("07") ) { // UT2
                 diemUT = diemUT.add(new BigDecimal("1.0")); 
             }
         }
-
         // Tính điểm khu vực
         String kv = thiSinh.getKhuVuc();
         if (kv != null) {
@@ -192,14 +191,28 @@ public class XtThisinhXetTuyen25BUS {
                     break;
             }
         }
+        return diemUT;
+   }
+
+    public BigDecimal getDiemUuTienByCCCD( String cccd, BigDecimal diemTongCoDoLech, BigDecimal diemCong ) {
+        if (cccd == null || cccd.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        if(diemTongCoDoLech.add(diemCong).compareTo(new BigDecimal("30")) >= 0) return  BigDecimal.ZERO; // Nếu điểm >= 30 thì điểm ưu tiên là 0
+        
+        BigDecimal MucDiemUuTien = this.getMucDiemUuTienTheoQuyDinh(cccd);
 
         // Tính tổng điểm ưu tiên
         BigDecimal tong = diemTongCoDoLech.add(diemCong);
+        if (tong.compareTo(new BigDecimal("22.5")) < 0){ // Nếu bé hơn 22.5
+            return MucDiemUuTien;
+        }
+        
         BigDecimal heSo = new BigDecimal("30")
                 .subtract(tong)
-                .divide(new BigDecimal("7.5"), 4, RoundingMode.HALF_UP);
+                .divide(new BigDecimal("7.5"), 5, RoundingMode.HALF_UP);
 
-        return heSo.multiply(diemUT).setScale(5, RoundingMode.HALF_UP);
+        return heSo.multiply(MucDiemUuTien).setScale(5, RoundingMode.HALF_UP);
     }
 
 }

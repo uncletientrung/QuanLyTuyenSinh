@@ -176,7 +176,10 @@ public class NganhToHopDialog extends JDialog {
         JComboBox<String> cbb = new JComboBox<>();
         cbb.addItem("-- Chọn ngành --");
         for (XtNganh n : listNganh) {
-            cbb.addItem(n.getManganh());
+            cbb.addItem(n.getManganh() + " - " + n.getTennganh());
+            //cbb.addItem(n.getManganh()+" - "+n.getTennganh());
+            //toi muon chi them ten cho tuong minh, con lai giu nguyen, tu them du lieu vo db, va cbb tb_key 
+            //van la manganh_matohop nhu ban dau
         }
         styleCombo(cbb);
         return cbb;
@@ -186,7 +189,8 @@ public class NganhToHopDialog extends JDialog {
         JComboBox<String> cbb = new JComboBox<>();
         cbb.addItem("-- Chọn tổ hợp --");
         for (XtToHopMonThi t : listToHop) {
-            cbb.addItem(t.getMatohop());
+            cbb.addItem(t.getMatohop() + " - " + t.getTentohop());
+            //cbb.addItem(t.getMatohop()+" - " +t.getTentohop());
         }
         styleCombo(cbb);
         return cbb;
@@ -274,10 +278,24 @@ public class NganhToHopDialog extends JDialog {
     private void fillData() {
         // Chọn đúng item trong combobox (listener sẽ kích hoạt updateMonFromToHop)
         if (currentRecord.getManganh() != null) {
-            cbbManganh.setSelectedItem(currentRecord.getManganh());
+            for (int i = 0; i < cbbManganh.getItemCount(); i++) {
+                String item = cbbManganh.getItemAt(i);
+
+                if (item.startsWith(currentRecord.getManganh() + " - ")) {
+                    cbbManganh.setSelectedIndex(i);
+                    break;
+                }
+            }
         }
         if (currentRecord.getMatohop() != null) {
-            cbbMatohop.setSelectedItem(currentRecord.getMatohop());
+            for (int i = 0; i < cbbMatohop.getItemCount(); i++) {
+                String item = cbbMatohop.getItemAt(i);
+
+                if (item.startsWith(currentRecord.getMatohop() + " - ")) {
+                    cbbMatohop.setSelectedIndex(i);
+                    break;
+                }
+            }
         }
 
         // TB Keys và độ lệch
@@ -294,8 +312,47 @@ public class NganhToHopDialog extends JDialog {
 
 
     private void luuNTH(String type) {
-        XtNganhToHop nth = new XtNganhToHop();
+       
+        String maNganh = getSelectedNganh();
+        String maToHop = getSelectedToHop();
+        // CREATE
+        if (type.equals("create")) {
 
+            if (bus.kiemTraTrungMaNganhToHop(maNganh, maToHop)) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ngành và tổ hợp này đã tồn tại!",
+                        "Trùng dữ liệu",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+            }
+        }
+
+        // UPDATE
+        else {
+
+            if (bus.existsByMaNganhAndToHopExceptId(
+                    maNganh,
+                    maToHop,
+                    currentRecord.getId()
+            )) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ngành và tổ hợp này đã tồn tại!",
+                        "Trùng dữ liệu",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+            }
+        }
+        
+        XtNganhToHop nth = new XtNganhToHop();
+        
         nth.setManganh(getSelectedNganh());
         nth.setMatohop(getSelectedToHop());
         nth.setTbKeys(txtTbKeys.getText().trim());
@@ -334,20 +391,38 @@ public class NganhToHopDialog extends JDialog {
         nth.setNk5 (mon1.equals("NK5")  || mon2.equals("NK5")  || mon3.equals("NK5"));
         nth.setNk6 (mon1.equals("NK6")  || mon2.equals("NK6")  || mon3.equals("NK6"));
 
-        if (type.equals("create")) {
-            if (bus.addNTH(nth)) {
-                JOptionPane.showMessageDialog(this, "Thêm mới thành công!");
-                parent.loadDataTable(bus.getAll());
-                dispose();
-            }
-        } else {
-            nth.setId(currentRecord.getId());
+        if (bus.addNTH(nth)) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Thêm mới thành công!"
+            );
+            parent.loadDataTable(bus.getAll());
+            dispose();
 
-                if (bus.updateNTH(nth)) {
-                    JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
-                    parent.loadDataTable(bus.getAll());
-                    dispose();
-                }
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Không thể thêm dữ liệu!",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+        
+        
+        if (bus.updateNTH(nth)) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Cập nhật thành công!"
+            );
+            parent.loadDataTable(bus.getAll());
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Không thể cập nhật dữ liệu!",
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 
@@ -415,14 +490,20 @@ public class NganhToHopDialog extends JDialog {
     // null nếu người dùng chưa chọn 
     private String getSelectedNganh() {
         Object sel = cbbManganh.getSelectedItem();
-        if (sel == null || sel.toString().startsWith("--")) return null;
-        return sel.toString();
+
+        if (sel == null || sel.toString().startsWith("--")) {
+            return null;
+        }
+        return sel.toString().split(" - ")[0].trim();
     }
 
     private String getSelectedToHop() {
         Object sel = cbbMatohop.getSelectedItem();
-        if (sel == null || sel.toString().startsWith("--")) return null;
-        return sel.toString();
+
+        if (sel == null || sel.toString().startsWith("--")) {
+            return null;
+        }
+        return sel.toString().split(" - ")[0].trim();
     }
 
     private JPanel buildMonRow(VerticalInputForm fMon, VerticalInputForm fHs) {

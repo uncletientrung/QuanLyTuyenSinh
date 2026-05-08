@@ -259,7 +259,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
     private XtNganhToHop getSelectedRecord() {
         int row = paginatedTable.getTable().getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một bản ghi!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một dòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return null;
         }
         int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);

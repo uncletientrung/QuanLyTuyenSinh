@@ -89,4 +89,43 @@ public class XtNganhToHopBUS {
         }
         return rs;
     }
+    
+    public boolean kiemTraTrungMaNganhToHop(String maNganh, String maToHop) {
+
+        for (XtNganhToHop nth : listNTH) {
+
+            if (
+                nth.getManganh() != null &&
+                nth.getMatohop() != null &&
+                nth.getManganh().equalsIgnoreCase(maNganh) &&
+                nth.getMatohop().equalsIgnoreCase(maToHop)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public boolean existsByMaNganhAndToHopExceptId(
+            String maNganh,
+            String maToHop,
+            int currentId
+    ) {
+
+        for (XtNganhToHop nth : listNTH) {
+
+            if (
+                nth.getId() != currentId &&
+                nth.getManganh() != null &&
+                nth.getMatohop() != null &&
+                nth.getManganh().equalsIgnoreCase(maNganh) &&
+                nth.getMatohop().equalsIgnoreCase(maToHop)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

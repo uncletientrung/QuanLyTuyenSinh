@@ -510,9 +510,9 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         if (Validation.isEmpty(ts.getCccd())) {
             return "CCCD không được để trống!";
         }
-        if (!ts.getCccd().matches("\\d{12}")) {
-            return "CCCD phải gồm đúng 12 chữ số!";
-        }
+//        if (!ts.getCccd().matches("\\d{12}")) {
+//            return "CCCD phải gồm đúng 12 chữ số!";
+//        }
         if (!TSBUS.checkCCCD(ts.getCccd(), 0)) {
             return "CCCD đã tồn tại trong hệ thống!";
         }

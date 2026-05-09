@@ -95,6 +95,18 @@ public boolean delete(int idnganh) {
         return null;
     }
 }
+   
+   public XtNganh getNganhByMaNganh(String manganh) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                "FROM XtNganh WHERE manganh = :ma", XtNganh.class)
+                .setParameter("ma", manganh)
+                .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     
     
     public boolean checkTrungMaNganh(String manganh, int id) {

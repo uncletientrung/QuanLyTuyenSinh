@@ -205,4 +205,9 @@ public class XtNganhBUS {
         return this.nganhDAO.getDiemSanByMaNganh(maNganh);
         
     }
+    
+    public XtNganh getByMaNganh(String maNganh){
+        if(maNganh == null || maNganh.equals("")) return null; 
+        return this.nganhDAO.getNganhByMaNganh(maNganh);
+    }
 }

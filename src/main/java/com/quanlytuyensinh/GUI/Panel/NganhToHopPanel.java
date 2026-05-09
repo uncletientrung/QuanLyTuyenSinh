@@ -1,6 +1,8 @@
 package com.quanlytuyensinh.GUI.Panel;
 
+import com.quanlytuyensinh.BUS.XtNganhBUS;
 import com.quanlytuyensinh.BUS.XtNganhToHopBUS;
+import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
@@ -21,6 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class NganhToHopPanel extends JPanel implements ActionListener, ItemListener {
 
     private final XtNganhToHopBUS nganhToHopBUS;
+    private final XtNganhBUS nganhBUS;
     private List<XtNganhToHop> listNganhToHop;
 
     private PanelBorderRadius pnlMain, functionBar;
@@ -33,6 +36,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
 
     public NganhToHopPanel(Main mainF) {
         this.nganhToHopBUS = new XtNganhToHopBUS();
+        this.nganhBUS = new XtNganhBUS();
         initComponent();                                    
         this.listNganhToHop = nganhToHopBUS.getAll();    
         loadDataTable(listNganhToHop);                     
@@ -326,6 +330,7 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
 
         java.io.File file = fileChooser.getSelectedFile();
         int successCount = 0;
+        int updateGocCount = 0;
         java.util.List<String> errorLines = new java.util.ArrayList<>();
 
         // Cache tb_keys đã tồn tại để kiểm tra trùng
@@ -404,6 +409,9 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
                     // Cột 7: Độ lệch
                     java.math.BigDecimal dolech = getCellDecimal(row.getCell(7), evaluator);
 
+                    // Cột 6: Gốc
+                    String goc = getCellString(row.getCell(6), evaluator).trim();
+
                     // Kiểm tra trùng tb_keys
                     if (existingKeys.contains(tbKeys.toLowerCase())) {
                         errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Đã tồn tại, bỏ qua.");
@@ -432,6 +440,20 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
                     if (nganhToHopBUS.addNTH(nth)) {
                         successCount++;
                         existingKeys.add(tbKeys.toLowerCase());
+
+                        // Nếu cột Gốc = "Gốc" → update tổ hợp gốc bên bảng ngành
+                        if ("Gốc".equalsIgnoreCase(goc)) {
+                            XtNganh nganh = nganhBUS.getByMaNganh(maNganh);
+                            if (nganh != null) {
+                                nganh.setNTohopgoc(maToHop);
+                                if (nganhBUS.updateNganh(nganh)) {
+                                    updateGocCount++;
+                                } else {
+                                    errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Cập nhật tổ hợp gốc thất bại.");
+                                }
+                            }
+                            // Nếu không tìm thấy ngành thì bỏ qua (không báo lỗi)
+                        }
                     } else {
                         errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Thêm vào DB thất bại.");
                     }
@@ -452,6 +474,9 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         StringBuilder sb = new StringBuilder();
         sb.append("Import hoàn tất!\n");
         sb.append("Thành công: ").append(successCount).append(" dòng\n");
+        if (updateGocCount > 0) {
+            sb.append("Cập nhật tổ hợp gốc ngành: ").append(updateGocCount).append(" ngành\n");
+        }
         sb.append("Bỏ qua/Lỗi: ").append(errorLines.size()).append(" dòng");
         if (!errorLines.isEmpty()) {
             sb.append("\n\nChi tiết:\n");

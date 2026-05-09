@@ -259,7 +259,7 @@ public class NguyenVongDialog extends JDialog{
             this.txtKetQua.setDisable();
             this.cbTuyenThang.setEnabled(false);
         }
-         if(this.currentNV.getTtPhuongthuc().equals("Tuyển thẳng")){
+         if(this.currentNV!= null && this.currentNV.getTtPhuongthuc().equals("Tuyển thẳng")){
                 this.cbTuyenThang.setSelected(true);
             }
     }

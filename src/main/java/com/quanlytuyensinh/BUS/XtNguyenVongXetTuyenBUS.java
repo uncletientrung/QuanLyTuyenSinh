@@ -95,22 +95,18 @@ public class XtNguyenVongXetTuyenBUS {
             if(nganhBUS == null ) return false;
             this.NganhBUS = nganhBUS;
             boolean rs= false;
-            
             rs = nvDAO.approveAll();
             if(rs){
                 for(XtNguyenVongXetTuyen nv : listNV){
-                    
                     BigDecimal diemTT = NganhBUS.getDiemTTByMaNganhBUS(nv.getNvManganh()); 
-                    
-                    if (diemTT == null) {
-                        nv.setNvKetqua("Đang xét");
-                        continue;
-                    }
+                    BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nv.getNvManganh()); 
                     if (nv.getDiemXettuyen() == null) {
                         nv.setNvKetqua("Chưa có điểm");
-                        continue;
-                    }
-                    if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                    } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
+                        nv.setNvKetqua("Rớt điểm sàn");
+                    } else if (diemTT == null) {
+                        nv.setNvKetqua("Đang xét");
+                    } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
                         nv.setNvKetqua("Trúng tuyển");
                     } else {
                         nv.setNvKetqua("Không trúng tuyển");

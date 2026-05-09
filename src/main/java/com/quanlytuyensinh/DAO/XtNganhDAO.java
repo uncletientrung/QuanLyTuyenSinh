@@ -122,4 +122,19 @@ public boolean delete(int idnganh) {
             return null;
         }
     }
+        public BigDecimal getDiemSanByMaNganh(String maNganh) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<BigDecimal> cq = cb.createQuery(BigDecimal.class);
+            Root<XtNganh> root = cq.from(XtNganh.class);
+            cq.select(root.get("nDiemsan"))
+              .where(cb.equal(root.get("manganh"), maNganh));
+            BigDecimal diem = session.createQuery(cq).uniqueResult();
+            return diem != null ? diem : null;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

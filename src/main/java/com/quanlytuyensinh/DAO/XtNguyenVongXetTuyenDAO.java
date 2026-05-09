@@ -130,22 +130,20 @@ public class XtNguyenVongXetTuyenDAO {
             
             for (XtNguyenVongXetTuyen nv : list) {
                 BigDecimal diemTT = nganhDAO.getDiemTTByMaNganh(nv.getNvManganh()); 
-                if (diemTT == null) {
-                    nv.setNvKetqua("Đang xét");
-                    continue;
-                }
+                BigDecimal diemSan = nganhDAO.getDiemSanByMaNganh(nv.getNvManganh()); 
                 if (nv.getDiemXettuyen() == null) {
                     nv.setNvKetqua("Chưa có điểm");
-                    continue;
-                }
-
-                if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
+                    nv.setNvKetqua("Rớt điểm sàn");
+                } else if (diemTT == null) {
+                    nv.setNvKetqua("Đang xét");
+                } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
                     nv.setNvKetqua("Trúng tuyển");
                 } else {
                     nv.setNvKetqua("Không trúng tuyển");
                 }
-                session.merge(nv);
-            }
+                    session.merge(nv);
+                }
             transaction.commit();
             return true;
         } catch (Exception e) {

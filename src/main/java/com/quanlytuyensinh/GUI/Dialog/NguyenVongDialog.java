@@ -148,7 +148,7 @@ public class NguyenVongDialog extends JDialog{
         
         this.cbbCCCD = new VerticalComboBoxForm("CCCD", listStrCCCD);
         this.cbbMaNganh = new VerticalComboBoxForm("Mã Ngành", listStrMaNganh); 
-        this.cbbPhuongThuc = new VerticalComboBoxForm("Phương thức xét tuyển", new String[]{"THPT", "DGNL", "VSAT"}); 
+        this.cbbPhuongThuc = new VerticalComboBoxForm("Phương thức xét tuyển", new String[]{"THPT", "DGNL", "VSAT","Tuyển thẳng"}); 
         this.txtThuTu = new VerticalInputForm("Thứ tự nguyện vọng");
         this.txtDanhSachTH =  new VerticalInputForm("Danh sách tổ hợp");
         this.txtTHXet = new VerticalInputForm("Tổ hợp xét tuyển (Cao nhất)"); 

@@ -228,11 +228,11 @@ public class ThiSinhDialog extends JDialog {
             txtCCCD.getTxtForm().requestFocus();
             return false;
         }
-        if (!cccd.matches("\\d{12}")) {
-            JOptionPane.showMessageDialog(this, "CCCD phải gồm đúng 12 chữ số!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtCCCD.getTxtForm().requestFocus();
-            return false;
-        }
+//        if (!cccd.matches("\\d{12}")) {
+//            JOptionPane.showMessageDialog(this, "CCCD phải gồm đúng 12 chữ số!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtCCCD.getTxtForm().requestFocus();
+//            return false;
+//        }
         if (!bus.checkCCCD(cccd, idTS)) {
             JOptionPane.showMessageDialog(this, "CCCD đã tồn tại trong hệ thống", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtCCCD.getTxtForm().requestFocus();
@@ -240,18 +240,24 @@ public class ThiSinhDialog extends JDialog {
         }
 
         // ===== Họ =====
-        if (Validation.isEmpty(txtHo.getText())) {
-            JOptionPane.showMessageDialog(this, "Họ không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtHo.getTxtForm().requestFocus();
-            return false;
-        }
+//        if (Validation.isEmpty(txtHo.getText())) {
+//            JOptionPane.showMessageDialog(this, "Họ không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtHo.getTxtForm().requestFocus();
+//            return false;
+//        }
+
 
         // ===== Tên =====
-        if (Validation.isEmpty(txtTen.getText())) {
-            JOptionPane.showMessageDialog(this, "Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtTen.getTxtForm().requestFocus();
+//        if (Validation.isEmpty(txtTen.getText())) {
+//            JOptionPane.showMessageDialog(this, "Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtTen.getTxtForm().requestFocus();
+//            return false;
+//        }
+        if (Validation.isEmpty(txtHo.getText()) && Validation.isEmpty(txtHo.getText())) {
+              JOptionPane.showMessageDialog(this, "Họ Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtHo.getTxtForm().requestFocus();
             return false;
-        }
+         }
 
         // ===== Ngày sinh =====
         Date ngaySinh = txtNgaySinh.getDateChooser().getDate();

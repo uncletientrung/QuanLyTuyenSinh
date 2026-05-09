@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2026 at 06:10 PM
+-- Generation Time: May 09, 2026 at 10:33 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -852,13 +852,13 @@ CREATE TABLE `xt_diemthixettuyen` (
 -- Dumping data for table `xt_diemthixettuyen`
 --
 
-INSERT INTO `xt_diemthixettuyen` (`iddiemthi`, `cccd`, `sobaodanh`, `d_phuongthuc`, `TO`, `LI`, `HO`, `SI`, `SU`, `DI`, `VA`, `N1_THI`, `N1_CC`, `CNCN`, `CNNN`, `TI`, `KTPL`, `NL1`, `NK1`, `NK2`) VALUES
-(1, '079201000001', 'BD001', 'THPT', 8.50, 8.00, 7.75, 6.50, 5.50, 6.00, 7.00, 8.25, 8.25, 0.00, 0.00, 7.50, 6.50, 780.00, NULL, NULL),
-(2, '079201000002', 'BD002', 'THPT', 7.80, 7.20, 7.00, 6.80, 7.40, 7.60, 8.10, 8.90, 8.90, 0.00, 0.00, 7.00, 7.20, 820.00, NULL, NULL),
-(3, '079201000003', 'BD003', 'THPT', 9.00, 8.75, 8.50, 7.20, 6.00, 6.50, 7.25, 7.80, 7.80, 0.00, 0.00, 8.20, 6.80, 910.00, NULL, NULL),
-(4, '079201000004', 'BD004', 'THPT', 6.80, 6.40, 6.20, 7.00, 8.60, 8.75, 8.90, 7.50, 7.50, 0.00, 0.00, 6.50, 8.10, 760.00, NULL, NULL),
-(5, '079201000005', 'BD005', 'THPT', 7.25, 7.00, 8.20, 8.40, 5.80, 6.10, 6.70, 6.95, 6.95, 0.00, 0.00, 7.80, 6.00, 700.00, NULL, NULL),
-(6, '079201000006', 'BD006', 'THPT', 8.10, 7.50, 7.40, 7.30, 8.20, 8.00, 8.60, 8.85, 8.85, 0.00, 0.00, 7.20, 8.30, 845.00, NULL, NULL);
+INSERT INTO `xt_diemthixettuyen` (`iddiemthi`, `cccd`, `sobaodanh`, `d_phuongthuc`, `TO`, `LI`, `HO`, `SI`, `SU`, `DI`, `VA`, `GDCD`, `N1_THI`, `N1_CC`, `CNCN`, `CNNN`, `TI`, `KTPL`, `NL1`, `NK1`, `NK2`, `NK3`, `NK4`, `NK5`, `NK6`) VALUES
+(1, '079201000001', 'BD001', 'THPT', 8.50, 8.00, 7.75, 6.50, 5.50, 6.00, 7.00, 0.00, 8.25, 8.25, 0.00, 0.00, 7.50, 6.50, 780.00, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, '079201000002', 'BD002', 'THPT', 7.80, 7.20, 7.00, 6.80, 7.40, 7.60, 8.10, 0.00, 8.90, 8.90, 0.00, 0.00, 7.00, 7.20, 820.00, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, '079201000003', 'BD003', 'THPT', 9.00, 8.75, 8.50, 7.20, 6.00, 6.50, 7.25, 0.00, 7.80, 7.80, 0.00, 0.00, 8.20, 6.80, 910.00, NULL, NULL, NULL, NULL, NULL, NULL),
+(4, '079201000004', 'BD004', 'THPT', 6.80, 6.40, 6.20, 7.00, 8.60, 8.75, 8.90, 0.00, 7.50, 7.50, 0.00, 0.00, 6.50, 8.10, 760.00, NULL, NULL, NULL, NULL, NULL, NULL),
+(5, '079201000005', 'BD005', 'THPT', 7.25, 7.00, 8.20, 8.40, 5.80, 6.10, 6.70, 0.00, 6.95, 6.95, 0.00, 0.00, 7.80, 6.00, 700.00, NULL, NULL, NULL, NULL, NULL, NULL),
+(6, '079201000006', 'BD006', 'THPT', 8.10, 7.50, 7.40, 7.30, 8.20, 8.00, 8.60, 0.00, 8.85, 8.85, 0.00, 0.00, 7.20, 8.30, 845.00, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -913,39 +913,53 @@ CREATE TABLE `xt_nganh` (
 --
 
 INSERT INTO `xt_nganh` (`idnganh`, `manganh`, `tennganh`, `n_tohopgoc`, `n_chitieu`, `n_diemsan`, `n_diemtrungtuyen`, `n_tuyenthang`, `n_dgnl`, `n_thpt`, `n_vsat`, `sl_xtt`, `sl_dgnl`, `sl_vsat`, `sl_thpt`) VALUES
-(1, '7480201', 'Công nghệ thông tin', 'A00', 120, 18.00, 24.50, '1', '1', '1', '0', 5, 35, 0, 80),
-(2, '7340101', 'Quản trị kinh doanh', 'D01', 100, 17.00, 23.00, '1', '1', '1', '0', 5, 30, 0, 65),
-(3, '7220201', 'Ngôn ngữ Anh', 'D01', 90, 18.00, 24.00, '1', '0', '1', '0', 10, 0, 0, 80),
-(4, '7520201', 'Kỹ thuật điện', 'A00', 80, 17.50, 22.50, '0', '1', '1', '0', 0, 25, 0, 55),
-(5, '7140201', 'Giáo dục Tiểu học', 'C00', 70, 19.00, 25.00, '1', '0', '1', '0', 5, 0, 0, 65),
-(6, '7480231', 'Công nghệ vũ trụ', 'A00', 20, 20.00, 29.50, '1', '1', '1', '0', 5, 35, 0, 80),
-(7, '7480202', 'An toàn thông tin', 'A01', 100, 17.50, 23.00, '0', '1', '1', '0', 3, 30, 0, 70),
-(8, '7480203', 'Khoa học máy tính', 'A00', 150, 19.00, 25.00, '1', '1', '1', '0', 6, 40, 0, 90),
-(9, '7480204', 'Hệ thống thông tin', 'D01', 90, 16.50, 22.50, '0', '1', '1', '0', 2, 25, 0, 60),
-(10, '7480205', 'Kỹ thuật phần mềm', 'A00', 130, 18.00, 24.00, '1', '1', '1', '0', 4, 38, 0, 85),
-(11, '7510201', 'Công nghệ kỹ thuật cơ khí', 'A00', 110, 17.00, 22.00, '0', '0', '1', '1', 2, 0, 20, 70),
-(12, '7510301', 'Công nghệ kỹ thuật điện', 'A00', 120, 17.50, 23.00, '0', '0', '1', '1', 3, 0, 25, 75),
-(13, '7510302', 'Công nghệ kỹ thuật điện tử', 'A01', 100, 17.00, 22.50, '0', '0', '1', '1', 2, 0, 22, 70),
-(14, '7510401', 'Công nghệ kỹ thuật hóa học', 'B00', 80, 16.00, 21.00, '0', '0', '1', '1', 1, 0, 18, 60),
-(15, '7520201', 'Kỹ thuật điện tử viễn thông', 'A00', 140, 18.00, 24.00, '1', '1', '1', '0', 5, 36, 0, 85),
-(16, '7340101', 'Quản trị kinh doanh', 'D01', 200, 17.00, 23.50, '1', '1', '1', '0', 8, 50, 0, 120),
-(17, '7340201', 'Tài chính ngân hàng', 'A01', 180, 17.50, 24.00, '1', '1', '1', '0', 7, 45, 0, 110),
-(18, '7340301', 'Kế toán', 'A00', 160, 16.50, 22.50, '0', '1', '1', '0', 5, 40, 0, 100),
-(19, '7340401', 'Quản trị nhân lực', 'D01', 140, 16.00, 22.00, '0', '1', '1', '0', 4, 35, 0, 90),
-(20, '7340501', 'Marketing', 'D01', 170, 17.50, 24.50, '1', '1', '1', '0', 6, 48, 0, 110),
-(21, '7220201', 'Ngôn ngữ Anh', 'D01', 150, 16.50, 23.00, '1', '0', '1', '0', 5, 0, 0, 100),
-(22, '7220204', 'Ngôn ngữ Trung', 'D04', 130, 16.00, 22.50, '0', '0', '1', '0', 3, 0, 0, 90),
-(23, '7220209', 'Ngôn ngữ Nhật', 'D06', 120, 16.50, 23.50, '0', '0', '1', '0', 4, 0, 0, 85),
-(24, '7310101', 'Kinh tế', 'A01', 140, 17.00, 23.00, '1', '1', '1', '0', 5, 30, 0, 95),
-(25, '7310205', 'Quản lý nhà nước', 'C00', 100, 15.50, 21.00, '0', '0', '1', '0', 2, 0, 0, 80),
-(26, '172389', 'sadsdff', 'bvc', 12, 1.00, 10.00, '1', '0', '0', '0', 10000, 12, 12, 12),
-(31, '123488', 'ádsff', 'A00', 12, 17.00, 19.00, '0', '0', '0', '0', 13, 13, 13, 143),
-(32, 'rư3r', 'ưerwer', 'A01', 12, 12.00, 14.00, '1', '0', '1', '1', 12, 12, 12, 12),
-(33, 'ưeqwe', 'eqweqe', '123', 12, 12.00, 16.00, '0', '0', '1', '0', 13, 123, 132, 123),
-(38, '800001', 'Test ngành 1', 'A00', 100, 10.00, 20.00, '1', '0', '1', '1', 10, 0, 10, 12),
-(39, '800002', 'Test ngành 2', 'A08', 199, 18.00, 30.00, '1', '1', '0', '0', 100, 30, 0, 0),
-(40, '800003', 'Test ngành 3', 'A01', 188, 13.00, 23.00, '0', '1', '0', '0', 0, 67, 0, 0),
-(42, '9991111', 'Nganh Teest 009', 'A00', 19, 12.00, 19.00, '1', '1', '0', '0', 10, 199, 0, 0);
+(1, '7140114', 'Quản lý giáo dục', NULL, 40, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(2, '7140201', 'Giáo dục Mầm non', NULL, 200, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(3, '7140202', 'Giáo dục Tiểu học', NULL, 200, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(4, '7140205', 'Giáo dục chính trị', NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(5, '7140209', 'Sư phạm Toán học', NULL, 40, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(6, '7140211', 'Sư phạm Vật lý', NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(7, '7140212', 'Sư phạm Hoá học', NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(8, '7140213', 'Sư phạm Sinh học', NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(9, '7140217', 'Sư phạm Ngữ văn', NULL, 50, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(10, '7140218', 'Sư phạm Lịch sử', NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(11, '7140219', 'Sư phạm Địa lý', NULL, 10, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(12, '7140221', 'Sư phạm Âm nhạc', NULL, 75, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(13, '7140222', 'Sư phạm Mỹ thuật', NULL, 75, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(14, '7140231', 'Sư phạm Tiếng Anh', NULL, 120, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(15, '7140247', 'Sư phạm Khoa học tự nhiên', NULL, 60, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(16, '7140249', 'Sư phạm Lịch sử - Địa lý', NULL, 40, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(17, '7220201', 'Ngôn ngữ Anh', NULL, 253, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(18, '7220201CLC', 'Ngôn ngữ Anh (Chương trình đào tạo chất lượng cao)', NULL, 100, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(19, '7229010', 'Lịch sử', NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(20, '7310401', 'Tâm lý học', NULL, 100, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(21, '7310501', 'Địa lý học', NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(22, '7310601', 'Quốc tế học', NULL, 80, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(23, '7310630', 'Việt Nam học', NULL, 140, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(24, '7320201', 'Thông tin - Thư viện', NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(25, '7340101', 'Quản trị kinh doanh', NULL, 360, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(26, '7340101CLC', 'Quản trị kinh doanh (Chương trình đào tạo chất lượng cao)', NULL, 100, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(27, '7340120', 'Kinh doanh quốc tế', NULL, 200, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(28, '7340201', 'Tài chính - Ngân hàng', NULL, 500, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(29, '7340301', 'Kế toán', NULL, 380, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(30, '7340301CLC', 'Kế toán (Chương trình đào tạo chất lượng cao)', NULL, 50, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(31, '7340302', 'Kiểm toán', NULL, 60, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(32, '7340406', 'Quản trị văn phòng', NULL, 70, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(33, '7380101', 'Luật', NULL, 210, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(34, '7440301', 'Khoa học môi trường', NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(35, '7460108', 'Khoa học dữ liệu', NULL, 80, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(36, '7460112', 'Toán ứng dụng', NULL, 90, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(37, '7480103', 'Kỹ thuật phần mềm', NULL, 110, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(38, '7480107', 'Trí tuệ nhân tạo', NULL, 80, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(39, '7480201', 'Công nghệ thông tin', NULL, 400, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(40, '7480201CLC', 'Công nghệ thông tin (Chương trình đào tạo chất lượng cao)', NULL, 350, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(41, '7510301', 'Công nghệ kỹ thuật điện, điện tử', NULL, 45, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(42, '7510302', 'Công nghệ kỹ thuật điện tử – viễn thông', NULL, 45, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(43, '7510406', 'Công nghệ kỹ thuật môi trường', NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(44, '7520201', 'Kỹ thuật điện', NULL, 30, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(45, '7520207', 'Kỹ thuật điện tử - viễn thông (Thiết kế vi mạch)', NULL, 90, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(46, '7810101', 'Du lịch', NULL, 120, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0),
+(47, '7810202', 'Quản trị nhà hàng và dịch vụ ăn uống', NULL, 60, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -1264,7 +1278,7 @@ ALTER TABLE `xt_khuvuc`
 -- AUTO_INCREMENT for table `xt_nganh`
 --
 ALTER TABLE `xt_nganh`
-  MODIFY `idnganh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `idnganh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `xt_nganh_tohop`

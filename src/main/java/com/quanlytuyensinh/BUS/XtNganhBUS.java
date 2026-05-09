@@ -135,39 +135,39 @@ public class XtNganhBUS {
         if (nganh.getNDiemsan() != null && nganh.getNDiemsan().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Điểm sàn không được là số âm!");
         }
-        if (nganh.getNDiemtrungtuyen() != null && nganh.getNDiemtrungtuyen().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Điểm trúng tuyển không được là số âm!");
-        }
+//        if (nganh.getNDiemtrungtuyen() != null && nganh.getNDiemtrungtuyen().compareTo(BigDecimal.ZERO) < 0) {
+//            throw new IllegalArgumentException("Điểm trúng tuyển không được là số âm!");
+//        }
         if (nganh.getNDiemsan() != null && nganh.getNDiemtrungtuyen() != null &&
             nganh.getNDiemtrungtuyen().compareTo(nganh.getNDiemsan()) < 0) {
             throw new IllegalArgumentException("Điểm trúng tuyển không được nhỏ hơn điểm sàn!");
         }
 
-        if (!isValidFlag(nganh.getNTuyenthang())) {
-            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'Tuyển thẳng' (Có/Không)!");
-        }
-        if (!isValidFlag(nganh.getNDgnl())) {
-            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'ĐGNL' (Có/Không)!");
-        }
-        if (!isValidFlag(nganh.getNThpt())) {
-            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'THPT' (Có/Không)!");
-        }
-        if (!isValidFlag(nganh.getNVsat())) {
-            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'VSAT' (Có/Không)!");
-        }
-
-        if (nganh.getSlXtt() != null && nganh.getSlXtt() < 0) {
-            throw new IllegalArgumentException("Số lượng Xét tuyển thẳng phải >= 0!");
-        }
-        if (nganh.getSlDgnl() != null && nganh.getSlDgnl() < 0) {
-            throw new IllegalArgumentException("Số lượng ĐGNL phải >= 0!");
-        }
-        if (nganh.getSlVsat() != null && nganh.getSlVsat() < 0) {
-            throw new IllegalArgumentException("Số lượng VSAT phải >= 0!");
-        }
-        if (nganh.getSlThpt() != null && nganh.getSlThpt() < 0) {
-            throw new IllegalArgumentException("Số lượng THPT phải >= 0!");
-        }
+//        if (!isValidFlag(nganh.getNTuyenthang())) {
+//            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'Tuyển thẳng' (Có/Không)!");
+//        }
+//        if (!isValidFlag(nganh.getNDgnl())) {
+//            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'ĐGNL' (Có/Không)!");
+//        }
+//        if (!isValidFlag(nganh.getNThpt())) {
+//            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'THPT' (Có/Không)!");
+//        }
+//        if (!isValidFlag(nganh.getNVsat())) {
+//            throw new IllegalArgumentException("Vui lòng chọn trạng thái 'VSAT' (Có/Không)!");
+//        }
+//
+//        if (nganh.getSlXtt() != null && nganh.getSlXtt() < 0) {
+//            throw new IllegalArgumentException("Số lượng Xét tuyển thẳng phải >= 0!");
+//        }
+//        if (nganh.getSlDgnl() != null && nganh.getSlDgnl() < 0) {
+//            throw new IllegalArgumentException("Số lượng ĐGNL phải >= 0!");
+//        }
+//        if (nganh.getSlVsat() != null && nganh.getSlVsat() < 0) {
+//            throw new IllegalArgumentException("Số lượng VSAT phải >= 0!");
+//        }
+//        if (nganh.getSlThpt() != null && nganh.getSlThpt() < 0) {
+//            throw new IllegalArgumentException("Số lượng THPT phải >= 0!");
+//        }
     }
 
     private boolean isValidFlag(String flag) {

@@ -195,8 +195,11 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
     }
     
     private String StringDBToText(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "";  
+        }
         return "1".equals(value) ? "✔" : "✘";
-}
+    }
 
 
     private void performSearch() {
@@ -234,6 +237,7 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
         return null;
     }
 
+
     private void importExcel() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
@@ -241,6 +245,7 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
 
         java.io.File file = fileChooser.getSelectedFile();
         int successCount = 0;
+        int skipCount = 0;
         java.util.List<String> errorLines = new java.util.ArrayList<>();
 
         try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook
@@ -248,40 +253,66 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
 
             org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
 
-            // Row 0 = tiêu đề bảng, Row 1 = header cột -> dữ liệu từ row 2
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+           
+            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
                 org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
                 if (row == null) continue;
 
-                int excelRow = i + 1; // số dòng hiển thị cho user (Excel đếm từ 1)
+                int excelRow = i + 1; 
                 try {
-                    // Cột 0: STT - bỏ qua | Cột 1+: dữ liệu
-                    String maNganh = getCellString(row.getCell(1)).trim();
-                    if (maNganh.isEmpty()) continue;
+                
 
+                    String maNganh = getCellString(row.getCell(1)).trim();
+                    if (maNganh.isEmpty()) {
+                        skipCount++;
+                        continue; // bỏ qua dòng trống
+                    }
+
+                    String tenNganh = getCellString(row.getCell(2)).trim();
+                    if (tenNganh.isEmpty()) {
+                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Tên ngành không được để trống");
+                        continue;
+                    }
+
+                    org.apache.poi.ss.usermodel.Cell chiTieuCell = row.getCell(3);
+                    if (chiTieuCell == null
+                            || chiTieuCell.getCellType() == org.apache.poi.ss.usermodel.CellType.BLANK) {
+                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Chỉ tiêu không được để trống");
+                        continue;
+                    }
+                    int chiTieu = (int) chiTieuCell.getNumericCellValue();
+                    if (chiTieu <= 0) {
+                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Chỉ tiêu phải lớn hơn 0");
+                        continue;
+                    }
+
+                    // Tạo đối tượng XtNganh với chỉ các trường có trong file
+                  
                     XtNganh ng = new XtNganh();
                     ng.setManganh(maNganh);
-                    ng.setTennganh(getCellString(row.getCell(2)).trim());
-                    ng.setNTohopgoc(getCellString(row.getCell(3)).trim());
-                    ng.setNChitieu((int) row.getCell(4).getNumericCellValue());
-                    ng.setNDiemsan(getCellDecimal(row.getCell(5)));
-                    ng.setNDiemtrungtuyen(getCellDecimal(row.getCell(6)));
-                    ng.setNTuyenthang(parseFlag(getCellString(row.getCell(7))));
-                    ng.setNDgnl(parseFlag(getCellString(row.getCell(8))));
-                    ng.setNThpt(parseFlag(getCellString(row.getCell(9))));
-                    ng.setNVsat(parseFlag(getCellString(row.getCell(10))));
-                    ng.setSlXtt((int) row.getCell(11).getNumericCellValue());
-                    ng.setSlDgnl((int) row.getCell(12).getNumericCellValue());
-                    ng.setSlVsat((int) row.getCell(13).getNumericCellValue());
-                    ng.setSlThpt((int) row.getCell(14).getNumericCellValue());
+                    ng.setTennganh(tenNganh);
+                    ng.setNChitieu(chiTieu);
+                    ng.setNTohopgoc(null);
+                    ng.setNDiemsan(null);
+                    ng.setNDiemtrungtuyen(null);
+                    ng.setNTuyenthang(null);
+                    ng.setNDgnl(null);
+                    ng.setNThpt(null);
+                    ng.setNVsat(null);
+                    ng.setSlXtt(0);
+                    ng.setSlDgnl(0);
+                    ng.setSlVsat(0);
+                    ng.setSlThpt(0);
 
-               
                     if (nganhBUS.insertNganh(ng)) {
                         successCount++;
                     } else {
-                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: ");
+                        errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Không thể lưu vào database");
                     }
 
+                } catch (IllegalArgumentException ex) {
+                    
+                    errorLines.add("  • Dòng " + excelRow + ": " + ex.getMessage());
                 } catch (Exception ex) {
                     errorLines.add("  • Dòng " + excelRow + ": Lỗi đọc dữ liệu - " + ex.getMessage());
                 }
@@ -297,11 +328,14 @@ public class NganhPanel extends JPanel implements ActionListener, ItemListener {
         // Hiển thị kết quả
         StringBuilder sb = new StringBuilder();
         sb.append("Import hoàn tất!\n");
-        sb.append("Thành công: ").append(successCount).append(" dòng\n");
-        sb.append("Bỏ qua: ").append(errorLines.size()).append(" dòng");
+        sb.append("✔ Thành công: ").append(successCount).append(" dòng\n");
+        if (skipCount > 0) {
+            sb.append("— Bỏ qua (dòng trống): ").append(skipCount).append(" dòng\n");
+        }
+        sb.append("✘ Lỗi: ").append(errorLines.size()).append(" dòng");
 
         if (!errorLines.isEmpty()) {
-            sb.append("\n\nChi tiết các dòng bỏ qua:\n");
+            sb.append("\n\nChi tiết các dòng lỗi:\n");
             for (String err : errorLines) {
                 sb.append(err).append("\n");
             }

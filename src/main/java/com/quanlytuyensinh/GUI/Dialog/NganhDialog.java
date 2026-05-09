@@ -97,7 +97,12 @@ public class NganhDialog extends JDialog {
         if (currentNganh != null) {
             txtMaNganh.setText(currentNganh.getManganh());
             txtTenNganh.setText(currentNganh.getTennganh());
-            cbbToHopGoc.setSelectedItem(currentNganh.getNTohopgoc());
+             if (currentNganh.getNTohopgoc() == null
+                    || currentNganh.getNTohopgoc().trim().isEmpty()) {
+                    cbbToHopGoc.setSelectedIndex(0);
+                } else {
+                    cbbToHopGoc.setSelectedItem(currentNganh.getNTohopgoc());
+                }
             txtChiTieu.setText(currentNganh.getNChitieu() > 0 ? String.valueOf(currentNganh.getNChitieu()) : "");
             txtDiemSan.setText(currentNganh.getNDiemsan() != null ? currentNganh.getNDiemsan().toString() : "");
             txtDiemTrungTuyen.setText(currentNganh.getNDiemtrungtuyen() != null ? currentNganh.getNDiemtrungtuyen().toString() : "");
@@ -233,7 +238,12 @@ public class NganhDialog extends JDialog {
 
             nganh.setManganh(txtMaNganh.getText().trim());
             nganh.setTennganh(txtTenNganh.getText().trim());
-            nganh.setNTohopgoc(cbbToHopGoc.getSelectedItem().toString());
+//            nganh.setNTohopgoc(cbbToHopGoc.getSelectedItem().toString());
+            if (cbbToHopGoc.getSelectedIndex() == 0) {
+                nganh.setNTohopgoc(null);
+            } else {
+                nganh.setNTohopgoc(cbbToHopGoc.getSelectedItem().toString());
+            }
             nganh.setNChitieu(Integer.parseInt(txtChiTieu.getText().trim()));
             nganh.setNDiemsan(parseBigDecimal(txtDiemSan.getText()));
             nganh.setNDiemtrungtuyen(parseBigDecimal(txtDiemTrungTuyen.getText()));
@@ -318,35 +328,35 @@ public class NganhDialog extends JDialog {
             txtChiTieu.getTxtForm().requestFocus();
             return false;
         }
-        if (cbbToHopGoc.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Tổ hợp gốc không được để trống!",
-                    "Lỗi",
-                    JOptionPane.WARNING_MESSAGE);
-
-            cbbToHopGoc.requestFocus();
-            return false;
-}
-        if (Validation.isEmpty(txtSlDgnl.getText())) {
-            JOptionPane.showMessageDialog(this, "Số lượng DGNL không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSlDgnl.getTxtForm().requestFocus();
-            return false;
-        }
-        if (Validation.isEmpty(txtSlThpt.getText())) {
-            JOptionPane.showMessageDialog(this, "Số lượng THPT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSlThpt.getTxtForm().requestFocus();
-            return false;
-        }
-        if (Validation.isEmpty(txtSlVsat.getText())) {
-            JOptionPane.showMessageDialog(this, "Số lượng VSAT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSlVsat.getTxtForm().requestFocus();
-            return false;
-        }
-        if (Validation.isEmpty(txtSlXtt.getText())) {
-            JOptionPane.showMessageDialog(this, "Số lượng xét tuyển sớm không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            txtSlXtt.getTxtForm().requestFocus();
-            return false;
-        }
+//        if (cbbToHopGoc.getSelectedIndex() == 0) {
+//            JOptionPane.showMessageDialog(this,
+//                    "Tổ hợp gốc không được để trống!",
+//                    "Lỗi",
+//                    JOptionPane.WARNING_MESSAGE);
+//
+//            cbbToHopGoc.requestFocus();
+//            return false;
+//}
+//        if (Validation.isEmpty(txtSlDgnl.getText())) {
+//            JOptionPane.showMessageDialog(this, "Số lượng DGNL không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSlDgnl.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (Validation.isEmpty(txtSlThpt.getText())) {
+//            JOptionPane.showMessageDialog(this, "Số lượng THPT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSlThpt.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (Validation.isEmpty(txtSlVsat.getText())) {
+//            JOptionPane.showMessageDialog(this, "Số lượng VSAT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSlVsat.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (Validation.isEmpty(txtSlXtt.getText())) {
+//            JOptionPane.showMessageDialog(this, "Số lượng xét tuyển sớm không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSlXtt.getTxtForm().requestFocus();
+//            return false;
+//        }
         
         return true;
     }

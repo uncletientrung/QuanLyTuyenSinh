@@ -130,10 +130,11 @@ public static List<String[]> readNguyenVongExcel(File file) throws Exception {
             String cccd     = getCellString(row.getCell(1)); // Cột B
             String thuTu    = getCellString(row.getCell(2)); // Cột C
             String maNganh  = getCellString(row.getCell(5)); // Cột F (Mã xét tuyển)
+            String tuyenThang = getCellString(row.getCell(7)); // Cột H
 
             if (cccd.isEmpty() && thuTu.isEmpty() && maNganh.isEmpty()) continue; // dòng trống
 
-            result.add(new String[]{cccd, thuTu, maNganh});
+            result.add(new String[]{cccd, thuTu, maNganh, tuyenThang});
         }
     }
     return result;

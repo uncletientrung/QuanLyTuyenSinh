@@ -131,6 +131,7 @@ public class XtNguyenVongXetTuyenDAO {
             for (XtNguyenVongXetTuyen nv : list) {
                 BigDecimal diemTT = nganhDAO.getDiemTTByMaNganh(nv.getNvManganh()); 
                 BigDecimal diemSan = nganhDAO.getDiemSanByMaNganh(nv.getNvManganh()); 
+
                 if (nv.getDiemXettuyen() == null) {
                     nv.setNvKetqua("Chưa có điểm");
                 } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
@@ -141,6 +142,10 @@ public class XtNguyenVongXetTuyenDAO {
                     nv.setNvKetqua("Trúng tuyển");
                 } else {
                     nv.setNvKetqua("Không trúng tuyển");
+                }
+                
+                if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
+                    nv.setNvKetqua("Trúng tuyển");
                 }
                     session.merge(nv);
                 }

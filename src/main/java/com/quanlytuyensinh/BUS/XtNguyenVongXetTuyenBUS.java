@@ -111,6 +111,10 @@ public class XtNguyenVongXetTuyenBUS {
                     } else {
                         nv.setNvKetqua("Không trúng tuyển");
                     }
+                    
+                    if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
+                        nv.setNvKetqua("Trúng tuyển");
+                    }
                 }
                 return true;
             }

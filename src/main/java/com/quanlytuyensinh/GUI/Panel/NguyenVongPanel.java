@@ -498,6 +498,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             String cccd     = row[0].trim();
             int    thuTu    = Integer.parseInt(row[1].trim());
             String maNganh  = row[2].trim();
+            String tuyenThang = row.length > 3 ? row[3].trim() : "";
 
             // --- Validate cơ bản ---
             boolean cccdExists  = listTS.stream().anyMatch(ts -> ts.getCccd().equals(cccd));
@@ -548,8 +549,13 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             nv.setDiemUtqd(helper.getBestDiemUT());
             nv.setDiemCong(helper.getBestDiemCong());
             nv.setDiemXettuyen(helper.getMaxDiemXT());
-            nv.setNvKetqua("Đang xét");
-            nv.setTtPhuongthuc(helper.getBestPhuongThuc());
+            if (tuyenThang.equalsIgnoreCase("x")) {
+                nv.setTtPhuongthuc("Tuyển thẳng");
+                nv.setNvKetqua("Trúng tuyển");
+            } else {
+                nv.setTtPhuongthuc(helper.getBestPhuongThuc());
+                nv.setNvKetqua("Đang xét");
+            }
             nv.setTtThm(helper.getBestToHop());
             nv.setNvKeys(cccd + "_" + maNganh + "_" + thuTu);
 

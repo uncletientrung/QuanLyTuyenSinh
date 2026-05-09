@@ -26,11 +26,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -53,8 +55,9 @@ public class NguyenVongDialog extends JDialog{
     private VerticalInputForm txtThuTu, txtDiemTHXT, txtDiemUT, txtDiemCong, txtDiemXetTuyen, txtDoLech, txtDanhSachTH, txtTHXet, txtNV_Key;
     private VerticalInputForm txtKetQua;
     private VerticalComboBoxForm cbbPhuongThuc, cbbCCCD, cbbMaNganh;
+    private JCheckBox cbTuyenThang;
     private ButtonCustom btnLuu, btnHuy;
-    private JPanel pnlMain, pnlButtons;
+    private JPanel pnlMain, pnlButtons, pnlPhuongThuc;
     
     // Tác vụ thêm để xử lý
     private XtNganhBUS NganhBUS;
@@ -159,16 +162,22 @@ public class NguyenVongDialog extends JDialog{
         this.txtDoLech =  new VerticalInputForm("Độ lệch");  
         this.txtNV_Key= new VerticalInputForm("Nguyện vọng Key"); 
         this.txtKetQua= new VerticalInputForm("Kết quả xét tuyển"); 
+        this.cbTuyenThang =  new JCheckBox("Tuyển thẳng");
+        cbTuyenThang.setFont(new Font("SansSerif", Font.BOLD, 13));
+        cbTuyenThang.setBackground(Color.WHITE);
         Label lbHide = new Label();
+        // Panel Cho Phương thức
+         this.pnlPhuongThuc = new JPanel(new FlowLayout(FlowLayout.LEFT, 40, 20));
+        
         
         // ==================== LEFT COLUMN ====================
         left.add(txtThuTu);
         left.add(cbbCCCD);
         left.add(cbbMaNganh);
         left.add(cbbPhuongThuc);
+        left.add(cbTuyenThang);   
         left.add(txtDanhSachTH);
         left.add(txtTHXet);
-        left.add(lbHide);
         
         // ==================== RIGHT COLUMN ====================
         right.add(txtDiemTHXT);
@@ -217,6 +226,7 @@ public class NguyenVongDialog extends JDialog{
     
     // Gắn sự kiện cho cbb và textfield
     private void bindListeners() { 
+        
         this.cbbMaNganh.getComboBox().addActionListener(e -> {
                 updateNVKey();
                 upadateField();
@@ -231,6 +241,7 @@ public class NguyenVongDialog extends JDialog{
                 updateNVKey();
             }
         );
+        this.cbTuyenThang.addActionListener(e -> upadateField());
     }
     
     // Set các field là disable
@@ -246,7 +257,11 @@ public class NguyenVongDialog extends JDialog{
             this.cbbCCCD.setDisable();
             this.cbbMaNganh.setDisable();
             this.txtKetQua.setDisable();
+            this.cbTuyenThang.setEnabled(false);
         }
+         if(this.currentNV.getTtPhuongthuc().equals("Tuyển thẳng")){
+                this.cbTuyenThang.setSelected(true);
+            }
     }
     
     // Cập nhật Key
@@ -272,6 +287,7 @@ public class NguyenVongDialog extends JDialog{
         bestPhuongThuc ="";
         String cccd = getSelectedCCCD();
         String maNganh = getSelectedMaNganh();
+        
         if (maNganh == null || cccd == null) {
             this.txtDanhSachTH.setText("");
             txtTHXet.setText("");
@@ -280,6 +296,11 @@ public class NguyenVongDialog extends JDialog{
             txtDiemUT.setText("");
             txtDiemXetTuyen.setText("");
             txtDoLech.setText("");
+            if(this.cbTuyenThang.isSelected()){
+                this.cbbPhuongThuc.setSelectedValue("Tuyển thẳng");
+            }else{
+             this.cbbPhuongThuc.setSelectedValue("THPT");
+        }
             return;
         }
         this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
@@ -295,7 +316,12 @@ public class NguyenVongDialog extends JDialog{
         txtDiemUT.setText(bestDiemUT.setScale(5).toString());
         txtDiemXetTuyen.setText(maxDiemXT.setScale(5).toString());
         txtDoLech.setText(diemDoLech.setScale(2).toString());   
-        this.cbbPhuongThuc.setSelectedValue(this.bestPhuongThuc.toString());
+        if(this.cbTuyenThang.isSelected()){
+            this.cbbPhuongThuc.setSelectedValue("Tuyển thẳng");
+        }else{
+             this.cbbPhuongThuc.setSelectedValue(this.bestPhuongThuc.toString());
+        }
+       
         
         
     }
@@ -652,5 +678,6 @@ public class NguyenVongDialog extends JDialog{
         this.txtKetQua.setText(nv.getNvKetqua());
         // Sau khi set 3 cái txThuTu với cbbMaNganh và cbbCCCD thì nó chạy hàm upadateField và upadateKeys đỡ viết
     }
+
     
 }

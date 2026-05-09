@@ -46,6 +46,10 @@ public class CustomRowRenderer extends DefaultTableCellRenderer {
                     break;
                     
                 case "Không trúng tuyển":
+                    c.setBackground(new Color(255, 204, 188));   // Cam đỏ
+                    c.setForeground(Color.BLACK);
+                    break;
+                case "Rớt điểm sàn":
                     c.setBackground(new Color(255, 223, 221));   // Đỏ hồng
                     c.setForeground(Color.BLACK);
                     break;

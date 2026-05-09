@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="fragments/head :: head"></head>
+
+    <body>
+        <!-- Page Container -->
+        <div id="page-container" class="page-header-dark main-content-boxed">
+
+            <!-- Main Container -->
+            <main id="main-container">
+
+                <div th:replace="fragments/nav :: nav"></div>
+
+                <!-- Page Content -->
+                <div class="content">
+                    <!-- Table Sections -->
+                    <div class="block block-rounded">
+                        <div class="block-header block-header-default">
+                            <h3 class="block-title">Tính điểm vào ngành xét tuyển
+                                <span class="fw-bold text-primary">Quản lý giáo dục (7140114)</span>
+                            </h3>
+                        </div>
+                        <div class="block-content">
+                            <p>
+                                Tổ hợp có điểm xét tuyển cao nhất:
+                                <code>D01, 22.83 điểm</code>.
+                                Tổ hợp gốc <span class="fw-bold text-primary">D01</span>.
+                                Ngưỡng đầu vào:
+                            </p>
+                            <div class="table-responsive">
+                                <table class="js-table-sections table table-hover table-vcenter table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 30px;"></th>
+                                            <th style="width: 50%;">Nội dung</th>
+                                            <th style="width: 50%;">Chi tiết điểm</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody class="fs-sm">
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Khu vực ưu tiên: 2NT</td>
+                                            <td>0.50</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Đối tượng ưu tiên: 06a</td>
+                                            <td>1.00</td>
+                                        </tr>
+                                    </tbody>
+
+                                    <!-- 1 -->
+                                    <tbody class="js-table-sections-header show table-active">
+                                        <tr>
+                                            <td class="text-center">
+                                                <i class="fa fa-angle-right text-muted"></i>
+                                            </td>
+                                            <td class="fw-semibold">
+                                                <div class="py-1">
+                                                    <span class="fw-bold text-primary">Tổ hợp B03 - Toán, Sinh học, Ngữ văn</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody class="fs-sm">
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm môn Toán</td>
+                                            <td>
+                                                10.0
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm môn Văn</td>
+                                            <td>
+                                                9.0
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm môn Sinh</td>
+                                            <td>
+                                                2.0
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm tổ hợp xét tuyển (ĐTHXT) = (TO*1 + VA*2 + SI*1) / 4 * 3</td>
+                                            <td>
+                                                Tính điểm tổ hợp xét tuyển
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm ưu tiên (ĐƯT)</td>
+                                            <td>
+                                                1.5
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm cộng<span class="fw-bold text-primary">(<= 3.0)</span>
+                                            </td>
+                                            <td>1.50</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Độ lệch với tổ hợp gốc <span class="fw-bold text-primary">(D01)</span></td>
+                                            <td>
+                                                Số độ lệch
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm xét tuyển (ĐXT) = ĐTHXT + ĐC + ĐƯT - Độ lệch (<=30) </td>
+                                            <td>
+                                                Tính điểm xét tuyển
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <!-- END 1 -->
+
+                                    <!-- 1 -->
+                                    <tbody class="js-table-sections-header show table-active">
+                                        <tr>
+                                            <td class="text-center">
+                                                <i class="fa fa-angle-right text-muted"></i>
+                                            </td>
+                                            <td class="fw-semibold">
+                                                <div class="py-1">
+                                                    <span class="fw-bold text-primary">Tổ hợp B03 - Toán, Sinh học, Ngữ văn</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody class="fs-sm">
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm môn Toán</td>
+                                            <td>
+                                                10.0
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm môn Văn</td>
+                                            <td>
+                                                9.0
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm môn Sinh</td>
+                                            <td>
+                                                2.0
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm tổ hợp xét tuyển (ĐTHXT) = (TO*1 + VA*2 + SI*1) / 4 * 3</td>
+                                            <td>
+                                                Tính điểm tổ hợp xét tuyển
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm ưu tiên (ĐƯT)</td>
+                                            <td>
+                                                1.5
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm cộng<span class="fw-bold text-primary">(<= 3.0)</span>
+                                            </td>
+                                            <td>1.50</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Độ lệch với tổ hợp gốc <span class="fw-bold text-primary">(D01)</span></td>
+                                            <td>
+                                                Số độ lệch
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold">Điểm xét tuyển (ĐXT) = ĐTHXT + ĐC + ĐƯT - Độ lệch (<=30) </td>
+                                            <td>
+                                                Tính điểm xét tuyển
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <!-- END 1 -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END Table Sections -->
+                </div>
+                <!-- END Page Content -->
+            </main>
+            <!-- END Main Container -->
+
+        </div>
+        <!-- END Page Container -->
+
+    </body>
+
+    <!-- JS -->
+    <script th:src="@{/js/dashmix.app.min.js}"></script>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script>Dashmix.helpersOnLoad(['dm-table-tools-sections']);</script>
+
+</html>

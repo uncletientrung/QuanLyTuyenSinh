@@ -1,110 +1,162 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head"></head>
+<body>
+    <div id="page-container" class="page-header-dark main-content-boxed">
+        <main id="main-container">
+            <div th:replace="fragments/nav :: nav"></div>
 
-    <head th:replace="fragments/head :: head"></head>
-
-    <body>
-        <!-- Page Container -->
-        <div id="page-container" class="page-header-dark main-content-boxed">
-
-            <!-- Main Container -->
-            <main id="main-container">
-
-                <div th:replace="fragments/nav :: nav"></div>
-
-                <!-- Page Content -->
-                <div class="content">
-                    <!-- Elements -->
-                    <div class="block block-rounded">
-                        <div class="block-header block-header-default">
-                            <h3 class="block-title">Công cụ tham khảo tính điểm xét tuyển</h3>
-                        </div>
-                        <div class="block-content">
-                            <form class="js-validation-dgnl" th:action="@{/tinhdiemDGNL}" method="POST">
-                                <!-- Basic Elements -->
-                                <h2 class="content-heading pt-0">Điểm thi <span class="fw-bold text-primary">
-                                        Đánh Giá Năng Lực</span></h2>
-                                <div class="row push">
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <!-- TODO: Should use <option th:each> to replace hardcode -->
-                                            <label class="form-label" for="nganh-select">Chọn ngành</label>
-                                            <select class="form-select" id="nganh-select" name="nganh-select">
-                                                <option selected>Open this select menu</option>
-                                                <option value="1">Option #1</option>
-                                                <option value="2">Option #2</option>
-                                                <option value="3">Option #3</option>
-                                                <option value="4">Option #4</option>
-                                                <option value="5">Option #5</option>
-                                                <option value="6">Option #6</option>
-                                                <option value="7">Option #7</option>
-                                                <option value="8">Option #8</option>
-                                                <option value="9">Option #9</option>
-                                                <option value="10">Option #10</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="diem-cong-input">Điểm cộng <span class="fw-bold text-primary">
-                                                    (<= 3.0)</span></label>
-                                            <input type="number" step="0.1" class="form-control" id="diem-cong-input" name="diem-cong-input"
-                                                   placeholder="0.0">
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="khuvuc-select">Khu vực ưu tiên</label>
-                                            <select class="form-select" id="khuvuc-select" name="khuvuc-select">
-                                                <option selected>Không có</option>
-                                                <option value="1">Khu vực 1</option>
-                                                <option value="2">Khu vực 2</option>
-                                                <option value="3">Khu vực 3</option>
-                                                <option value="2NT">Khu vực 2 nông thôn</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label" for="doituong-select">Đối tượng ưu tiên</label>
-                                            <select class="form-select" id="doituong-select" name="doituong-select">
-                                                <option selected>Không đối tượng</option>
-                                                <option value="01">Đối tượng 01</option>
-                                                <option value="02">Đối tượng 02</option>
-                                                <option value="03">Đối tượng 03</option>
-                                                <option value="04">Đối tượng 04</option>
-                                                <option value="05">Đối tượng 05</option>
-                                                <option value="06">Đối tượng 06</option>
-                                                <option value="07">Đối tượng 07</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6">
-                                        <div class="mb-4">
-                                            <label class="form-label" for="diem-thi-input">Điểm thi</label>
-                                            <input type="number" class="form-control" id="diem-thi-input" name="diem-thi-input" placeholder="0">
-                                        </div>
-                                        <div class="mb-4">
-                                            <button type="submit" class="btn btn-hero btn-primary">Tính điểm</button>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- END Basic Elements -->
-                            </form>
-                        </div>
+            <div class="content">
+                <div class="block block-rounded">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Công cụ tham khảo tính điểm xét tuyển</h3>
                     </div>
-                    <!-- END Elements -->
+                    <div class="block-content">
+                        <form class="js-validation-thpt" th:action="@{/tinhdiemTHPT}" method="POST">
+                            
+                            <p class="text-danger fw-bold">Phương thức THPT (thang 30)</p>
+                            <p class="text-muted">Môn thi không có điểm: nhập 0.</p>
+
+                            <div class="row push">
+                                <!-- Cột trái: Thông tin chung -->
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label class="form-label" for="nganh-select">Chọn ngành:</label>
+                                        <select class="form-select" id="nganh-select" name="nganh">
+                                            <option value="">-- Chọn ngành --</option>
+                                            <!-- Vòng lặp for của thymeleaf -->
+                                            <option th:each="nganh : ${listNganh}"  
+                                                    th:value="${nganh.manganh}" 
+                                                    th:text="${nganh.manganh + ' - ' + nganh.tennganh}"
+                                                    th:selected="${nganh.manganh == selectedNganh}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label" for="diem-cong-input">Điểm cộng (<span class="fw-bold text-primary">&le; 3.0</span>):</label>
+                                        <input type="number" step="0.1" min="0" max="3" class="form-control" id="diem-cong-input" 
+                                               name="diemCong" value="0" placeholder="0.0">
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label" for="khuvuc-select">Khu vực ưu tiên:</label>
+                                        <select class="form-select" id="khuvuc-select" name="khuVuc">
+                                            <option value="0" selected>Không có</option>
+                                            <option value="1">Khu vực 1</option>
+                                            <option value="2">Khu vực 2</option>
+                                            <option value="2NT">Khu vực 2 nông thôn</option>
+                                            <option value="3">Khu vực 3</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label" for="doituong-select">Đối tượng ưu tiên:</label>
+                                        <select class="form-select" id="doituong-select" name="doiTuong">
+                                            <option value="0" selected>Không đối tượng</option>
+                                            <option value="01">Đối tượng 01</option>
+                                            <option value="02">Đối tượng 02</option>
+                                            <option value="03">Đối tượng 03</option>
+                                            <option value="04">Đối tượng 04</option>
+                                            <option value="05">Đối tượng 05</option>
+                                            <option value="06a">Đối tượng 06a</option>
+                                            <option value="06b">Đối tượng 06b</option>
+                                            <option value="07a">Đối tượng 07a</option>
+                                            <option value="07b">Đối tượng 07b</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Cột phải: Điểm các môn -->
+                                <div class="col-lg-8">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-toan">Điểm môn Toán:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-toan" name="toan" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-van">Điểm môn Ngữ văn:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-van" name="nguVan" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-ly">Điểm môn Vật lý:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-ly" name="vatLy" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-hoa">Điểm môn Hóa học:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-hoa" name="hoaHoc" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-sinh">Điểm môn Sinh học:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-sinh" name="sinhHoc" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-anh">Điểm môn Tiếng Anh:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-anh" name="tiengAnh" value="0">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-su">Điểm môn Lịch sử:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-su" name="lichSu" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-dia">Điểm môn Địa lý:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-dia" name="diaLy" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-tin">Điểm môn Tin học:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-tin" name="tinHoc" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-gdcd">Điểm môn GD Kinh tế Pháp luật:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-gdcd" name="gdcd" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-cn-cn">Điểm môn CN Công nghiệp:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-cn-cn" name="cnCongNghiep" value="0">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="diem-cn-nn">Điểm môn CN Nông nghiệp:</label>
+                                                <input type="number" step="0.1" min="0" max="10" class="form-control" 
+                                                       id="diem-cn-nn" name="cnNongNghiep" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nút tính điểm -->
+                            <div class="text-end mt-4 mb-4">
+                                <button type="submit" class="btn btn-hero btn-primary px-5">Tính điểm</button>
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
-                <!-- END Page Content -->
-            </main>
-            <!-- END Main Container -->
-
-        </div>
-        <!-- END Page Container -->
-
-    </body>
+            </div>
+        </main>
+    </div>
 
     <!-- JS -->
     <script th:src="@{/js/jquery.min.js}"></script>
     <script th:src="@{/js/jquery.validate.min.js}"></script>
     <script th:src="@{/js/dashmix.app.min.js}"></script>
 
-    <script th:src="@{/js/dgnl_forms_validation.js}"></script>
-
+    <!-- Thay file validation cũ bằng file mới nếu cần -->
+    <script th:src="@{/js/thpt_forms_validation.js}"></script>
+</body>
 </html>

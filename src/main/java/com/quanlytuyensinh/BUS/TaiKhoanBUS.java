@@ -10,7 +10,7 @@ public class TaiKhoanBUS {
 
     private final TaiKhoanDAO taiKhoanDAO = TaiKhoanDAO.getInstance();
     private List<TaiKhoan> listTaiKhoan;
-
+    
     public TaiKhoanBUS() {
         listTaiKhoan =taiKhoanDAO.getAll();
     }
@@ -109,5 +109,12 @@ public class TaiKhoanBUS {
         }
 
         return taiKhoanDAO.login(username, password);
+    }
+    public boolean checktdn(String tdn, int idtk)
+    {
+        for(TaiKhoan ts : listTaiKhoan){
+            if (ts.getTendangnhap().equals(tdn) && ts.getMatk() != idtk)  return false; // Đã tồn tại
+        }
+        return true;
     }
 }

@@ -8,9 +8,11 @@ import com.quanlytuyensinh.BUS.TaiKhoanBUS;
 import com.quanlytuyensinh.ENTITY.TaiKhoan;
 import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
+import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
+import com.quanlytuyensinh.GUI.Dialog.TaiKhoanDialog;
 import com.quanlytuyensinh.GUI.Main;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,13 +43,15 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
     MainFunction mainFunction; // Thanh function
     IntegratedSearch search; // Thanh Search
     DefaultTableModel tblModel;
+    private PaginatedTable paginatedTable;
     
     TaiKhoanBUS tkBUS= new TaiKhoanBUS();
     List<TaiKhoan> listTK =  tkBUS.getAllTaiKhoan();
     Color BackgroundColor = new Color(240, 247, 250);
    
-    public TaiKhoanPanel(Main mainF){
+    public TaiKhoanPanel(Main mainF ){
         this.mainFrame = mainF;
+        
         initComponent();
         loadDataTable(listTK);
     }
@@ -172,11 +176,73 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
             });
         }
     }
-
+private TaiKhoan getSelectedTaiKhoan() {
+        int row = tableTaiKhoan.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một tài khoản!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+       int id = Integer.parseInt(tableTaiKhoan.getValueAt(row, 0).toString().replace("TK-", ""));
+        for (TaiKhoan ts : listTK) {
+            if (ts.getMatk()== id) return ts;
+        }
+        return null;
+    }
     // Event Nhấn nút ToolBar
     @Override
     public void actionPerformed(ActionEvent e) { 
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+  JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this); // Lấy Frame cha
+        Object source = e.getSource();
+        
+        if(source == mainFunction.btn.get("create") ){
+            new TaiKhoanDialog(this,tkBUS ,owner, "THÊM TÀI KHOẢN", "create",true, () -> {
+                TaiKhoanBUS tkbus = new TaiKhoanBUS();
+                listTK=tkbus.getAllTaiKhoan();
+                   loadDataTable(listTK);
+       }, null
+            );
+            
+        }
+        if(source == mainFunction.btn.get("update") ){
+            TaiKhoan tk = getSelectedTaiKhoan();
+            new TaiKhoanDialog(this,tkBUS ,owner, "SỬA TÀI KHOẢN", "update",true, () -> {
+                TaiKhoanBUS tkbus = new TaiKhoanBUS();
+                listTK=tkbus.getAllTaiKhoan();
+                   loadDataTable(listTK);
+       },tk
+            );}
+            if(source == mainFunction.btn.get("detail") ){
+            TaiKhoan tk = getSelectedTaiKhoan();
+            new TaiKhoanDialog(this,tkBUS ,owner, "CHI TIẾT TÀI KHOẢN", "detail",true, () -> {
+              TaiKhoanBUS tkbus = new TaiKhoanBUS();
+                listTK=tkbus.getAllTaiKhoan();
+                   loadDataTable(listTK);
+       },tk
+            );
+            
+        }
+            else if(source == mainFunction.btn.get("delete") ){
+             TaiKhoan tk = getSelectedTaiKhoan();
+
+               int confirm = JOptionPane.showConfirmDialog(
+    this,
+    "Bạn có chắc chắn muốn xóa tài khoản này không?",
+    "Xác nhận xóa",
+    JOptionPane.YES_NO_OPTION
+);
+    
+            if (confirm == JOptionPane.YES_OPTION) {
+                        if (tkBUS.deleteTaiKhoan(tk.getMatk())) {
+                            JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                            TaiKhoanBUS bus = new TaiKhoanBUS();
+                            listTK = bus.getAllTaiKhoan();
+                            loadDataTable(listTK);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+            
+    }
     }
 
     // Event nhấn thay đổi kiểu Search

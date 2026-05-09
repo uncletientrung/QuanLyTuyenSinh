@@ -3,12 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.quanlytuyensinh.ENTITY;
-
-/**
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;/**
  *
  * @author dell
  */
-public class TinhDiemToHopTHPTDTO {
+public class TinhDiemTHPTDTO {
     private String maToHop;
     private String tenToHop;
     private String congThuc;   

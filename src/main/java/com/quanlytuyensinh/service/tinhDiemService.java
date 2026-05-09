@@ -124,8 +124,10 @@ public class tinhDiemService {
         return heSo.multiply(MucDiemUuTien).setScale(5, RoundingMode.HALF_UP);
     }
     
-    // Tính điểm xét ngưỡng
-    
+//    // Tính điểm xét ngưỡng
+//    public BigDecimal getDiemTHXT(XtDiemThiXetTuyen tsGiaLap){
+//        
+//    }
     
     
     

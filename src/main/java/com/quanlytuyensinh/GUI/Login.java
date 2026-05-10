@@ -160,7 +160,7 @@ public class Login extends JFrame implements KeyListener {
         lblImage = new JLabel();
         lblImage.setHorizontalAlignment(JLabel.CENTER);
 
-        java.net.URL imgURL = Login.class.getResource("/img/login.png");
+        java.net.URL imgURL = Login.class.getResource("/static/img/Login.jpg");
         if (imgURL != null) {
             Image scaled = new ImageIcon(imgURL).getImage()
                     .getScaledInstance(420, 380, Image.SCALE_SMOOTH);

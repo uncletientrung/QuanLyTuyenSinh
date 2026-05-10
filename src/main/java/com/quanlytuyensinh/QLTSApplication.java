@@ -18,7 +18,7 @@ public class QLTSApplication {
         
         // GUI Main
         SwingUtilities.invokeLater(() -> {
-            Main gui = new Main();
+            Login gui = new Login();
             gui.setVisible(true);
         });
     }

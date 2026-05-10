@@ -4,18 +4,42 @@
  */
 package com.quanlytuyensinh.controller;
 
+import com.quanlytuyensinh.ENTITY.KetQuaTraCuuDTO;
+import com.quanlytuyensinh.service.TraCuuService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-/**
- *
- * @author Windows
- */
+import java.util.List;
+
 @Controller
 public class TraCuuController {
+
+    @Autowired
+    private TraCuuService traCuuService;
+    
     // Running on http://localhost:8080/tracuu
-    @RequestMapping("/tracuu")
-    public String tracuu() {
+    @GetMapping("/tracuu")
+    public String showForm() {
+        return "tracuu";
+    }
+
+    @PostMapping("/tracuu")
+    public String traKetQua(
+            @RequestParam String cccd,
+            @RequestParam String ngaySinh,
+            Model model) {
+
+        List<KetQuaTraCuuDTO> dsKetQua = traCuuService.traCuu(cccd, ngaySinh);
+
+        model.addAttribute("daTraCuu", true);
+        model.addAttribute("dsKetQua", dsKetQua);
+        model.addAttribute("cccd", cccd);
+        model.addAttribute("ngaySinh", ngaySinh);
+
         return "tracuu";
     }
 }

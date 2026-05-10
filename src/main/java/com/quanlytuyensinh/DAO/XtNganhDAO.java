@@ -107,6 +107,8 @@ public boolean delete(int idnganh) {
             return null;
         }
     }
+   
+
     
     
     public boolean checkTrungMaNganh(String manganh, int id) {

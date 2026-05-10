@@ -44,7 +44,7 @@
                         </div>
 
                         <div class="block-content p-4">
-                            <form th:action="@{/tra-cuu}" method="post">
+                            <form th:action="@{/tracuu}" method="post">
 
                                 <!-- CCCD -->
                                 <div class="mb-4">
@@ -82,7 +82,7 @@
                                         Tra cứu
                                     </button>
 
-                                    <a th:href="@{/tra-cuu}"
+                                    <a th:href="@{/tracuu}"
                                        class="btn btn-outline-secondary btn-lg">
                                         <i class="fa fa-rotate-right me-1"></i>
                                         Làm mới
@@ -231,43 +231,9 @@
                                     </div>
                                 </div>
 
+                               
+
                                 <!-- Hàng 4 -->
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <div class="form-floating">
-                                            <input type="text"
-                                                   class="form-control bg-body-light"
-                                                   placeholder="Điểm môn 1"
-                                                   th:value="${ketQua.diemMon1}"
-                                                   readonly>
-                                            <label>Điểm môn 1</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-floating">
-                                            <input type="text"
-                                                   class="form-control bg-body-light"
-                                                   placeholder="Điểm môn 2"
-                                                   th:value="${ketQua.diemMon2}"
-                                                   readonly>
-                                            <label>Điểm môn 2</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-floating">
-                                            <input type="text"
-                                                   class="form-control bg-body-light"
-                                                   placeholder="Điểm môn 3"
-                                                   th:value="${ketQua.diemMon3}"
-                                                   readonly>
-                                            <label>Điểm môn 3</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Hàng 5 -->
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Kết quả</label>

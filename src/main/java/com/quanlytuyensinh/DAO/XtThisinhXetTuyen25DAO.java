@@ -113,4 +113,23 @@ public class XtThisinhXetTuyen25DAO {
                     .uniqueResult();
         }
     }
+    
+    
+    public XtThisinhXetTuyen25 findByCccdAndPassword(String cccd, String ngaySinhNhap) {
+        
+        String ngaySinhDB = ngaySinhNhap.substring(4, 8)  
+                          + "-"
+                          + ngaySinhNhap.substring(2, 4)   
+                          + "-"
+                          + ngaySinhNhap.substring(0, 2);  
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "FROM XtThisinhXetTuyen25 WHERE cccd = :cccd AND ngaySinh = :ngaySinh",
+                    XtThisinhXetTuyen25.class)
+                    .setParameter("cccd", cccd)
+                    .setParameter("ngaySinh", ngaySinhDB)
+                    .uniqueResult();
+        }
+    }
 }

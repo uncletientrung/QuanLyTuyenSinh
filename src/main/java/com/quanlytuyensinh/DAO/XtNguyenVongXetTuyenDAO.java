@@ -204,4 +204,15 @@ public class XtNguyenVongXetTuyenDAO {
             return count != null && count > 0;
         }
 }
+    
+    
+    public List<XtNguyenVongXetTuyen> findByCccdOrderByThuTu(String cccd) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "FROM XtNguyenVongXetTuyen WHERE nnCccd = :cccd ORDER BY nvTt ASC",
+                    XtNguyenVongXetTuyen.class)
+                    .setParameter("cccd", cccd)
+                    .list();
+        }
+    }
 }

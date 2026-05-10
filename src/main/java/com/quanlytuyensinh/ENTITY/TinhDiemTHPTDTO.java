@@ -32,7 +32,7 @@ public class TinhDiemTHPTDTO {
     private BigDecimal  diemSu;
     private BigDecimal   diemDia;
     private BigDecimal  diemTin;
-    private BigDecimal  diemGDCD;
+    private BigDecimal  diemKTPL;
     private BigDecimal  diemCnCongNghiep;
     private BigDecimal  diemCnNongNghiep;
 
@@ -51,7 +51,7 @@ public class TinhDiemTHPTDTO {
             BigDecimal diemToan, BigDecimal diemVan, BigDecimal diemLy,
             BigDecimal diemHoa, BigDecimal diemSinh, BigDecimal diemAnh,
             BigDecimal diemSu, BigDecimal diemDia, BigDecimal diemTin,
-            BigDecimal diemGDCD, BigDecimal diemCnCongNghiep,
+            BigDecimal diemKTPL, BigDecimal diemCnCongNghiep,
             BigDecimal diemCnNongNghiep, BigDecimal diemTHXT,
             BigDecimal diemUuTien, BigDecimal diemCong, BigDecimal doLech,
             BigDecimal diemXT, boolean isToHopGoc) {
@@ -68,7 +68,7 @@ public class TinhDiemTHPTDTO {
         this.diemSu = diemSu;
         this.diemDia = diemDia;
         this.diemTin = diemTin;
-        this.diemGDCD = diemGDCD;
+        this.diemKTPL = diemKTPL;
         this.diemCnCongNghiep = diemCnCongNghiep;
         this.diemCnNongNghiep = diemCnNongNghiep;
         this.diemTHXT = diemTHXT;
@@ -175,12 +175,12 @@ public class TinhDiemTHPTDTO {
         this.diemTin = diemTin;
     }
 
-    public BigDecimal getDiemGDCD() {
-        return diemGDCD;
+    public BigDecimal getDiemKTPL() {
+        return diemKTPL;
     }
 
-    public void setDiemGDCD(BigDecimal diemGDCD) {
-        this.diemGDCD = diemGDCD;
+    public void setDiemKTPL(BigDecimal diemKTPL) {
+        this.diemKTPL = diemKTPL;
     }
 
     public BigDecimal getDiemCnCongNghiep() {
@@ -271,7 +271,7 @@ public class TinhDiemTHPTDTO {
             case "DI": return getDiemDia();
             case "TI": return getDiemTin();
             case "N1": return getDiemTin();
-            case "GDCD": return getDiemGDCD();
+            case "KTPL": return getDiemKTPL();
             case "CNCN": return getDiemCnCongNghiep();
             case "CNNN": return getDiemCnNongNghiep();
             default: return BigDecimal.ZERO;

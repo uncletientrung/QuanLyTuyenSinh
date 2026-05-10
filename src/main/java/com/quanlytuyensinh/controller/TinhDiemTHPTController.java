@@ -49,15 +49,15 @@ public class TinhDiemTHPTController {
         @RequestParam("lichSu") BigDecimal lichSu,
         @RequestParam("diaLy") BigDecimal diaLy,
         @RequestParam("tinHoc") BigDecimal tinHoc,
-        @RequestParam("gdcd") BigDecimal gdcd,
+        @RequestParam("ktpl") BigDecimal ktpl,
         @RequestParam("cnCongNghiep") BigDecimal cnCongNghiep,
         @RequestParam("cnNongNghiep") BigDecimal cnNongNghiep, Model model
     ) {
 
         List<TinhDiemTHPTDTO> listKQTHPT = new ArrayList<>();
         
-        listKQTHPT = this.tinhDiemSV.tinhDiemTHPTTatCaToHop(nganh, toan, nguVan, vatLy, hoaHoc, sinhHoc, tiengAnh, lichSu, diaLy, tinHoc, gdcd, 
-                gdcd, cnCongNghiep, cnNongNghiep, khuVuc, doiTuong, diemCong);
+        listKQTHPT = this.tinhDiemSV.tinhDiemTHPTTatCaToHop(nganh, toan, nguVan, vatLy, hoaHoc, sinhHoc, tiengAnh, lichSu, diaLy, tinHoc, 
+                ktpl, cnCongNghiep, cnNongNghiep, khuVuc, doiTuong, diemCong);
         String THGoc = this.tinhDiemSV.getTHGoc(nganh);
         TinhDiemTHPTDTO ThCaoNhat = listKQTHPT.get(0);
         BigDecimal NguongDauVao = this.tinhDiemSV.getDiemSan(nganh);

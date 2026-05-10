@@ -62,7 +62,7 @@ Dashmix.onLoad((() => class {
                     min: 0,
                     max: 10
                 },
-                "gdcd": {
+                "ktpl": {
                     required: true,
                     number: true,
                     min: 0,
@@ -139,7 +139,7 @@ Dashmix.onLoad((() => class {
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 10"
                 },
-                "gdcd": {
+                "ktpl": {
                     required: "Vui lòng nhập điểm GD Kinh tế Pháp luật (nhập 0 nếu không thi)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",

@@ -179,7 +179,7 @@ public class tinhDiemService {
     }
     
     public XtDiemThiXetTuyen getDiemThiGiaLap(BigDecimal toan, BigDecimal nguVan, BigDecimal vatLy, BigDecimal hoaHoc, 
-            BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, BigDecimal tinHoc, BigDecimal gdcd, BigDecimal ktpl, BigDecimal cnCongNghiep, 
+            BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, BigDecimal tinHoc, BigDecimal ktpl, BigDecimal cnCongNghiep, 
             BigDecimal cnNongNghiep){
         XtDiemThiXetTuyen diemThiGiaLap = new XtDiemThiXetTuyen();
         diemThiGiaLap.setCccd(null);
@@ -193,7 +193,6 @@ public class tinhDiemService {
         diemThiGiaLap.setSu(lichSu);
         diemThiGiaLap.setDi(diaLy);
         diemThiGiaLap.setTi(tinHoc);
-        diemThiGiaLap.setGdcd(gdcd);
         diemThiGiaLap.setKtpl(ktpl);
         diemThiGiaLap.setCncn(cnCongNghiep);
         diemThiGiaLap.setCnnn(cnNongNghiep);
@@ -235,14 +234,14 @@ public class tinhDiemService {
     }
        
     public  List<TinhDiemTHPTDTO> tinhDiemTHPTTatCaToHop(String maNganh,  BigDecimal toan, BigDecimal nguVan, BigDecimal vatLy, BigDecimal hoaHoc, 
-         BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, BigDecimal tinHoc, BigDecimal gdcd, BigDecimal ktpl, BigDecimal cnCongNghiep, 
+         BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, BigDecimal tinHoc, BigDecimal ktpl, BigDecimal cnCongNghiep, 
          BigDecimal cnNongNghiep, String khuVuc, String doiTuong, BigDecimal diemCong) {
          List<TinhDiemTHPTDTO> listKQTHPT = new ArrayList<>();
          List<XtNganhToHop> listTH =this.getNTHByMaNganh(maNganh);
          String THGoc = getTHGoc(maNganh);
          // Tạo điểm thi Entity giả lập
          XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLap( toan, nguVan, vatLy, hoaHoc, sinhHoc, tiengAnh, lichSu, diaLy,
-                 tinHoc, gdcd, ktpl, cnCongNghiep, cnNongNghiep);
+                 tinHoc, ktpl, cnCongNghiep, cnNongNghiep);
          
         for (XtNganhToHop nth : listTH) {
             // Tên tổ hợp môn thi
@@ -320,7 +319,7 @@ public class tinhDiemService {
             diemTHDTO.setDiemSu(lichSu);
             diemTHDTO.setDiemDia(diaLy);
             diemTHDTO.setDiemTin(tinHoc);
-            diemTHDTO.setDiemGDCD(gdcd);
+            diemTHDTO.setDiemKTPL(ktpl);
             diemTHDTO.setDiemCnCongNghiep(cnCongNghiep);
             diemTHDTO.setDiemCnNongNghiep(cnNongNghiep);
             // Điểm xét tuyển

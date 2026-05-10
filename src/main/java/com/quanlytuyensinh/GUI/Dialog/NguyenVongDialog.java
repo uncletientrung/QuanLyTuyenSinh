@@ -154,6 +154,7 @@ public class NguyenVongDialog extends JDialog{
         this.cbbPhuongThuc = new VerticalComboBoxForm("Phương thức xét tuyển", new String[]{"THPT", "DGNL", "VSAT","Tuyển thẳng"}); 
         this.txtThuTu = new VerticalInputForm("Thứ tự nguyện vọng");
         this.txtDanhSachTH =  new VerticalInputForm("Danh sách tổ hợp");
+
         this.txtTHXet = new VerticalInputForm("Tổ hợp xét tuyển (Cao nhất)"); 
         this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển (Đã thêm độ lệch)");
         this.txtDiemUT =  new VerticalInputForm("Điểm ưu tiên");
@@ -397,7 +398,7 @@ public class NguyenVongDialog extends JDialog{
                     + nth.getHsMon2()
                     + nth.getHsMon3()
             );
-            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE).multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE,5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
@@ -411,11 +412,11 @@ public class NguyenVongDialog extends JDialog{
             
             // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong); // Điểm ưu tiên đã if else 22.5 rồi
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong, diemCong); // Điểm ưu tiên đã if else 22.5 rồi
 
            // Điểm xét tuyển
-            BigDecimal diemTH = tong.subtract(doLech);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            BigDecimal diemTH = tong;
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
                 diemXT = new BigDecimal("30");
             }
@@ -459,7 +460,7 @@ public class NguyenVongDialog extends JDialog{
                     + nth.getHsMon2()
                     + nth.getHsMon3()
             );
-            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE).multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
@@ -473,11 +474,11 @@ public class NguyenVongDialog extends JDialog{
             
             // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong, diemCong);
 
            // Điểm xét tuyển
-            BigDecimal diemTH = tong.subtract(doLech);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            BigDecimal diemTH = tong;
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
                 diemXT = new BigDecimal("30");
             }
@@ -517,12 +518,11 @@ public class NguyenVongDialog extends JDialog{
             
             // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong, diemCong);
 
            // Điểm xét tuyển
-           
-            BigDecimal diemTH = tong.subtract(doLech).add(diemThiDGNLQuyDoi);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            BigDecimal diemTH = tong.add(diemThiDGNLQuyDoi);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
                 diemXT = new BigDecimal("30");
             }

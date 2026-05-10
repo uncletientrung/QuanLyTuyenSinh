@@ -194,16 +194,16 @@ public class XtThisinhXetTuyen25BUS {
         return diemUT;
    }
 
-    public BigDecimal getDiemUuTienByCCCD( String cccd, BigDecimal diemTongCoDoLech, BigDecimal diemCong ) {
+    public BigDecimal getDiemUuTienByCCCD( String cccd, BigDecimal diemTHXT, BigDecimal diemCong ) {
         if (cccd == null || cccd.isEmpty()) {
             return BigDecimal.ZERO;
         }
-        if(diemTongCoDoLech.add(diemCong).compareTo(new BigDecimal("30")) >= 0) return  BigDecimal.ZERO; // Nếu điểm >= 30 thì điểm ưu tiên là 0
+        if(diemTHXT.add(diemCong).compareTo(new BigDecimal("30")) >= 0) return  BigDecimal.ZERO; // Nếu điểm >= 30 thì điểm ưu tiên là 0
         
         BigDecimal MucDiemUuTien = this.getMucDiemUuTienTheoQuyDinh(cccd);
 
         // Tính tổng điểm ưu tiên
-        BigDecimal tong = diemTongCoDoLech.add(diemCong);
+        BigDecimal tong = diemTHXT.add(diemCong);
         if (tong.compareTo(new BigDecimal("22.5")) < 0){ // Nếu bé hơn 22.5
             return MucDiemUuTien;
         }

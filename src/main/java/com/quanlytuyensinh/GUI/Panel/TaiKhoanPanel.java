@@ -130,11 +130,11 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
         }
         functionBar.add(mainFunction);
 
-        search = new IntegratedSearch(new String[]{"Tất cả", "Mã", "Tài khoản", "Nhóm quyền"});
+        search = new IntegratedSearch(new String[]{"Tất cả", "Mã tài khoản", "Tên đăng nhập", "Mật khẩu"});
         search.txtSearchForm.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-//                thucHienTimKiem(); Viết hàm Search
+                Search();
             }
         });
         search.cbxChoose.addItemListener(this);
@@ -175,6 +175,12 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
                 trangThaiText
             });
         }
+    }
+    private void Search(){
+        String keyword = this.search.txtSearchForm.getText().trim();
+        String searchType = (String) this.search.cbxChoose.getSelectedItem(); // Trả về value luôn
+        listTK = this.tkBUS.searchTaiKhoan(keyword, searchType);
+        loadDataTable(listTK);
     }
 private TaiKhoan getSelectedTaiKhoan() {
         int row = tableTaiKhoan.getSelectedRow();
@@ -247,7 +253,9 @@ private TaiKhoan getSelectedTaiKhoan() {
 
     // Event nhấn thay đổi kiểu Search
     @Override
-    public void itemStateChanged(ItemEvent e) { 
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            Search();
+        }
     }
 }

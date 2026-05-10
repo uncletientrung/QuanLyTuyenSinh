@@ -49,7 +49,44 @@ public class TaiKhoanBUS {
 
         return taiKhoanDAO.insert(tk);
     }
+public List<TaiKhoan> searchTaiKhoan(String keyword, String searchType) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return listTaiKhoan;
+        }
+        String key = keyword.trim().toLowerCase();
+        List<TaiKhoan> result = new ArrayList<>();
 
+        for (TaiKhoan ts : listTaiKhoan) {
+            switch (searchType) {
+
+                case "Mã tài khoản":
+                    if (String.valueOf(ts.getMatk()).contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Tên đăng nhập":
+                    if (ts.getTendangnhap() != null && ts.getTendangnhap().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+
+                case "Mật khẩu":
+                    if (ts.getMatkhau() != null && ts.getMatkhau().toLowerCase().contains(key)) {
+                        result.add(ts);
+                    }
+                    break;
+                    
+                default: // Tất cả
+                    if(ts.toString().toLowerCase().contains(key)){
+                        result.add(ts);
+                    }
+                    break;
+            }
+        }
+
+        return result;
+    }
     // ===================== Cập nhật =====================
 
     public boolean updateTaiKhoan(int matk,

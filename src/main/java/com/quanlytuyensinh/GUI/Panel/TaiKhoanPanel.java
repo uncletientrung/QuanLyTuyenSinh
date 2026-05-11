@@ -12,9 +12,11 @@ import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
+import com.quanlytuyensinh.GUI.Component.VerticalInputForm;
 import com.quanlytuyensinh.GUI.Dialog.TaiKhoanDialog;
 import com.quanlytuyensinh.GUI.Main;
 import com.quanlytuyensinh.UTIL.ExcelImportUtil;
+import com.quanlytuyensinh.helper.Validation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,6 +29,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import javax.swing.border.EmptyBorder;
@@ -64,8 +68,7 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
         this.setLayout(new BorderLayout(0, 0));
         this.setOpaque(true);
         
-        tableTaiKhoan = new JTable();
-        scrollTableTaiKhoan = new JScrollPane();
+       
         
         tblModel = new DefaultTableModel() {
             @Override
@@ -76,14 +79,18 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
         
         // Table Header
         String[] header = new String[]{"Mã tài khoản", "Tên đăng nhập", "Mật khẩu", "Nhóm quyền", "Trạng thái"};
+        paginatedTable = new PaginatedTable(header);
+        tableTaiKhoan = paginatedTable.getTable();
         tblModel.setColumnIdentifiers(header);
-        tableTaiKhoan.setModel(tblModel);
         tableTaiKhoan.setFocusable(false);
         tableTaiKhoan.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
         tableTaiKhoan.getTableHeader().setPreferredSize(new Dimension(0, 40));
+        tableTaiKhoan.setAutoCreateRowSorter(true);
+      TableSorter.configureTableColumnSorter(tableTaiKhoan, 0, TableSorter.INTEGER_COMPARATOR);
+
         DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) tableTaiKhoan.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        scrollTableTaiKhoan.setViewportView(tableTaiKhoan);
+   
         // Table Cell
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -93,7 +100,14 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
         
         // Table Sorter
         tableTaiKhoan.setAutoCreateRowSorter(true);
-        TableSorter.configureTableColumnSorter(tableTaiKhoan, 0, TableSorter.INTEGER_COMPARATOR);
+        Comparator<Object>[] comps = new Comparator[12];
+        comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
+        comps[1] = TableSorter.STRING_COMPARATOR;      // Tên đăng nhập
+        comps[2] = TableSorter.STRING_COMPARATOR;      // Mật khẩu
+        comps[3] = TableSorter.INTEGER_COMPARATOR;      // Phân quyền
+        comps[4] = TableSorter.INTEGER_COMPARATOR;      // Trạng thái
+       
+        paginatedTable.enableFullDataSorting(comps);
         
         // Tạo khung viền
         pnlBorder1 = new JPanel();
@@ -153,14 +167,14 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
         pnlMain = new PanelBorderRadius();
         pnlMain.setLayout(new BorderLayout());
         pnlMain.setBackground(Color.WHITE);
-        pnlMain.add(scrollTableTaiKhoan, BorderLayout.CENTER);
+        pnlMain.add(paginatedTable, BorderLayout.CENTER);
         contentCenter.add(pnlMain, BorderLayout.CENTER);
         
     }
     
     // Hàm load DataTable
     private void loadDataTable(List<TaiKhoan> listTK ) {
-        tblModel.setRowCount(0);
+       List<Object[]> data = new ArrayList<>();
         for(TaiKhoan tk : listTK){
             String trangThaiText = "";
             int tt = tk.getTrangthai();
@@ -169,14 +183,17 @@ public class TaiKhoanPanel extends JPanel implements ActionListener, ItemListene
             } else if (tt == 0) {
                 trangThaiText = "Ngưng hoạt động";
             }
-            tblModel.addRow(new Object[]{
-                "TK-"+tk.getMatk(),
+            data.add(new Object[] {
+                      "TK-"+tk.getMatk(),
                 tk.getTendangnhap(),
                 tk.getMatkhau(),
                 tk.getMaphanquyen() == 1 ? "Quản lý " : "Học sinh",
                 trangThaiText
             });
+  
         }
+         
+        paginatedTable.setData(data);
     }
     private void Search(){
         String keyword = this.search.txtSearchForm.getText().trim();
@@ -251,6 +268,9 @@ private TaiKhoan getSelectedTaiKhoan() {
                     }
             
     }
+            else if(source == mainFunction.btn.get("import")){
+            importExcel();
+            }
     }
     private void importExcel() {
 
@@ -294,186 +314,209 @@ private TaiKhoan getSelectedTaiKhoan() {
         dialog.setSize(400, 120);
         dialog.setLocationRelativeTo(this);
 
-//        // ================= WORKER =================
-//
-//        SwingWorker<Void, Integer> worker = new SwingWorker<>() {
-//
-//            int success = 0;
-//            int skipped = 0;
-//
-//            StringBuilder errors = new StringBuilder();
-//
-//            @Override
-//            protected Void doInBackground() {
-//
-//                try {
-//
-//                    List<TaiKhoan> listImport =
-//                            ExcelImportUtil.readThiSinhFromExcel(
-//                                    selectedFile.getAbsolutePath()
-//                            );
-//
-//                    if (listImport.isEmpty()) {
-//
-//                        SwingUtilities.invokeLater(() -> {
-//                            JOptionPane.showMessageDialog(
-//                                    ThiSinhPanel.this,
-//                                    "Không có dữ liệu hợp lệ!",
-//                                    "Thông báo",
-//                                    JOptionPane.WARNING_MESSAGE
-//                            );
-//                        });
-//
-//                        return null;
-//                    }
-//
-//                    int total = listImport.size();
-//                    int current = 0;
-//
-//                    for (XtThisinhXetTuyen25 ts : listImport) {
-//
-//                        current++;
-//
-//                        // ===== VALIDATE =====
-//
-//                        String errorMsg = validateThiSinh(ts);
-//
-//                        if (errorMsg != null) {
-//
-//                            errors.append("Dòng ")
-//                                    .append(current + 1)
-//                                    .append(" - CCCD: ")
-//                                    .append(ts.getCccd())
-//                                    .append(" -> ")
-//                                    .append(errorMsg)
-//                                    .append("\n");
-//
-//                            skipped++;
-//
-//                        } else {
-//
-//                            try {
-//
-//                                if (TSBUS.insertThiSinh(ts)) {
-//                                    success++;
-//                                } else {
-//
-//                                    skipped++;
-//
-//                                    errors.append("Dòng ")
-//                                            .append(current + 1)
-//                                            .append(" insert thất bại\n");
-//                                }
-//
-//                            } catch (Exception ex) {
-//
-//                                skipped++;
-//
-//                                errors.append("Dòng ")
-//                                        .append(current + 1)
-//                                        .append(": ")
-//                                        .append(ex.getMessage())
-//                                        .append("\n");
-//                            }
-//                        }
-//
-//                        // ===== UPDATE PROGRESS =====
-//
-//                        int percent = (current * 100) / total;
-//
-//                        publish(percent);
-//                    }
-//
-//                } catch (Exception ex) {
-//
-//                    SwingUtilities.invokeLater(() -> {
-//
-//                        JOptionPane.showMessageDialog(
-//                                ThiSinhPanel.this,
-//                                "Lỗi import:\n" + ex.getMessage(),
-//                                "Lỗi",
-//                                JOptionPane.ERROR_MESSAGE
-//                        );
-//
-//                    });
-//
-//                }
-//
-//                return null;
-//            }
-//
-//            @Override
-//            protected void process(List<Integer> chunks) {
-//
-//                int value = chunks.get(chunks.size() - 1);
-//
-//                progressBar.setValue(value);
-//
-//                lblStatus.setText("Đang import... " + value + "%");
-//            }
-//
-//            @Override
-//            protected void done() {
-//
-//                dialog.dispose();
-//
-//                listTS = TSBUS.getAllThiSinh();
-//
-//                loadDataTable(listTS);
-//
-//                String message =
-//                        "Import hoàn tất!\n\n"
-//                        + "Thành công: " + success + "\n"
-//                        + "Bỏ qua: " + skipped;
-//
-//                if (errors.length() > 0) {
-//
-//                    JTextArea textArea = new JTextArea(errors.toString());
-//
-//                    textArea.setEditable(false);
-//                    textArea.setLineWrap(true);
-//                    textArea.setWrapStyleWord(true);
-//
-//                    JScrollPane scroll = new JScrollPane(textArea);
-//
-//                    scroll.setPreferredSize(new Dimension(600, 300));
-//
-//                    JPanel panel = new JPanel(new BorderLayout(10, 10));
-//
-//                    JLabel lbl = new JLabel(
-//                            "<html>"
-//                            + "Import hoàn tất!<br>"
-//                            + "Thành công: " + success + "<br>"
-//                            + "Bỏ qua: " + skipped
-//                            + "</html>"
-//                    );
-//
-//                    panel.add(lbl, BorderLayout.NORTH);
-//                    panel.add(scroll, BorderLayout.CENTER);
-//
-//                    JOptionPane.showMessageDialog(
-//                            ThiSinhPanel.this,
-//                            panel,
-//                            "Kết quả Import",
-//                            JOptionPane.WARNING_MESSAGE
-//                    );
-//
-//                } else {
-//
-//                    JOptionPane.showMessageDialog(
-//                            ThiSinhPanel.this,
-//                            message,
-//                            "Kết quả Import",
-//                            JOptionPane.INFORMATION_MESSAGE
-//                    );
-//                }
-//            }
-//        };
-//
-//        worker.execute();
-//
-//        dialog.setVisible(true);
+        // ================= WORKER =================
+
+        SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+
+            int success = 0;
+            int skipped = 0;
+
+            StringBuilder errors = new StringBuilder();
+
+            @Override
+            protected Void doInBackground() {
+
+                try {
+
+                    List<TaiKhoan> listImport =
+                            ExcelImportUtil.readTaiKhoanFromExcel(
+                                    selectedFile.getAbsolutePath()
+                            );
+
+                    if (listImport.isEmpty()) {
+
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(
+                                    TaiKhoanPanel.this,
+                                    "Không có dữ liệu hợp lệ!",
+                                    "Thông báo",
+                                    JOptionPane.WARNING_MESSAGE
+                            );
+                        });
+
+                        return null;
+                    }
+
+                    int total = listImport.size();
+                    int current = 0;
+
+                    for (TaiKhoan ts : listImport) {
+
+                        current++;
+
+                        // ===== VALIDATE =====
+
+                        String errorMsg = validateInput(ts);
+
+                        if (errorMsg != null) {
+
+                            errors.append("Dòng ")
+                                    .append(current + 1)
+                                    .append(" - Tên đăng nhập: ")
+                                    .append(ts.getTendangnhap())
+                                    .append(" -> ")
+                                    .append(errorMsg)
+                                    .append("\n");
+
+                            skipped++;
+
+                        } else {
+
+                            try {
+
+                                if (tkBUS.addTaiKhoan(ts.getTendangnhap(),ts.getMatkhau(),ts.getMaphanquyen(),1)) {
+                                    success++;
+                                } else {
+
+                                    skipped++;
+
+                                    errors.append("Dòng ")
+                                            .append(current + 1)
+                                            .append(" insert thất bại\n");
+                                }
+
+                            } catch (Exception ex) {
+
+                                skipped++;
+
+                                errors.append("Dòng ")
+                                        .append(current + 1)
+                                        .append(": ")
+                                        .append(ex.getMessage())
+                                        .append("\n");
+                            }
+                        }
+
+                        // ===== UPDATE PROGRESS =====
+
+                        int percent = (current * 100) / total;
+
+                        publish(percent);
+                    }
+
+                } catch (Exception ex) {
+
+                    SwingUtilities.invokeLater(() -> {
+
+                        JOptionPane.showMessageDialog(
+                                TaiKhoanPanel.this,
+                                "Lỗi import:\n" + ex.getMessage(),
+                                "Lỗi",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+
+                    });
+
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void process(List<Integer> chunks) {
+
+                int value = chunks.get(chunks.size() - 1);
+
+                progressBar.setValue(value);
+
+                lblStatus.setText("Đang import... " + value + "%");
+            }
+
+            @Override
+            protected void done() {
+
+                dialog.dispose();
+
+                listTK = tkBUS.getAllTaiKhoan();
+
+                loadDataTable(listTK);
+
+                String message =
+                        "Import hoàn tất!\n\n"
+                        + "Thành công: " + success + "\n"
+                        + "Bỏ qua: " + skipped;
+
+                if (errors.length() > 0) {
+
+                    JTextArea textArea = new JTextArea(errors.toString());
+
+                    textArea.setEditable(false);
+                    textArea.setLineWrap(true);
+                    textArea.setWrapStyleWord(true);
+
+                    JScrollPane scroll = new JScrollPane(textArea);
+
+                    scroll.setPreferredSize(new Dimension(600, 300));
+
+                    JPanel panel = new JPanel(new BorderLayout(10, 10));
+
+                    JLabel lbl = new JLabel(
+                            "<html>"
+                            + "Import hoàn tất!<br>"
+                            + "Thành công: " + success + "<br>"
+                            + "Bỏ qua: " + skipped
+                            + "</html>"
+                    );
+
+                    panel.add(lbl, BorderLayout.NORTH);
+                    panel.add(scroll, BorderLayout.CENTER);
+
+                    JOptionPane.showMessageDialog(
+                            TaiKhoanPanel.this,
+                            panel,
+                            "Kết quả Import",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                } else {
+
+                    JOptionPane.showMessageDialog(
+                            TaiKhoanPanel.this,
+                            message,
+                            "Kết quả Import",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                }
+            }
+        };
+
+        worker.execute();
+
+        dialog.setVisible(true);
     }
+    private String validateInput(TaiKhoan tk) {
+
+        // ===== CCCD =====
+       
+        if (Validation.isEmpty(tk.getTendangnhap())) {
+            return "Tên đăng nhập không được để trống!";
+        }
+       
+        if (!tkBUS.checktdn(tk.getTendangnhap(),0)) {
+            return "Tên đăng nhập đã tồn tại trong hệ thống";
+        }
+        // ===== Password =====
+
+
+        if (Validation.isEmpty(tk.getMatkhau())) {
+            return "Mật khẩu không được để trống!";
+        }
+        if (tk.getMatkhau().length() < 5) {
+            return "Mật khẩu phải >= 5 ký tự!";
+        }
+      return null;
+    }
+   
     // Event nhấn thay đổi kiểu Search
     @Override
     public void itemStateChanged(ItemEvent e) {

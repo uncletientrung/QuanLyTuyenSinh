@@ -1,5 +1,6 @@
 package com.quanlytuyensinh.UTIL;
 
+import com.quanlytuyensinh.ENTITY.TaiKhoan;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import java.io.File;
 import org.apache.poi.ss.usermodel.*;
@@ -64,7 +65,48 @@ public class ExcelImportUtil {
 
         return list;
     }
+     public static List<TaiKhoan> readTaiKhoanFromExcel(String excelFilePath) {
+        List<TaiKhoan> list = new ArrayList<>();
 
+        try (FileInputStream fis = new FileInputStream(excelFilePath);
+             Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null) return list;
+
+            // Bắt đầu từ row 1 (row 0 là header)
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                TaiKhoan ts = new TaiKhoan();
+                
+                try {
+                    // Mapping cột theo Excel của bạn
+                    ts.setTendangnhap(getStringValue(row.getCell(1)));
+                    
+                    
+                    
+                    String matkhau = getStringValue(row.getCell(2));
+                    int phanquyen = Integer.parseInt(getStringValue(row.getCell(4)));
+                    ts.setMatkhau(matkhau);  
+                    ts.setMaphanquyen(phanquyen);
+                    // Các trường mặc định
+                    ts.setTrangthai(1);
+
+                    list.add(ts);
+
+                } catch (Exception e) {
+                    System.out.println("Lỗi dòng " + (i+1) + ": " + e.getMessage());
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
     private static String getStringValue(Cell cell) {
         if (cell == null) return null;
         try {

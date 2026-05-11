@@ -79,8 +79,8 @@ public class XtToHopMonThiBUS {
         }
     }
 
-    public boolean existMaToHop(String ma) {
-        return tohopDAO.existMaToHop(ma);
+    public boolean existMaToHop(String ma, String ma1) {
+        return tohopDAO.existMaToHop(ma, ma1);
     }
 
     public String existToHopMon(String mon1, String mon2, String mon3) {

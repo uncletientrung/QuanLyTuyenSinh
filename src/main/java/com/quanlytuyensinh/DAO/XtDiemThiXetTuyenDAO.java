@@ -2,6 +2,8 @@ package com.quanlytuyensinh.DAO;
 
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -106,11 +108,13 @@ public class XtDiemThiXetTuyenDAO {
         return null;
     }
 
-    public boolean existCCCD(String cccd) {
+    public boolean existCCCD(String cccd, String cccd1, String pt) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "select count(m) from XtDiemThiXetTuyen m where m.cccd = :cccd";
+            String hql = "select count(m) from XtDiemThiXetTuyen m where m.cccd = :cccd and m.cccd != :cccd1 and m.dPhuongthuc = :pt";
             Long count = session.createQuery(hql, Long.class)
                                 .setParameter("cccd", cccd)
+                                .setParameter("cccd1", cccd1)
+                                .setParameter("pt", pt)
                                 .uniqueResult();
             return count != null && count > 0;
         }
@@ -130,6 +134,48 @@ public class XtDiemThiXetTuyenDAO {
                         .setParameter("cccd", cccd)
                         .setParameter("pt", pt)
                         .uniqueResult();
+        }
+    }
+
+    public boolean delete(XtDiemThiXetTuyen t) {
+         Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.remove(t);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null , e.getMessage());
+            transaction.rollback();
+            return false;
+        }
+    }
+
+    public boolean add(XtDiemThiXetTuyen t) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.persist(t);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null , e.getMessage());
+            transaction.rollback();
+            return false;
+        }
+    }
+
+    public boolean update(XtDiemThiXetTuyen t) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.merge(t);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null , e.getMessage());
+            transaction.rollback();
+            return false;
         }
     }
 

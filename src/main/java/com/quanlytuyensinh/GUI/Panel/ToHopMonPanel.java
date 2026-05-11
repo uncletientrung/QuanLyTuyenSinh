@@ -109,6 +109,8 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
         }
         table.getColumnModel().getColumn(table.getColumnCount() - 1).setPreferredWidth(300);
         
+        table.setRowSorter(null);
+        table.setAutoCreateRowSorter(false);
         Comparator<Object>[] comps = new Comparator[10];
         comps[0] = TableSorter.INTEGER_COMPARATOR;     // ID
         comps[1] = TableSorter.STRING_COMPARATOR;      // Mã tổ hợp

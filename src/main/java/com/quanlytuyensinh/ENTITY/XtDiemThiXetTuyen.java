@@ -81,9 +81,30 @@ public class XtDiemThiXetTuyen {
     @Column(name = "NK6", precision = 8, scale = 2)
     private BigDecimal nk6;
 
+    public XtDiemThiXetTuyen(String cccd, String dPhuongthuc, BigDecimal nl1) {
+        this.cccd = cccd;
+        this.dPhuongthuc = dPhuongthuc;
+        this.nl1 = nl1;
+    }
+
+    //Constructor cho VSAT
+    public XtDiemThiXetTuyen(String cccd, String dPhuongthuc, BigDecimal to, BigDecimal li,
+            BigDecimal ho, BigDecimal si, BigDecimal su, BigDecimal di, BigDecimal va, BigDecimal n1Thi) {
+        this.cccd = cccd;
+        this.dPhuongthuc = dPhuongthuc;
+        this.to = to;
+        this.li = li;
+        this.ho = ho;
+        this.si = si;
+        this.su = su;
+        this.di = di;
+        this.va = va;
+        this.n1Thi = n1Thi;
+    }
+
     //Constructor cho THPT
     public XtDiemThiXetTuyen(String cccd, String dPhuongthuc, BigDecimal to, BigDecimal li, BigDecimal ho,
-            BigDecimal si, BigDecimal su, BigDecimal di, BigDecimal va, BigDecimal gdcd, BigDecimal n1Thi,
+            BigDecimal si, BigDecimal su, BigDecimal di, BigDecimal va, BigDecimal gdcd, BigDecimal n1Thi, BigDecimal n1Cc,
             BigDecimal cncn, BigDecimal cnnn, BigDecimal ti, BigDecimal ktpl, BigDecimal nk1, BigDecimal nk2,
             BigDecimal nk3, BigDecimal nk4, BigDecimal nk5, BigDecimal nk6) {
         this.cccd = cccd;
@@ -97,6 +118,7 @@ public class XtDiemThiXetTuyen {
         this.va = va;
         this.gdcd = gdcd;
         this.n1Thi = n1Thi;
+        this.n1Cc = n1Cc;
         this.cncn = cncn;
         this.cnnn = cnnn;
         this.ti = ti;
@@ -308,8 +330,7 @@ public class XtDiemThiXetTuyen {
     @Override
     public String toString() {
         return "XtDiemThiXetTuyen{" +
-                "iddiemthi=" + iddiemthi +
-                ", cccd='" + cccd + '\'' +
+                "cccd='" + cccd + '\'' +
                 ", dPhuongthuc='" + dPhuongthuc + '\'' +
                 ", to=" + to +
                 ", li=" + li +

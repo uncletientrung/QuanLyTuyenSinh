@@ -67,6 +67,17 @@ public final class InputForm extends JPanel {
         this.add(txtForm);
     }
     
+    public InputForm(String title, boolean inline) {
+        this.setLayout(new GridLayout(1, 2));
+        this.setBackground(Color.white);
+        this.setBorder(new EmptyBorder(5, 0, 5, 0));
+        this.setPreferredSize(new Dimension(100, 50));
+        lblTitle = new JLabel(title);
+        txtForm = new JTextField();
+        this.add(lblTitle);
+        this.add(txtForm);
+    }
+    
     public void setTitle(String title) {
         this.lblTitle.setText(title);
     }

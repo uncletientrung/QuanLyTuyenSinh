@@ -50,6 +50,18 @@ public class XtDiemThiXetTuyenBUS {
         return rs;
     }
 
+    public boolean delete(XtDiemThiXetTuyen diem) {
+        return diemDAO.delete(diem);
+    }
+
+    public boolean add(XtDiemThiXetTuyen diem) {
+        return diemDAO.add(diem);
+    }
+
+    public boolean update(XtDiemThiXetTuyen diem) {
+        return diemDAO.update(diem);
+    }
+
     public void updateCert(String cccd, String diem) {
         diemDAO.updateCert(cccd, diem);
     }
@@ -57,8 +69,8 @@ public class XtDiemThiXetTuyenBUS {
     public XtDiemThiXetTuyen findByCCCDAndPT(String cccd, String pt) {
         return diemDAO.findByCCCDAndPT(cccd, pt);
     }
-    public boolean existCCCD(String cccd) {
-        return diemDAO.existCCCD(cccd);
+    public boolean existCCCD(String cccd, String cccd1, String pt) {
+        return diemDAO.existCCCD(cccd, cccd1, pt);
     }
 
     public void importToDB(List<XtDiemThiXetTuyen> list) {

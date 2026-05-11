@@ -7,9 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -17,7 +14,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -181,44 +177,43 @@ public class ToHopMonDialog extends JDialog implements ActionListener {
         if (e.getSource() == btnCancel) {
             dispose();
         } else if (e.getSource() == btnConfirm) {
-                String existIn;
-                String tenMon1 = mon1.getValue();
-                String tenMon2 = mon2.getValue();
-                String tenMon3 = mon3.getValue();
-                String maToHopText = maToHop.getText();
-                if (bus.existMaToHop(maToHopText)) {
-                    JOptionPane.showMessageDialog(this, "Mã tổ hợp " + maToHopText + " đã tồn tại!", "Kiểm tra lại thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-                } else if ((existIn = bus.existToHopMon(tenMon1, tenMon2, tenMon3)) != "" && !(existIn.equals(selectedToHop.getMatohop()))) {
-                    JOptionPane.showMessageDialog(this, "Tổ hợp đã tồn tại với mã " + existIn, "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-                } else if (maToHopText.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Nhập mã tổ hợp", "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
-                } 
-                else {
-                    newToHop = new XtToHopMonThi(maToHopText, tenMon1, tenMon2, tenMon3, tenToHop.getText());
-                    if (selectedToHop == null) {
-                        if (bus.addNewToHop(newToHop)) {
-                            parentPanel.loadDataTable(bus.refreshList());
-                            JOptionPane.showMessageDialog(this, "Thêm tổ hợp mới thành công!");
-                            dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Xảy ra lỗi khi thêm tổ hợp với vào database!");
-                        }
-                    } else if (selectedToHop.toString() == newToHop.toString())
+            String existIn;
+            String tenMon1 = mon1.getValue();
+            String tenMon2 = mon2.getValue();
+            String tenMon3 = mon3.getValue();
+            String maToHopText = maToHop.getText();
+            String maToHopSource = (selectedToHop != null) ? selectedToHop.getMatohop() : "";            if (bus.existMaToHop(maToHopText, maToHopSource)) {
+                JOptionPane.showMessageDialog(this, "Mã tổ hợp " + maToHopText + " đã tồn tại!", "Kiểm tra lại thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+            } else if ((existIn = bus.existToHopMon(tenMon1, tenMon2, tenMon3)) != "" && !(existIn.equals(selectedToHop.getMatohop()))) {
+                JOptionPane.showMessageDialog(this, "Tổ hợp đã tồn tại với mã " + existIn, "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+            } else if (maToHopText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nhập mã tổ hợp", "Sai thông tin tổ hợp", JOptionPane.ERROR_MESSAGE);
+            } 
+            else {
+                newToHop = new XtToHopMonThi(maToHopText, tenMon1, tenMon2, tenMon3, tenToHop.getText());
+                if (selectedToHop == null) {
+                    if (bus.addNewToHop(newToHop)) {
+                        parentPanel.loadDataTable(bus.refreshList());
+                        JOptionPane.showMessageDialog(this, "Thêm tổ hợp mới thành công!");
                         dispose();
-                    else {
-                        selectedToHop.setMatohop(maToHopText);
-                        selectedToHop.setMon1(tenMon1);
-                        selectedToHop.setMon2(tenMon2);
-                        selectedToHop.setMon3(tenMon3);
-                        selectedToHop.setTentohop(tenToHop.getText());
-                        if (bus.updateToHop(selectedToHop)) {
-                            parentPanel.loadDataTable(bus.refreshList());
-                            JOptionPane.showMessageDialog(this, "Cập nhật tổ hợp mới thành công!");
-                            dispose();
-                        }
-                        else
-                            JOptionPane.showMessageDialog(this, "Xảy ra lỗi khi thêm tổ hợp với vào database!");
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Xảy ra lỗi khi thêm tổ hợp với vào database!");
                     }
+                } else if (selectedToHop.toString().equals(newToHop.toString())) {
+                    dispose();
+                } else {
+                    selectedToHop.setMatohop(maToHopText);
+                    selectedToHop.setMon1(tenMon1);
+                    selectedToHop.setMon2(tenMon2);
+                    selectedToHop.setMon3(tenMon3);
+                    selectedToHop.setTentohop(tenToHop.getText());
+                    if (bus.updateToHop(selectedToHop)) {
+                        parentPanel.loadDataTable(bus.refreshList());
+                        JOptionPane.showMessageDialog(this, "Cập nhật tổ hợp mới thành công!");
+                        dispose();
+                    } else
+                        JOptionPane.showMessageDialog(this, "Xảy ra lỗi khi thêm tổ hợp với vào database!");
+                }
             }
         }
     }

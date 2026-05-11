@@ -37,12 +37,13 @@ public class XtToHopMonThiDAO {
         }
     }
     
-    public boolean existMaToHop(String ma)
+    public boolean existMaToHop(String ma, String ma1)
     {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "select count(m) from XtToHopMonThi m where m.matohop = :ma";
+            String hql = "select count(m) from XtToHopMonThi m where m.matohop = :ma and m.matohop != :ma1";
             Long count = session.createQuery(hql, Long.class)
                                 .setParameter("ma", ma)
+                                .setParameter("ma1", ma1)
                                 .uniqueResult();
             return count != null && count > 0;
         }

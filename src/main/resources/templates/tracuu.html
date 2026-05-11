@@ -16,34 +16,37 @@
         <div class="content">
 
             <!-- Tiêu đề -->
-            <div class="block block-rounded mb-4">
+            <div class="block block-rounded mb-4 shadow-sm border-0">
                 <div class="block-content py-4 text-center">
                     <h2 class="fs-3 fw-bold mb-2 text-primary">
                         Tra cứu kết quả xét tuyển nguyện vọng
                     </h2>
                     <p class="text-muted mb-0">
-                        Sử dụng số CCCD và ngày sinh để tra cứu thông tin xét tuyển
+                        Sử dụng số CCCD và password để tra cứu thông tin xét tuyển
                     </p>
                 </div>
             </div>
 
- 
-
             <!-- Layout 2 cột -->
             <div class="row g-4 align-items-start">
 
-                <!-- ================= PANEL TRÁI - FORM TRA CỨU ================= -->
-                <!-- Tăng chiều rộng từ col-xl-3 lên col-xl-4 -->
+                <!-- ===================================================== -->
+                <!-- PANEL TRÁI - FORM TRA CỨU                             -->
+                <!-- ===================================================== -->
                 <div class="col-lg-4 col-xl-4">
 
-                    <div class="block block-rounded shadow-sm border-0">
-                        <div class="block-header bg-primary-light">
-                            <h3 class="block-title fw-semibold text-primary mb-0">
-                                Thông tin tra cứu
-                            </h3>
-                        </div>
+                    <div class="block block-rounded shadow-sm border-0 overflow-hidden">
 
-                        <div class="block-content p-4">
+                        <!-- Header màu xanh navy -->
+                        <div class="block-header"
+                            style="background-color: #18253a;">
+                           <h3 class="block-title fw-semibold text-white mb-0">
+                               Thông tin tra cứu
+                           </h3>
+                       </div>
+
+
+                        <div class="block-content p-4 bg-white">
                             <form th:action="@{/tracuu}" method="post">
 
                                 <!-- CCCD -->
@@ -58,7 +61,7 @@
                                            th:value="${cccd}">
                                 </div>
 
-                                <!-- Ngày sinh -->
+                                <!-- Password -->
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold">
                                         Password
@@ -71,20 +74,21 @@
                                            inputmode="numeric"
                                            pattern="[0-9]{8}"
                                            th:value="${ngaySinh}">
-                                 
                                 </div>
 
-                                <!-- Nút chức năng -->
+                                <!-- Buttons -->
                                 <div class="d-grid gap-2 mt-4">
+
+
                                     <button type="submit"
-                                            class="btn btn-primary btn-lg">
-                                        <i class="fa fa-search me-1"></i>
+                                            class="btn btn-lg fw-semibold text-white border-0"
+                                            style="background-color: #18253a;">
                                         Tra cứu
                                     </button>
 
+                                    <!-- Nút Làm mới -->
                                     <a th:href="@{/tracuu}"
-                                       class="btn btn-outline-secondary btn-lg">
-                                        <i class="fa fa-rotate-right me-1"></i>
+                                       class="btn btn-light btn-lg fw-semibold border">
                                         Làm mới
                                     </a>
                                 </div>
@@ -93,46 +97,39 @@
                     </div>
                 </div>
 
-
-
-                
-                <!-- ================= PANEL PHẢI - KẾT QUẢ ================= -->
+                <!-- ===================================================== -->
+                <!-- PANEL PHẢI - KẾT QUẢ                                  -->
+                <!-- ===================================================== -->
                 <div class="col-lg-8 col-xl-8">
 
-                    <!-- ===================================================== -->
-                    <!-- 1. GIAO DIỆN MẶC ĐỊNH (CHƯA TRA CỨU)                  -->
-                    <!-- Hiển thị khi biến daTraCuu = null hoặc false         -->
-                    <!-- ===================================================== -->
+                    <!-- ================================================= -->
+                    <!-- 1. CHƯA TRA CỨU                                   -->
+                    <!-- ================================================= -->
                     <div class="block block-rounded shadow-sm border-0 h-100"
-                        th:if="${daTraCuu == null or daTraCuu == false}">
+                         th:if="${daTraCuu == null or daTraCuu == false}">
 
-                       <div class="block-header bg-body-light">
-                           <h3 class="block-title fw-semibold text-primary mb-0">
-                               Kết quả tra cứu
-                           </h3>
-                       </div>
+                        <div class="block-header bg-body-light">
+                            <h3 class="block-title fw-semibold text-primary mb-0">
+                                Kết quả tra cứu
+                            </h3>
+                        </div>
 
-                       
-                       <div class="block-content d-flex flex-column justify-content-center align-items-center text-center h-100"
-                            style="min-height: 330px;">
+                        <div class="block-content d-flex flex-column justify-content-center align-items-center text-center h-100"
+                             style="min-height: 330px;">
 
-                           <i class="fa fa-search fs-1 text-muted mb-4"></i>
+                            <h4 class="mb-2 text-muted">
+                                Chưa có dữ liệu tra cứu
+                            </h4>
 
-                           <h4 class="mb-2 text-muted">
-                               Chưa có dữ liệu tra cứu
-                           </h4>
+                            <p class="text-muted mb-0">
+                                Vui lòng nhập số CCCD và password để xem kết quả xét tuyển.
+                            </p>
+                        </div>
+                    </div>
 
-                           <p class="text-muted mb-0">
-                               Vui lòng nhập số CCCD và password để xem kết quả xét tuyển.
-                           </p>
-                       </div>
-                   </div>
-
-
-                    <!-- ===================================================== -->
-                    <!-- 2. CÓ KẾT QUẢ TRA CỨU                                -->
-                    <!-- Hiển thị khi đã tra cứu và danh sách có dữ liệu      -->
-                    <!-- ===================================================== -->
+                    <!-- ================================================= -->
+                    <!-- 2. CÓ KẾT QUẢ TRA CỨU                             -->
+                    <!-- ================================================= -->
                     <div th:if="${daTraCuu == true and dsKetQua != null and !#lists.isEmpty(dsKetQua)}">
 
                         <!-- Mỗi phần tử trong dsKetQua sẽ tạo ra 1 block -->
@@ -196,7 +193,7 @@
                                     </div>
 
                                     <div class="col-md-8">
-                                        <label class="form-label fw-semibold">Ngành trúng tuyển</label>
+                                        <label class="form-label fw-semibold">Ngành xét tuyển</label>
                                         <input type="text"
                                                class="form-control bg-body-light"
                                                th:value="${ketQua.tenNganh}"
@@ -223,31 +220,6 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label class="form-label fw-semibold">Điểm xét tuyển</label>
-                                        <input type="text"
-                                               class="form-control bg-body-light fw-semibold text-primary"
-                                               th:value="${ketQua.diemXetTuyen}"
-                                               readonly>
-                                    </div>
-                                </div>
-
-                               
-
-                                <!-- Hàng 4 -->
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Kết quả</label>
-                                        <input type="text"
-                                               class="form-control fw-bold"
-                                               th:classappend="${ketQua.ketQua == 'Trúng tuyển'}
-                                                   ? ' border-success text-success'
-                                                   : ' border-danger text-danger'"
-                                               th:value="${ketQua.ketQua}"
-                                               readonly
-                                               style="border-left-width: 5px;">
-                                    </div>
-
-                                    <div class="col-md-6">
                                         <label class="form-label fw-semibold">Thứ tự nguyện vọng</label>
                                         <input type="text"
                                                class="form-control bg-body-light"
@@ -256,15 +228,44 @@
                                     </div>
                                 </div>
 
+                                <!-- Điểm xét tuyển -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">
+                                            Điểm xét tuyển (Điểm sau khi được quy đổi)
+                                        </label>
+                                        <input type="text"
+                                               class="form-control bg-body-light fw-semibold text-primary"
+                                               th:value="${ketQua.diemXetTuyen}"
+                                               readonly>
+                                    </div>
+                                </div>
+
+                                <!-- Kết quả xét tuyển -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">
+                                            Kết quả xét tuyển
+                                        </label>
+
+                                        <div class="p-3 rounded border fw-bold fs-5 text-center"
+                                             th:style="${ketQua.ketQua == 'Trúng tuyển'}
+                                                ? 'background-color:#dcfce7; color:#166534; border-color:#bbf7d0;'
+                                                : 'background-color:#fee2e2; color:#991b1b; border-color:#fecaca;'"
+
+                                             th:text="${ketQua.ketQua}">
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
 
-
-                    <!-- ===================================================== -->
-                    <!-- 3. ĐÃ TRA CỨU NHƯNG KHÔNG CÓ KẾT QUẢ                  -->
-                    <!-- ===================================================== -->
-                    <div class="block block-rounded shadow-sm border-0"
+                    <!-- ================================================= -->
+                    <!-- 3. KHÔNG CÓ KẾT QUẢ                               -->
+                    <!-- ================================================= -->
+                    <div class="block block-rounded shadow-sm border-0 h-100"
                          th:if="${daTraCuu == true and (dsKetQua == null or #lists.isEmpty(dsKetQua))}">
 
                         <div class="block-header bg-body-light">
@@ -273,8 +274,8 @@
                             </h3>
                         </div>
 
-                        <div class="block-content py-6 text-center">
-                            <i class="fa fa-circle-info fs-1 text-muted mb-4"></i>
+                        <div class="block-content d-flex flex-column justify-content-center align-items-center text-center h-100"
+                             style="min-height: 330px;">
 
                             <h4 class="mb-2">
                                 Không tìm thấy kết quả
@@ -287,6 +288,7 @@
                     </div>
 
                 </div>
+                <!-- END PANEL PHẢI -->
 
             </div>
             <!-- END Layout 2 cột -->

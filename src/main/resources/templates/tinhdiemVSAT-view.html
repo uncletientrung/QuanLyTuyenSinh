@@ -29,47 +29,45 @@
                                         <div class="mb-4">
                                             <!-- TODO: Should use <option th:each> to replace hardcode -->
                                             <label class="form-label" for="nganh-select">Chọn ngành</label>
-                                            <select class="form-select" id="nganh-select" name="nganh-select">
-                                                <option selected>Open this select menu</option>
-                                                <option value="1">Option #1</option>
-                                                <option value="2">Option #2</option>
-                                                <option value="3">Option #3</option>
-                                                <option value="4">Option #4</option>
-                                                <option value="5">Option #5</option>
-                                                <option value="6">Option #6</option>
-                                                <option value="7">Option #7</option>
-                                                <option value="8">Option #8</option>
-                                                <option value="9">Option #9</option>
-                                                <option value="10">Option #10</option>
+                                            <select class="form-select" id="nganh-select" name="Manganh" >
+                                                <option value="">-- Chọn ngành --</option>
+
+                                                <option th:each="nganh : ${listNganh}"
+                                                        th:value="${nganh.manganh}"
+                                                        th:text="${nganh.manganh + ' - ' + nganh.tennganh}"
+                                                        th:selected="${nganh.manganh == selectedNganh}">
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-cong-input">Điểm cộng <span class="fw-bold text-primary">
                                                     (<= 3.0)</span></label>
-                                            <input type="number" step="0.1" class="form-control" id="diem-cong-input" name="diem-cong-input"
+                                            <input type="number" step="0.1" class="form-control" id="diem-cong-input" name="diemCong"
                                                    placeholder="0.0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="khuvuc-select">Khu vực ưu tiên</label>
-                                            <select class="form-select" id="khuvuc-select" name="khuvuc-select">
-                                                <option selected>Không có</option>
+                                            <select class="form-select" id="khuvuc-select" name="khuVuc">
+                                                <option value="0" selected>Không có</option>
                                                 <option value="1">Khu vực 1</option>
                                                 <option value="2">Khu vực 2</option>
-                                                <option value="3">Khu vực 3</option>
                                                 <option value="2NT">Khu vực 2 nông thôn</option>
+                                                <option value="3">Khu vực 3</option>
                                             </select>
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="doituong-select">Đối tượng ưu tiên</label>
-                                            <select class="form-select" id="doituong-select" name="doituong-select">
-                                                <option selected>Không đối tượng</option>
+                                            <select class="form-select" id="doituong-select" name="doiTuong">
+                                                <option value="0" selected>Không đối tượng</option>
                                                 <option value="01">Đối tượng 01</option>
                                                 <option value="02">Đối tượng 02</option>
                                                 <option value="03">Đối tượng 03</option>
                                                 <option value="04">Đối tượng 04</option>
                                                 <option value="05">Đối tượng 05</option>
-                                                <option value="06">Đối tượng 06</option>
-                                                <option value="07">Đối tượng 07</option>
+                                                <option value="06a">Đối tượng 06a</option>
+                                                <option value="06b">Đối tượng 06b</option>
+                                                <option value="07a">Đối tượng 07a</option>
+                                                <option value="07b">Đối tượng 07b</option>
                                             </select>
                                         </div>
                                     </div>
@@ -77,40 +75,40 @@
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-toan-input">Điểm môn Toán</label>
-                                            <input type="number" class="form-control" id="diem-toan-input" name="diem-toan-input"
+                                            <input type="number" class="form-control" id="diem-toan-input" name="toan"
                                                    placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-van-input">Điểm môn Ngữ văn</label>
-                                            <input type="number" class="form-control" id="diem-van-input" name="diem-van-input" placeholder="0">
+                                            <input type="number" class="form-control" id="diem-van-input" name="nguVan" placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-ly-input">Điểm môn Vật lí</label>
-                                            <input type="number" class="form-control" id="diem-ly-input" name="diem-ly-input" placeholder="0">
+                                            <input type="number" class="form-control" id="diem-ly-input" name="vatLy" placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-hoa-input">Điểm môn Hoá học</label>
-                                            <input type="number" class="form-control" id="diem-hoa-input" name="diem-hoa-input" placeholder="0">
+                                            <input type="number" class="form-control" id="diem-hoa-input" name="hoaHoc" placeholder="0">
                                         </div>
                                     </div>
 
                                     <div class="col-lg-4">
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-sinh-input">Điểm môn Sinh học</label>
-                                            <input type="number" class="form-control" id="diem-sinh-input" name="diem-sinh-input"
+                                            <input type="number" class="form-control" id="diem-sinh-input" name="sinhHoc"
                                                    placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-su-input">Điểm môn Lịch sử</label>
-                                            <input type="number" class="form-control" id="diem-su-input" name="diem-su-input" placeholder="0">
+                                            <input type="number" class="form-control" id="diem-su-input" name="lichSu" placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-dia-input">Điểm môn Địa Lí</label>
-                                            <input type="number" class="form-control" id="diem-dia-input" name="diem-dia-input" placeholder="0">
+                                            <input type="number" class="form-control" id="diem-dia-input" name="diaLy"placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <label class="form-label" for="diem-anh-input">Điểm môn Tiếng anh</label>
-                                            <input type="number" class="form-control" id="diem-anh-input" name="diem-anh-input" placeholder="0">
+                                            <input type="number" class="form-control" id="diem-anh-input" name="tiengAnh" placeholder="0">
                                         </div>
                                         <div class="mb-4">
                                             <button type="submit" class="btn btn-hero btn-primary">Tính điểm</button>
@@ -140,5 +138,9 @@
     <script th:src="@{/js/dashmix.app.min.js}"></script>
 
     <script th:src="@{/js/vsat_forms_validation.js}"></script>
+
+
+
+
 
 </html>

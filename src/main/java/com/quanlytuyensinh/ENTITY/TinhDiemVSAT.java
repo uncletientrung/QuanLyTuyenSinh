@@ -14,6 +14,9 @@ import java.util.List;
 public class TinhDiemVSAT {
     private String Matohop;
     private String Tentohop;
+    private List<String> dsMonThi;           // Ví dụ: ["TO", "VA", "SI"]
+    private List<String> dsTenMonThi; 
+    private String congThuc; 
     private BigDecimal  diemToan;
     private BigDecimal  diemVan;
     private BigDecimal  diemLy;
@@ -27,6 +30,7 @@ public class TinhDiemVSAT {
     private BigDecimal diemCong;
     private BigDecimal doLech;   
     private BigDecimal diemXT;    
+     private boolean isToHopGoc;  
     
     public TinhDiemVSAT(){
     
@@ -36,11 +40,12 @@ public class TinhDiemVSAT {
             BigDecimal diemHoa, BigDecimal diemSinh, BigDecimal diemAnh,
             BigDecimal diemSu, BigDecimal diemDia, BigDecimal diemTHXT,
             BigDecimal diemUuTien, BigDecimal diemCong, BigDecimal doLech,
-            BigDecimal diemXT) {
+            BigDecimal diemXT,boolean isToHopGoc) {
 
         this.Matohop = maToHop;
         this.Tentohop = tenToHop;
         this.diemToan = diemToan;
+         this.congThuc = congThuc;
         this.diemVan = diemVan;
         this.diemLy = diemLy;
         this.diemHoa = diemHoa;
@@ -54,7 +59,7 @@ public class TinhDiemVSAT {
         this.diemCong = diemCong;
         this.doLech = doLech;
         this.diemXT = diemXT;
-      
+      this.isToHopGoc = isToHopGoc;
     }
      public String getMaToHop() {
         return Matohop;
@@ -72,7 +77,13 @@ public class TinhDiemVSAT {
         this.Tentohop = tenToHop;
     }
 
-   
+     public String getCongThuc() {
+        return congThuc;
+    }
+
+    public void setCongThuc(String congThuc) {
+        this.congThuc = congThuc;
+    }
 
     public BigDecimal getDiemToan() {
         return diemToan;
@@ -180,7 +191,26 @@ public class TinhDiemVSAT {
     public void setDiemXT(BigDecimal diemXT) {
         this.diemXT = diemXT;
     }
+    public List<String> getDsMonThi() {
+        return dsMonThi;
+    }
+    public void setDsMonThi(List<String> dsMonThi) {
+        this.dsMonThi = dsMonThi;
+    }
 
+    public List<String> getDsTenMonThi() {
+        return dsTenMonThi;
+    }
+    public void setDsTenMonThi(List<String> dsTenMonThi) {
+        this.dsTenMonThi = dsTenMonThi;
+    }
+    public boolean isToHopGoc() {
+        return isToHopGoc;
+    }
+
+    public void setToHopGoc(boolean toHopGoc) {
+        isToHopGoc = toHopGoc;
+    }
     
     public BigDecimal getDiemTheoMaMon(String maMon) {
         if (maMon == null) return BigDecimal.ZERO;

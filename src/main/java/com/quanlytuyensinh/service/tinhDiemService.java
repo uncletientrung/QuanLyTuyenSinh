@@ -364,31 +364,73 @@ public class tinhDiemService {
         listKQTHPT.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
         return listKQTHPT;
     }
-    public List<KetQuaTraCuuVSATDTO> tinhdiemxettuyenVSAT(TinhDiemVSAT xt,String maNganh)
-    {
+    public List<TinhDiemVSAT> tinhdiemxettuyenVSAT(String maNganh,  BigDecimal toan, BigDecimal nguVan, BigDecimal vatLy, BigDecimal hoaHoc, 
+         BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, 
+          String khuVuc, String doiTuong, BigDecimal diemCong)
+    {   
         List<XtNganhToHop> listTHXT = this.getNTHByMaNganh(maNganh);
-        XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLapVSAT(xt.getDiemToan(), xt.getDiemVan(),xt.getDiemLy(),xt.getDiemHoa(),xt.getDiemSinh(),xt.getDiemAnh(),xt.getDiemSu(),xt.getDiemDia());
+        XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLapVSAT(toan, nguVan,vatLy,hoaHoc,sinhHoc,tiengAnh,lichSu,diaLy);
         XtBangQuyDoiBUS qdbus= new XtBangQuyDoiBUS();
         XtDiemThiXetTuyen diemquydoi = qdbus.getDiemThiVSATQuyDoi(diemThiGiaLap);
-        List<KetQuaTraCuuVSATDTO> listkq = new ArrayList<>();
+        List<TinhDiemVSAT> listkq = new ArrayList<>();
+        String THGoc = getTHGoc(maNganh);
         for(XtNganhToHop thxt : listTHXT)
         {
             String maToHop = thxt.getMatohop();
+            String TenTHMT = this.tohopDAO.findByMa(thxt.getMatohop()).getTentohop();
             BigDecimal tong = BigDecimal.ZERO;
-         
+              // Độ lệch
+            BigDecimal doLech =thxt.getDolech() == null ? BigDecimal.ZERO : thxt.getDolech();
+
+            // Điểm cộng 
+            BigDecimal diemCongXT= diemCong != null ? diemCong : BigDecimal.ZERO;
           tong = tong.add(getDiemByMon(thxt.getThMon1(),diemquydoi)).add(getDiemByMon(thxt.getThMon2(),diemquydoi)).add(getDiemByMon(thxt.getThMon3(),diemquydoi));
-          BigDecimal diemUT = (xt.getDiemUuTien() != null) ? xt.getDiemUuTien() : BigDecimal.ZERO;        
-          tong = tong.add(diemUT);
-          KetQuaTraCuuVSATDTO dto = new KetQuaTraCuuVSATDTO();
-          dto.setManganh(maNganh);
-          dto.setMatohop(maToHop);
-          dto.setDiemmon1(getDiemByMon(thxt.getThMon1(),diemquydoi));
-          dto.setDiemmon2(getDiemByMon(thxt.getThMon2(),diemquydoi));
-          dto.setDiemmon3(getDiemByMon(thxt.getThMon3(),diemquydoi));
-          dto.setTongdiem(tong.setScale(2, RoundingMode.HALF_UP));
+          BigDecimal diemUT = BigDecimal.ZERO;
+          
+            
+          diemUT = this.getDiemUuTien(khuVuc, doiTuong, tong, diemCongXT); // Điểm ưu tiên đã if else 22.5 rồi
+           BigDecimal diemTH = tong;
+           BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+          TinhDiemVSAT dto = new TinhDiemVSAT();
+           dto.setMaToHop(thxt.getMatohop());
+            dto.setTenToHop(TenTHMT);
+            
+           List<String> dsMon = new ArrayList<>();
+           List<String> dsTenMon = new ArrayList<>();
+            if (thxt.getThMon1() != null && !thxt.getThMon1().isEmpty()) {
+                dsMon.add(thxt.getThMon1());
+                dsTenMon.add(getTenMonHoc(thxt.getThMon1()));
+            }
+            if (thxt.getThMon2() != null && !thxt.getThMon2().isEmpty()) {
+                dsMon.add(thxt.getThMon2());
+                dsTenMon.add(getTenMonHoc(thxt.getThMon2()));
+            }
+            if (thxt.getThMon3() != null && !thxt.getThMon3().isEmpty()) {
+                dsMon.add(thxt.getThMon3());
+                dsTenMon.add(getTenMonHoc(thxt.getThMon3()));
+            }
+          dto.setDsMonThi(dsMon);
+            dto.setDsTenMonThi(dsTenMon);
+            // Điểm các môn
+            dto.setDiemToan(toan);
+            dto.setDiemVan(nguVan);
+            dto.setDiemLy(vatLy);
+            dto.setDiemHoa(hoaHoc);
+            dto.setDiemSinh(sinhHoc);
+            dto.setDiemAnh(tiengAnh);
+            dto.setDiemSu(lichSu);
+            dto.setDiemDia(diaLy);
+            
+         dto.setDiemTHXT(diemTH);
+            dto.setDiemUuTien(diemUT);
+            dto.setDiemCong(diemCongXT);
+            dto.setDoLech(doLech);
+            dto.setDiemXT(diemXT);
+            dto.setToHopGoc(thxt.getMatohop().equals(THGoc));
           
           listkq.add(dto);
         }
+        listkq.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
         return listkq;
         
     }

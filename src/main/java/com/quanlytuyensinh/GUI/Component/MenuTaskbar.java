@@ -15,6 +15,7 @@ import com.quanlytuyensinh.GUI.Panel.XtBangQuyDoiPanel;
 import com.quanlytuyensinh.GUI.Panel.NganhToHopPanel;
 import com.quanlytuyensinh.GUI.Panel.ToHopMonPanel;
 import com.quanlytuyensinh.GUI.Main;
+import com.quanlytuyensinh.GUI.Panel.MainThiSinhPanel;
 import com.quanlytuyensinh.GUI.ThongKe.ThongKe;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -119,7 +120,7 @@ public class MenuTaskbar extends JPanel {
                             main.setPanel(new TrangChuPanel());
                             break;
                         case 1:
-                            main.setPanel(new ThiSinhPanel(main));
+                            main.setPanel(new MainThiSinhPanel(main));
                             break;
                         case 2:
                             main.setPanel(new DiemThiPanel(main));

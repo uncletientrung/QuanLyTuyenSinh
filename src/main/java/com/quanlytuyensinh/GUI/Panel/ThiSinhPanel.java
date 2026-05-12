@@ -55,10 +55,10 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
     List<XtThisinhXetTuyen25> listTS;
     Color BackgroundColor = new Color(240, 247, 250);
 
-    public ThiSinhPanel(Main mainF) {
+    public ThiSinhPanel(Main mainF, XtThisinhXetTuyen25BUS tsBUS,   List<XtThisinhXetTuyen25> listThiSinh) {
         this.mainFrame = mainF;
-        TSBUS = new XtThisinhXetTuyen25BUS();
-        listTS = TSBUS.getAllThiSinh();
+        TSBUS = tsBUS;
+        listTS = listThiSinh;
         initComponent();
         loadDataTable(listTS);
     }

@@ -1,8 +1,10 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-    <head th:replace="fragments/head :: head"></head>
+    <head th:replace="fragments/head :: head">
+        <meta charset="UTF-8">
 
+    </head>
     <body>
         <!-- Page Container -->
         <div id="page-container" class="page-header-dark main-content-boxed">
@@ -234,8 +236,8 @@
     </body>
 
     <!-- JS -->
-    <script th:src="@{/js/dashmix.app.min.js}"></script>
     <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/dashmix.app.min.js}"></script>
     <script>Dashmix.helpersOnLoad(['dm-table-tools-sections']);</script>
 
 </html>

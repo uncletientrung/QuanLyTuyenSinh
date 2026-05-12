@@ -386,6 +386,7 @@ public class tinhDiemService {
           dto.setDiemmon2(getDiemByMon(thxt.getThMon2(),diemquydoi));
           dto.setDiemmon3(getDiemByMon(thxt.getThMon3(),diemquydoi));
           dto.setTongdiem(tong.setScale(2, RoundingMode.HALF_UP));
+          
           listkq.add(dto);
         }
         return listkq;

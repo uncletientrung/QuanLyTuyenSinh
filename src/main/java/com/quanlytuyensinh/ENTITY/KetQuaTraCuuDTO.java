@@ -24,7 +24,7 @@ public class KetQuaTraCuuDTO {
                            String maNganhTrungTuyen, String tenNganh,
                            int thuTuNguyenVong, String toHopTrungTuyen,
                            String ketQuaTrungTuyen, String phuongThuc,
-                           BigDecimal diemXettuyen) {
+                           BigDecimal diemXettuyen,BigDecimal diemchuan) {
         this.cccd = cccd;
         this.ho = ho;
         this.ten = ten;
@@ -99,4 +99,5 @@ public class KetQuaTraCuuDTO {
 
     public BigDecimal getDiemXettuyen() { return diemXettuyen; }
     public void setDiemXettuyen(BigDecimal diemXettuyen) { this.diemXettuyen = diemXettuyen; }
+
 }

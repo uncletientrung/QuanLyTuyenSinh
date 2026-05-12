@@ -165,6 +165,14 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
             });
         }
         paginatedTable.setData(data);
+
+        // Chỉnh độ rộng cột
+        SwingUtilities.invokeLater(() -> {
+            javax.swing.table.TableColumnModel colModel = paginatedTable.getTable().getColumnModel();
+            colModel.getColumn(0).setPreferredWidth(10);   // ID
+            colModel.getColumn(9).setPreferredWidth(180);   // keys
+            paginatedTable.getTable().setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        });
     }
 
     private void performSearch() {

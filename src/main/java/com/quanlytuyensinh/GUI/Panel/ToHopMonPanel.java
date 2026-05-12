@@ -90,7 +90,7 @@ public class ToHopMonPanel extends JPanel implements ActionListener, ItemListene
         this.setLayout(new BorderLayout(0, 0));
         this.setOpaque(true);
         
-        String[] header = new String[]{"#", "Mã tổ hợp", "Môn 1", "Môn 2", "Môn 3", "Tên tổ hợp"};
+        String[] header = new String[]{"ID", "Mã tổ hợp", "Môn 1", "Môn 2", "Môn 3", "Tên tổ hợp"};
         paginatedTable = new PaginatedTable(header);
 
         JTable table = paginatedTable.getTable();

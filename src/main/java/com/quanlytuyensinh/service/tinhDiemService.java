@@ -4,6 +4,7 @@
  */
 package com.quanlytuyensinh.service;
 
+import com.quanlytuyensinh.BUS.XtBangQuyDoiBUS;
 import com.quanlytuyensinh.DAO.XtBangQuyDoiDAO;
 import com.quanlytuyensinh.DAO.XtDiemCongXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtDiemThiXetTuyenDAO;
@@ -13,6 +14,7 @@ import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtThisinhXetTuyen25DAO;
 import com.quanlytuyensinh.DAO.XtToHopMonThiDAO;
 import com.quanlytuyensinh.ENTITY.KetQuaTraCuuDTO;
+import com.quanlytuyensinh.ENTITY.KetQuaTraCuuVSATDTO;
 import com.quanlytuyensinh.ENTITY.TinhDiemTHPTDTO;
 import com.quanlytuyensinh.ENTITY.TinhDiemVSAT;
 import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
@@ -362,32 +364,34 @@ public class tinhDiemService {
         listKQTHPT.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
         return listKQTHPT;
     }
-//    public List<KetQuaTraCuuDTO> tinhdiemxettuyenVSAT(TinhDiemVSAT xt,String maNganh)
-//    {
-//        List<XtNganhToHop> listTHXT = this.getNTHByMaNganh(maNganh);
-//        XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLapVSAT(xt.getDiemToan(), xt.getDiemVan(),xt.getDiemLy(),xt.getDiemHoa(),xt.getDiemSinh(),xt.getDiemAnh(),xt.getDiemSu(),xt.getDiemDia());
-//    }
-//    public TinhDiemTHPTDTO convertVSATtoTHPT(TinhDiemVSAT dto)
-//    {
-//        
-//    }
-//    private BigDecimal noiquytuyentinh(String maMon, Double diemVsat) {
-//    if (diemVsat == null || diemVsat == 0) return BigDecimal.ZERO;
-//
-//    // 1. Móc DB: Tìm hàng trong xt_bangquydoi sao cho diemA < diemVsat <= diemB
-//   
-//
-// 
-//
-//    // 2. Lấy các mốc a, b, c, d từ DB
-//    BigDecimal x = BigDecimal.valueOf(diemVsat);
-//    
-//  
-//
-//    // 3. Áp dụng công thức: y = c + ((x - a) / (b - a)) * (d - c)
-//    // Lưu ý: Dùng BigDecimal để chính xác tuyệt đối
-//
-//   
-//}
+    public List<KetQuaTraCuuVSATDTO> tinhdiemxettuyenVSAT(TinhDiemVSAT xt,String maNganh)
+    {
+        List<XtNganhToHop> listTHXT = this.getNTHByMaNganh(maNganh);
+        XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLapVSAT(xt.getDiemToan(), xt.getDiemVan(),xt.getDiemLy(),xt.getDiemHoa(),xt.getDiemSinh(),xt.getDiemAnh(),xt.getDiemSu(),xt.getDiemDia());
+        XtBangQuyDoiBUS qdbus= new XtBangQuyDoiBUS();
+        XtDiemThiXetTuyen diemquydoi = qdbus.getDiemThiVSATQuyDoi(diemThiGiaLap);
+        List<KetQuaTraCuuVSATDTO> listkq = new ArrayList<>();
+        for(XtNganhToHop thxt : listTHXT)
+        {
+            String maToHop = thxt.getMatohop();
+            BigDecimal tong = BigDecimal.ZERO;
+         
+          tong = tong.add(getDiemByMon(thxt.getThMon1(),diemquydoi)).add(getDiemByMon(thxt.getThMon2(),diemquydoi)).add(getDiemByMon(thxt.getThMon3(),diemquydoi));
+          BigDecimal diemUT = (xt.getDiemUuTien() != null) ? xt.getDiemUuTien() : BigDecimal.ZERO;        
+          tong = tong.add(diemUT);
+          KetQuaTraCuuVSATDTO dto = new KetQuaTraCuuVSATDTO();
+          dto.setManganh(maNganh);
+          dto.setMatohop(maToHop);
+          dto.setDiemmon1(getDiemByMon(thxt.getThMon1(),diemquydoi));
+          dto.setDiemmon2(getDiemByMon(thxt.getThMon2(),diemquydoi));
+          dto.setDiemmon3(getDiemByMon(thxt.getThMon3(),diemquydoi));
+          dto.setTongdiem(tong.setScale(2, RoundingMode.HALF_UP));
+          listkq.add(dto);
+        }
+        return listkq;
+        
+    }
+   
+   
     
 }

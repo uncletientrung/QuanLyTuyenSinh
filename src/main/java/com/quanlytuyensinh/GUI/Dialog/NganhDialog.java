@@ -16,7 +16,7 @@ import javax.swing.text.PlainDocument;
 
 public class NganhDialog extends JDialog {
 
-    private VerticalInputForm txtMaNganh, txtTenNganh,txtChiTieu,
+    private VerticalInputForm txtMaNganh, txtTenNganh, txtChiTieu,
             txtDiemSan, txtDiemTrungTuyen,
             txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt;
     private VerticalComboBoxForm cbbTuyenThang, cbbDgnl, cbbThpt, cbbVsat;
@@ -36,12 +36,12 @@ public class NganhDialog extends JDialog {
     }
 
     private void init(String type) {
-        this.setSize(800, 750); 
+        this.setSize(800, 750);
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
         this.getContentPane().setBackground(Color.WHITE);
 
-        initPnlMain();
+        initPnlMain(type);
         initPnlButtons(type);
 
         this.add(pnlMain, BorderLayout.CENTER);
@@ -54,8 +54,8 @@ public class NganhDialog extends JDialog {
         this.setVisible(true);
     }
 
-    private void initPnlMain() {
-        pnlMain = new JPanel(new GridLayout(1, 2, 40, 0));  
+    private void initPnlMain(String type) {
+        pnlMain = new JPanel(new GridLayout(1, 2, 40, 0));
         pnlMain.setBorder(new EmptyBorder(25, 40, 25, 40));
         pnlMain.setBackground(Color.WHITE);
 
@@ -87,22 +87,30 @@ public class NganhDialog extends JDialog {
         // Filter số
         setNumericFilter(txtChiTieu, txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt);
 
-        // Bind toggle
-        bindToggle(cbbTuyenThang, txtSlXtt);
-        bindToggle(cbbDgnl, txtSlDgnl);
-        bindToggle(cbbThpt, txtSlThpt);
-        bindToggle(cbbVsat, txtSlVsat);
+        if (type.equals("create")) {
+            
+            for (VerticalInputForm sl : new VerticalInputForm[]{txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt}) {
+                sl.setText("0");
+                sl.getTxtForm().setEnabled(false);
+            }
+        } else {
+            
+            bindToggle(cbbTuyenThang, txtSlXtt);
+            bindToggle(cbbDgnl, txtSlDgnl);
+            bindToggle(cbbThpt, txtSlThpt);
+            bindToggle(cbbVsat, txtSlVsat);
+        }
 
-        // Đổ dữ liệu nếu edit
+        // Đổ dữ liệu nếu edit/view
         if (currentNganh != null) {
             txtMaNganh.setText(currentNganh.getManganh());
             txtTenNganh.setText(currentNganh.getTennganh());
-             if (currentNganh.getNTohopgoc() == null
+            if (currentNganh.getNTohopgoc() == null
                     || currentNganh.getNTohopgoc().trim().isEmpty()) {
-                    cbbToHopGoc.setSelectedIndex(0);
-                } else {
-                    cbbToHopGoc.setSelectedItem(currentNganh.getNTohopgoc());
-                }
+                cbbToHopGoc.setSelectedIndex(0);
+            } else {
+                cbbToHopGoc.setSelectedItem(currentNganh.getNTohopgoc());
+            }
             txtChiTieu.setText(currentNganh.getNChitieu() > 0 ? String.valueOf(currentNganh.getNChitieu()) : "");
             txtDiemSan.setText(currentNganh.getNDiemsan() != null ? currentNganh.getNDiemsan().toString() : "");
             txtDiemTrungTuyen.setText(currentNganh.getNDiemtrungtuyen() != null ? currentNganh.getNDiemtrungtuyen().toString() : "");
@@ -118,19 +126,17 @@ public class NganhDialog extends JDialog {
             txtSlThpt.setText(currentNganh.getSlThpt() != null ? String.valueOf(currentNganh.getSlThpt()) : "");
         }
 
-        
         pnlLeft.add(txtMaNganh);
         pnlLeft.add(txtTenNganh);
-        pnlLeft.add(wrapCombo("Tổ hợp gốc", cbbToHopGoc));   
+        pnlLeft.add(wrapCombo("Tổ hợp gốc", cbbToHopGoc));
         pnlLeft.add(cbbTuyenThang);
         pnlLeft.add(cbbDgnl);
         pnlLeft.add(cbbVsat);
         pnlLeft.add(cbbThpt);
 
- 
         pnlRight.add(txtChiTieu);
         pnlRight.add(txtDiemSan);
-        pnlRight.add(txtDiemTrungTuyen);     
+        pnlRight.add(txtDiemTrungTuyen);
         pnlRight.add(txtSlXtt);
         pnlRight.add(txtSlDgnl);
         pnlRight.add(txtSlVsat);
@@ -138,8 +144,8 @@ public class NganhDialog extends JDialog {
 
         pnlMain.add(pnlLeft);
         pnlMain.add(pnlRight);
-}
-    
+    }
+
     private JComboBox<String> buildComboToHopGoc() {
         JComboBox<String> cbb = new JComboBox<>();
         cbb.addItem("-- Chọn tổ hợp gốc--");
@@ -152,13 +158,13 @@ public class NganhDialog extends JDialog {
         styleCombo(cbb);
         return cbb;
     }
-    
+
     private void styleCombo(JComboBox<String> cbb) {
         cbb.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         cbb.setBackground(Color.WHITE);
         cbb.setPreferredSize(new Dimension(0, 38));
     }
-    
+
     private JPanel wrapCombo(String labelText, JComboBox<String> cbb) {
         JPanel panel = new JPanel(new BorderLayout(0, 5));
         panel.setBackground(Color.WHITE);
@@ -182,8 +188,8 @@ public class NganhDialog extends JDialog {
 
     private void setAllFieldsDisable() {
         VerticalInputForm[] fields = {txtMaNganh, txtTenNganh, txtChiTieu,
-                txtDiemSan, txtDiemTrungTuyen, 
-                txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt};
+            txtDiemSan, txtDiemTrungTuyen,
+            txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt};
         for (VerticalInputForm f : fields) {
             f.setDisable();
         }
@@ -193,17 +199,16 @@ public class NganhDialog extends JDialog {
         cbbThpt.setDisable();
         cbbVsat.setDisable();
     }
- private void bindToggle(VerticalComboBoxForm cbb, VerticalInputForm txt) {
-    cbb.getComboBox().addActionListener(e -> {
-        boolean enable = cbb.isSelectedYes();
 
-        txt.getTxtForm().setEnabled(enable); 
-
-        if (!enable) {
-            txt.setText("0");
-        }
-    });
-}
+    private void bindToggle(VerticalComboBoxForm cbb, VerticalInputForm txt) {
+        cbb.getComboBox().addActionListener(e -> {
+            boolean enable = cbb.isSelectedYes();
+            txt.getTxtForm().setEnabled(enable);
+            if (!enable) {
+                txt.setText("0");
+            }
+        });
+    }
 
     private void initPnlButtons(String type) {
         pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
@@ -230,7 +235,6 @@ public class NganhDialog extends JDialog {
         }
         pnlButtons.add(btnHuy);
     }
-    
 
     private void luuNganh(String type) {
         try {
@@ -238,7 +242,6 @@ public class NganhDialog extends JDialog {
 
             nganh.setManganh(txtMaNganh.getText().trim());
             nganh.setTennganh(txtTenNganh.getText().trim());
-//            nganh.setNTohopgoc(cbbToHopGoc.getSelectedItem().toString());
             if (cbbToHopGoc.getSelectedIndex() == 0) {
                 nganh.setNTohopgoc(null);
             } else {
@@ -253,43 +256,43 @@ public class NganhDialog extends JDialog {
             nganh.setNThpt(cbbThpt.getSelectedValue());
             nganh.setNVsat(cbbVsat.getSelectedValue());
 
-            nganh.setSlXtt(cbbTuyenThang.isSelectedYes() 
-                ? parseInteger(txtSlXtt.getText()) : 0);
-
-            nganh.setSlDgnl(cbbDgnl.isSelectedYes() 
-                ? parseInteger(txtSlDgnl.getText()) : 0);
-
-            nganh.setSlThpt(cbbThpt.isSelectedYes() 
-                ? parseInteger(txtSlThpt.getText()) : 0);
-
-            nganh.setSlVsat(cbbVsat.isSelectedYes() 
-                ? parseInteger(txtSlVsat.getText()) : 0);
+            if (type.equals("create")) {
+                // khi add
+                nganh.setSlXtt(parseInteger(txtSlXtt.getText()) != null ? parseInteger(txtSlXtt.getText()) : 0);
+                nganh.setSlDgnl(parseInteger(txtSlDgnl.getText()) != null ? parseInteger(txtSlDgnl.getText()) : 0);
+                nganh.setSlThpt(parseInteger(txtSlThpt.getText()) != null ? parseInteger(txtSlThpt.getText()) : 0);
+                nganh.setSlVsat(parseInteger(txtSlVsat.getText()) != null ? parseInteger(txtSlVsat.getText()) : 0);
+            } else {
+                // khi sua
+                nganh.setSlXtt(cbbTuyenThang.isSelectedYes() ? parseInteger(txtSlXtt.getText()) : 0);
+                nganh.setSlDgnl(cbbDgnl.isSelectedYes() ? parseInteger(txtSlDgnl.getText()) : 0);
+                nganh.setSlThpt(cbbThpt.isSelectedYes() ? parseInteger(txtSlThpt.getText()) : 0);
+                nganh.setSlVsat(cbbVsat.isSelectedYes() ? parseInteger(txtSlVsat.getText()) : 0);
+            }
 
             if (type.equals("create")) {
                 if (bus.insertNganh(nganh)) {
-                    JOptionPane.showMessageDialog(this, "Thêm mới ngành thành công!", 
-                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Thêm mới ngành thành công!",
+                            "Thành công", JOptionPane.INFORMATION_MESSAGE);
                     parent.loadDataTable(bus.getAllNganh());
                     dispose();
                 }
-            } else { // update
+            } else {
                 nganh.setIdnganh(currentNganh.getIdnganh());
-
                 if (bus.updateNganh(nganh)) {
-                    JOptionPane.showMessageDialog(this, "Cập nhật ngành thành công!", 
-                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Cập nhật ngành thành công!",
+                            "Thành công", JOptionPane.INFORMATION_MESSAGE);
                     parent.loadDataTable(bus.getAllNganh());
                     dispose();
                 }
             }
 
         } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), 
-                "Lỗi", JOptionPane.ERROR_MESSAGE);
-
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + ex.getMessage(), 
-                "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra: " + ex.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -328,36 +331,6 @@ public class NganhDialog extends JDialog {
             txtChiTieu.getTxtForm().requestFocus();
             return false;
         }
-//        if (cbbToHopGoc.getSelectedIndex() == 0) {
-//            JOptionPane.showMessageDialog(this,
-//                    "Tổ hợp gốc không được để trống!",
-//                    "Lỗi",
-//                    JOptionPane.WARNING_MESSAGE);
-//
-//            cbbToHopGoc.requestFocus();
-//            return false;
-//}
-//        if (Validation.isEmpty(txtSlDgnl.getText())) {
-//            JOptionPane.showMessageDialog(this, "Số lượng DGNL không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-//            txtSlDgnl.getTxtForm().requestFocus();
-//            return false;
-//        }
-//        if (Validation.isEmpty(txtSlThpt.getText())) {
-//            JOptionPane.showMessageDialog(this, "Số lượng THPT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-//            txtSlThpt.getTxtForm().requestFocus();
-//            return false;
-//        }
-//        if (Validation.isEmpty(txtSlVsat.getText())) {
-//            JOptionPane.showMessageDialog(this, "Số lượng VSAT không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-//            txtSlVsat.getTxtForm().requestFocus();
-//            return false;
-//        }
-//        if (Validation.isEmpty(txtSlXtt.getText())) {
-//            JOptionPane.showMessageDialog(this, "Số lượng xét tuyển sớm không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-//            txtSlXtt.getTxtForm().requestFocus();
-//            return false;
-//        }
-        
         return true;
     }
 }

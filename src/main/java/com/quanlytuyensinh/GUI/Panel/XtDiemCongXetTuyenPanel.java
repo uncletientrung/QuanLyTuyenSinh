@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.*;
@@ -31,15 +32,17 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
     private PaginatedTable paginatedTable;
 
     private XtDiemCongXetTuyenBUS diemCongBUS;
-    private List<XtDiemCongXetTuyen> listDiemCong;
+    private List<XtDiemCongXetTuyen> listDiemCongFull;
+    private List<XtDiemCongXetTuyen> listDiemCongDisplay; // List khi search
     private Color BackgroundColor = new Color(240, 247, 250);
 
     public XtDiemCongXetTuyenPanel(Main mainF) {
         this.mainFrame = mainF;
         diemCongBUS = new XtDiemCongXetTuyenBUS();
-        listDiemCong = diemCongBUS.getAllDiemCong();
+        listDiemCongFull = diemCongBUS.getAllDiemCong();    // full data
+        listDiemCongDisplay = new ArrayList<>(listDiemCongFull); // copy
         initComponent();
-        loadDataTable(listDiemCong);
+        loadDataTable(listDiemCongDisplay);
     }
 
     private void initComponent() {
@@ -144,7 +147,7 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
     }
 
     public void loadDataTable(List<XtDiemCongXetTuyen> list) {
-        this.listDiemCong = list;
+        this.listDiemCongDisplay = list;
         List<Object[]> data = new java.util.ArrayList<>();
 
         for (XtDiemCongXetTuyen dc : list) {
@@ -172,6 +175,12 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
         loadDataTable(result);
     }
 
+    public void refreshFromDatabase() {
+        listDiemCongFull = diemCongBUS.getAllDiemCong();
+        listDiemCongDisplay = new ArrayList<>(listDiemCongFull);
+        loadDataTable(listDiemCongDisplay);
+    }
+
     private XtDiemCongXetTuyen getSelectedDiemCong() {
         int row = paginatedTable.getTable().getSelectedRow();
         if (row == -1) {
@@ -180,7 +189,7 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
         }
         int modelRow = paginatedTable.getTable().convertRowIndexToModel(row);
         int idDiemCong = (int) paginatedTable.getTable().getModel().getValueAt(modelRow, 0);
-        for (XtDiemCongXetTuyen dc : listDiemCong) {
+        for (XtDiemCongXetTuyen dc : listDiemCongDisplay) {
             if (dc.getIdDiemCong() == idDiemCong) {
                 return dc;
             }
@@ -209,8 +218,7 @@ public class XtDiemCongXetTuyenPanel extends JPanel implements ActionListener, I
                 if (confirm == JOptionPane.YES_OPTION) {
                     if (diemCongBUS.deleteDiemCong(selected.getIdDiemCong())) {
                         JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                        listDiemCong = diemCongBUS.getAllDiemCong();
-                        loadDataTable(listDiemCong);
+                        refreshFromDatabase();
                     } else {
                         JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }

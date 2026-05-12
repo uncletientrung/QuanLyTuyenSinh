@@ -33,14 +33,12 @@ public class MenuTaskbar extends JPanel {
         {"Thí sinh", "students.svg", "thiSinh"},
         {"Điểm thi", "diemthi.svg", "diemThi"},
         {"Nguyện vọng", "nguyenvong.svg", "nguyenVong"},
-        {"Khu vực", "khuvuc.svg", "khuVuc"},
         {"Môn", "subject.svg", "mon"},
         {"Ngành", "nganh.svg", "nganh"},
         {"Ngành - Tổ hợp", "tohop.svg", "nganhToHop"},
         {"Bảng quy đổi", "quydoi.svg", "bangQuyDoi"},
         {"Điểm cộng", "add.svg", "diemCong"},
         {"Người dùng", "nguoidung.svg", "nguoiDung"},
-        {"Nhóm quyền", "nhomquyen.svg", "nhomQuyen"},
         {"Thống kê", "thongke.svg", "thongKe"},
         {"Đăng xuất", "logout.svg", "dangXuat"}
     };
@@ -129,25 +127,25 @@ public class MenuTaskbar extends JPanel {
                         case 3:
                             main.setPanel(new NguyenVongPanel(main));
                             break;
-                        case 5:
+                        case 4:
                             main.setPanel(new ToHopMonPanel(main));
                             break;
-                        case 6:
+                        case 5:
                             main.setPanel(new NganhPanel(main));
                             break;
-                        case 7:
+                        case 6:
                             main.setPanel(new NganhToHopPanel(main));
                             break;
-                        case 8:
+                        case 7:
                             main.setPanel(new XtBangQuyDoiPanel(main));
                             break;
-                        case 9:
+                        case 8:
                             main.setPanel(new XtDiemCongXetTuyenPanel(main));
                             break;
-                        case 10:
+                        case 9:
                             main.setPanel(new TaiKhoanPanel(main));
                             break;
-                        case 12:
+                        case 10:
                             main.setPanel(new ThongKe());
                             break;
                     }

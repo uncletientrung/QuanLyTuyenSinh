@@ -517,17 +517,6 @@ public class XtDiemCongXetTuyenExcelDialog extends JDialog implements ActionList
                     }
                 }
 
-                if (!updateErrors.isEmpty()) {
-                    message.append("\nLỗi cập nhật:\n");
-                    int maxErrors = Math.min(updateErrors.size(), 10);
-                    for (int i = 0; i < maxErrors; i++) {
-                        message.append("  • ").append(updateErrors.get(i)).append("\n");
-                    }
-                    if (updateErrors.size() > 10) {
-                        message.append("  • ... và ").append(updateErrors.size() - 10).append(" lỗi khác\n");
-                    }
-                }
-
                 if (!errorRows.isEmpty()) {
                     message.append("\nLỗi đọc dữ liệu Excel:\n");
                     int maxErrors = Math.min(errorRows.size(), 10);

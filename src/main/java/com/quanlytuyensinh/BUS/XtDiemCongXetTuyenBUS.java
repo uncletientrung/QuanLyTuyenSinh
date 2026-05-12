@@ -37,7 +37,7 @@ public class XtDiemCongXetTuyenBUS {
 
     public List<XtDiemCongXetTuyen> searchDiemCong(String type, String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return listDiemCong;
+            return getAllDiemCong();
         }
 
         String lowerKeyword = keyword.trim().toLowerCase();

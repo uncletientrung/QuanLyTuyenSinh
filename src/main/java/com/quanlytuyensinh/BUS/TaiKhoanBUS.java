@@ -147,11 +147,20 @@ public List<TaiKhoan> searchTaiKhoan(String keyword, String searchType) {
 
         return taiKhoanDAO.login(username, password);
     }
-    public boolean checktdn(String tdn, int idtk)
-    {
-        for(TaiKhoan ts : listTaiKhoan){
-            if (ts.getTendangnhap().equals(tdn) && ts.getMatk() != idtk)  return false; // Đã tồn tại
+    public boolean checktdn(String tdn, int idtk) {
+    for (TaiKhoan ts : listTaiKhoan) {
+        // Nếu tìm thấy tên đăng nhập trùng trong danh sách
+        if (ts.getTendangnhap().equals(tdn)) {
+          
+            if (idtk == -1) {
+                return false;
+            }
+      
+            if (ts.getMatk() != idtk) {
+                return false;
+            }
         }
-        return true;
     }
+    return true; 
+}
 }

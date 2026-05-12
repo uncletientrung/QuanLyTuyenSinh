@@ -12,7 +12,9 @@ import com.quanlytuyensinh.DAO.XtNganhToHopDAO;
 import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtThisinhXetTuyen25DAO;
 import com.quanlytuyensinh.DAO.XtToHopMonThiDAO;
+import com.quanlytuyensinh.ENTITY.KetQuaTraCuuDTO;
 import com.quanlytuyensinh.ENTITY.TinhDiemTHPTDTO;
+import com.quanlytuyensinh.ENTITY.TinhDiemVSAT;
 import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
 import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
@@ -208,7 +210,32 @@ public class tinhDiemService {
         
         return diemThiGiaLap;
     }
-    
+    public XtDiemThiXetTuyen getDiemThiGiaLapVSAT(BigDecimal toan, BigDecimal nguVan, BigDecimal vatLy, BigDecimal hoaHoc, 
+            BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy){
+        XtDiemThiXetTuyen diemThiGiaLap = new XtDiemThiXetTuyen();
+        diemThiGiaLap.setCccd(null);
+        diemThiGiaLap.setDPhuongthuc("THPT");
+        diemThiGiaLap.setTo(toan);
+        diemThiGiaLap.setVa(nguVan);
+        diemThiGiaLap.setLi(vatLy);
+        diemThiGiaLap.setHo(hoaHoc);
+        diemThiGiaLap.setSi(sinhHoc);
+        diemThiGiaLap.setN1Thi(tiengAnh);
+        diemThiGiaLap.setSu(lichSu);
+        diemThiGiaLap.setDi(diaLy);
+      
+        // Không dùng
+        diemThiGiaLap.setN1Cc(null);
+        diemThiGiaLap.setNl1(null);
+        diemThiGiaLap.setNk1(null);
+        diemThiGiaLap.setNk2(null);
+        diemThiGiaLap.setNk3(null);
+        diemThiGiaLap.setNk4(null);
+        diemThiGiaLap.setNk5(null);
+        diemThiGiaLap.setNk6(null);
+        
+        return diemThiGiaLap;
+    }
     private String getTenMonHoc(String maMon) {
         if (maMon == null) return "";
             switch (maMon) {
@@ -335,6 +362,32 @@ public class tinhDiemService {
         listKQTHPT.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
         return listKQTHPT;
     }
-    
+//    public List<KetQuaTraCuuDTO> tinhdiemxettuyenVSAT(TinhDiemVSAT xt,String maNganh)
+//    {
+//        List<XtNganhToHop> listTHXT = this.getNTHByMaNganh(maNganh);
+//        XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLapVSAT(xt.getDiemToan(), xt.getDiemVan(),xt.getDiemLy(),xt.getDiemHoa(),xt.getDiemSinh(),xt.getDiemAnh(),xt.getDiemSu(),xt.getDiemDia());
+//    }
+//    public TinhDiemTHPTDTO convertVSATtoTHPT(TinhDiemVSAT dto)
+//    {
+//        
+//    }
+//    private BigDecimal noiquytuyentinh(String maMon, Double diemVsat) {
+//    if (diemVsat == null || diemVsat == 0) return BigDecimal.ZERO;
+//
+//    // 1. Móc DB: Tìm hàng trong xt_bangquydoi sao cho diemA < diemVsat <= diemB
+//   
+//
+// 
+//
+//    // 2. Lấy các mốc a, b, c, d từ DB
+//    BigDecimal x = BigDecimal.valueOf(diemVsat);
+//    
+//  
+//
+//    // 3. Áp dụng công thức: y = c + ((x - a) / (b - a)) * (d - c)
+//    // Lưu ý: Dùng BigDecimal để chính xác tuyệt đối
+//
+//   
+//}
     
 }

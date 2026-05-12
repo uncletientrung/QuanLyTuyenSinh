@@ -205,7 +205,9 @@ public class TaiKhoanDialog extends JDialog{
             return false;
         }
        
-        if (!bus.checktdn(tdn,tk.getMatk())) {
+        int currentId = (tk != null) ? tk.getMatk() : -1;
+        
+        if (!bus.checktdn(tdn,currentId)) {
             JOptionPane.showMessageDialog(this, "Tên đăng nhập đã tồn tại trong hệ thống", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txttdn.getTxtForm().requestFocus();
             return false;

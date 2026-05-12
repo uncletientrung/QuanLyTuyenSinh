@@ -25,4 +25,5 @@ public class TinhDiemVSATController {
     public String tinhdiemVSAT() {
         return "tinhdiemVSAT";
     }
+    
 }

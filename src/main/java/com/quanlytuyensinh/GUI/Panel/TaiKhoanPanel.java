@@ -221,8 +221,8 @@ private TaiKhoan getSelectedTaiKhoan() {
         
         if(source == mainFunction.btn.get("create") ){
             new TaiKhoanDialog(this,tkBUS ,owner, "THÊM TÀI KHOẢN", "create",true, () -> {
-                TaiKhoanBUS tkbus = new TaiKhoanBUS();
-                listTK=tkbus.getAllTaiKhoan();
+                tkBUS = new TaiKhoanBUS();
+                listTK=tkBUS.getAllTaiKhoan();
                    loadDataTable(listTK);
        }, null
             );
@@ -231,16 +231,16 @@ private TaiKhoan getSelectedTaiKhoan() {
         if(source == mainFunction.btn.get("update") ){
             TaiKhoan tk = getSelectedTaiKhoan();
             new TaiKhoanDialog(this,tkBUS ,owner, "SỬA TÀI KHOẢN", "update",true, () -> {
-                TaiKhoanBUS tkbus = new TaiKhoanBUS();
-                listTK=tkbus.getAllTaiKhoan();
+               tkBUS = new TaiKhoanBUS();
+                listTK=tkBUS.getAllTaiKhoan();
                    loadDataTable(listTK);
        },tk
             );}
             if(source == mainFunction.btn.get("detail") ){
             TaiKhoan tk = getSelectedTaiKhoan();
             new TaiKhoanDialog(this,tkBUS ,owner, "CHI TIẾT TÀI KHOẢN", "detail",true, () -> {
-              TaiKhoanBUS tkbus = new TaiKhoanBUS();
-                listTK=tkbus.getAllTaiKhoan();
+              tkBUS = new TaiKhoanBUS();
+                listTK=tkBUS.getAllTaiKhoan();
                    loadDataTable(listTK);
        },tk
             );
@@ -259,8 +259,8 @@ private TaiKhoan getSelectedTaiKhoan() {
             if (confirm == JOptionPane.YES_OPTION) {
                         if (tkBUS.deleteTaiKhoan(tk.getMatk())) {
                             JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                            TaiKhoanBUS bus = new TaiKhoanBUS();
-                            listTK = bus.getAllTaiKhoan();
+                            tkBUS = new TaiKhoanBUS();
+                listTK=tkBUS.getAllTaiKhoan();
                             loadDataTable(listTK);
                         } else {
                             JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);

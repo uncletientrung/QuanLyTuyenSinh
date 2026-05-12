@@ -270,7 +270,7 @@ public class TinhDiemTHPTDTO {
             case "SU": return getDiemSu();
             case "DI": return getDiemDia();
             case "TI": return getDiemTin();
-            case "N1": return getDiemTin();
+            case "N1": return getDiemAnh();
             case "KTPL": return getDiemKTPL();
             case "CNCN": return getDiemCnCongNghiep();
             case "CNNN": return getDiemCnNongNghiep();

@@ -35,7 +35,7 @@ public class TinhDiemVSAT {
     public TinhDiemVSAT(){
     
 }
-    public TinhDiemVSAT(String maToHop, String tenToHop,
+    public TinhDiemVSAT(String maToHop, String tenToHop,String congThuc,
             BigDecimal diemToan, BigDecimal diemVan, BigDecimal diemLy,
             BigDecimal diemHoa, BigDecimal diemSinh, BigDecimal diemAnh,
             BigDecimal diemSu, BigDecimal diemDia, BigDecimal diemTHXT,
@@ -222,6 +222,7 @@ public class TinhDiemVSAT {
             case "SI": return getDiemSinh();
             case "SU": return getDiemSu();
             case "DI": return getDiemDia();
+            case "N1": return getDiemAnh();
             default: return BigDecimal.ZERO;
         }
     }

@@ -64,6 +64,7 @@ public class TinhDiemVSATController {
            String tenNganh = this.tinhDiemSV.getTenNganhByMaNganh(Manganh);
            BigDecimal diemUuTienKhuVuc = this.tinhDiemSV.DiemUuTienKhuVuc(khuVuc);
         BigDecimal diemUuTienDoiTuong = this.tinhDiemSV.DiemUuTienDoiTuong(doiTuong);
+        BigDecimal diemcong= ThCaoNhat.getDiemCong();
         // 2. GỬI NGƯỢC LẠI INPUT CHỨA TOÀN BỘ ĐIỂM THÍ SINH VỪA NHẬP
        
             model.addAttribute("listKQVSAT", listKQVSAT);
@@ -78,11 +79,14 @@ public class TinhDiemVSATController {
         model.addAttribute("ThCaoNhat", ThCaoNhat);
         model.addAttribute("NguongDauVao", NguongDauVao);
         model.addAttribute("THGoc", THGoc);
+        model.addAttribute("diemcong",diemcong);
         return "tinhdiemVSAT";
         }
         catch (Exception e) {
-            model.addAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            return "error-page"; 
+           e.printStackTrace(); 
+    
+    model.addAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+    return "error-page";
         }
         
     }

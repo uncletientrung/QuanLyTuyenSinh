@@ -10,58 +10,58 @@ Dashmix.onLoad((() => class {
         jQuery(".js-validation-vsat").validate({
             ignore: [],
             rules: {
-                "nganh-select": {
+                "Manganh": {
                     required: true
                 },
-                "diem-cong-input": {
+                "diemCong": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 3
                 },
-                "diem-toan-input": {
+                "toan": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-van-input": {
+                "nguVan": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-ly-input": {
+                "vatLy": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-hoa-input": {
+                "hoaHoc": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-sinh-input": {
+                "sinhHoc": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-su-input": {
+                "lichSu": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-dia-input": {
+                "diaLy": {
                     required: true,
                     number: true,
                     min: 0,
                     max: 150
                 },
-                "diem-anh-input": {
+                "tiengAnh": {
                     required: true,
                     number: true,
                     min: 0,
@@ -69,58 +69,58 @@ Dashmix.onLoad((() => class {
                 }
             },
             messages: {
-                "nganh-select": {
+                "Manganh": {
                     required: "Vui lòng chọn ngành"
                 },
-                "diem-cong-input": {
+                "diemCong": {
                     required: "Vui lòng nhập điểm cộng",
                     number: "Điểm cộng phải là số",
                     min: "Điểm cộng tối thiểu là 0",
                     max: "Điểm cộng tối đa là 3"
                 },
-                "diem-toan-input": {
+                "toan": {
                     required: "Vui lòng nhập điểm Toán (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-van-input": {
+                "nguVan": {
                     required: "Vui lòng nhập điểm Ngữ văn (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-ly-input": {
+                "vatLy": {
                     required: "Vui lòng nhập điểm Vật lý (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-hoa-input": {
+                "hoaHoc": {
                     required: "Vui lòng nhập điểm Hoá học (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-sinh-input": {
+                "sinhHoc": {
                     required: "Vui lòng nhập điểm Sinh học (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-su-input": {
+                "lichSu": {
                     required: "Vui lòng nhập điểm Lịch sử (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-dia-input": {
+                "diaLy": {
                     required: "Vui lòng nhập điểm Địa lý (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 150"
                 },
-                "diem-anh-input": {
+                "tiengAnh": {
                     required: "Vui lòng nhập điểm Tiếng Anh (hoặc 0)",
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",

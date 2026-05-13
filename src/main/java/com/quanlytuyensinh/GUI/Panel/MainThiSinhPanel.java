@@ -46,7 +46,7 @@ public class MainThiSinhPanel extends JPanel {
         tabbedPane.setBackground(Color.WHITE);
         
         tabbedPane.addTab("Danh sách thí sinh", new ThiSinhPanel(mainFrame, TSBUS, listTS));
-        tabbedPane.addTab("Thống kê thí sinh", new ThongKeThiSinhPanel());
+        tabbedPane.addTab("Thống kê thí sinh", new ThongKeThiSinhPanel(TSBUS, listTS));
         
         this.add(tabbedPane);
     }

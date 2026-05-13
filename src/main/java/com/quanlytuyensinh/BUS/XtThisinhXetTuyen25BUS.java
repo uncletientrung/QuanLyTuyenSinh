@@ -5,8 +5,10 @@ import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import java.util.List;
+import java.util.Map;
 
 public class XtThisinhXetTuyen25BUS {
 
@@ -36,6 +38,86 @@ public class XtThisinhXetTuyen25BUS {
         return false;
     }
     
+    public HashMap<String, Integer> thongKeThiSinhKhuVuc(){
+        HashMap<String, Integer> rs = new HashMap<>();
+        for(XtThisinhXetTuyen25 ts : this.listThiSinh){
+            String kv = ts.getKhuVuc();
+            if(kv == null || kv.equals("")){
+                kv = "Không có";
+            }
+            if(kv.equals("01") || kv.equals("1")){
+                kv = "1";
+            }
+            if(kv.equals("02") || kv.equals("2")){
+                kv = "2";
+            }
+            if(kv.equals("02NT") || kv.equals("2NT")){
+                kv = "2NT";
+            }
+            if(kv.equals("03") || kv.equals("3")){
+                kv = "3";
+            }            
+            rs.put(kv, rs.getOrDefault(kv, 0) + 1);
+        }
+        return rs;
+    }
+    public HashMap<String, Integer> thongKeThiSinhNamNu(){
+        HashMap<String, Integer> rs = new HashMap<>();
+        for(XtThisinhXetTuyen25 ts : this.listThiSinh){
+            String gioiTinh = ts.getGioiTinh();
+            rs.put(gioiTinh, rs.getOrDefault(gioiTinh, 0) + 1);
+        }
+        return rs;
+    }
+    public HashMap<String, Integer> thongKeThiSinhDoiTuong(){
+        HashMap<String, Integer> rs = new HashMap<>();
+        for(XtThisinhXetTuyen25 ts : this.listThiSinh){
+            String doiTuong = ts.getDoiTuong();
+            if(doiTuong == null || doiTuong.equals("")){
+                doiTuong = "Không có";
+            }
+            if(doiTuong.startsWith("07")){
+                doiTuong = "07";
+            }
+            if(doiTuong.startsWith("06")){
+                doiTuong = "06";
+            }
+            if(doiTuong.startsWith("05")){
+                doiTuong = "05";
+            }
+            if(doiTuong.startsWith("04")){
+                doiTuong = "04";
+            }
+            if(doiTuong.startsWith("03")){
+                doiTuong = "03";
+            }
+            if(doiTuong.startsWith("02")){
+                doiTuong = "02";
+            }
+            if(doiTuong.startsWith("01")){
+                doiTuong = "01";
+            }
+            rs.put(doiTuong, rs.getOrDefault(doiTuong, 0) + 1);
+        }
+        return rs;
+    }
+    
+    public List<Map.Entry<String, Integer>> thongKeThiSinhTinhThanh(){
+        HashMap<String, Integer> rs = new HashMap<>();
+        for(XtThisinhXetTuyen25 ts : this.listThiSinh){
+            String tinhThanh = ts.getNoiSinh();
+            if(tinhThanh == null){
+                tinhThanh = "Không rõ";
+            }
+            tinhThanh = tinhThanh.toUpperCase();
+            rs.put(tinhThanh, rs.getOrDefault(tinhThanh, 0) + 1);
+        }
+        List<Map.Entry<String, Integer>> list =
+                new ArrayList<>(rs.entrySet());
+        list.sort((a, b) -> b.getValue() - a.getValue());
+        return list;
+    }
+        
     private String generateSBD() {
         int maxId = 0;
         for (XtThisinhXetTuyen25 ts : listThiSinh) {

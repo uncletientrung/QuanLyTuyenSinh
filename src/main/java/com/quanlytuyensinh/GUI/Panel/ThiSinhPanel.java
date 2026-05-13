@@ -520,7 +520,7 @@ public class ThiSinhPanel extends JPanel implements ActionListener, ItemListener
         // Họ Tên (ít nhất phải có họ hoặc tên)
         if (Validation.isEmpty(ts.getHo()) && Validation.isEmpty(ts.getTen())) {
             return "Họ Tên không được để trống!";
-        }
+    }
 
         // Giới tính
         if (Validation.isEmpty(ts.getGioiTinh())) {

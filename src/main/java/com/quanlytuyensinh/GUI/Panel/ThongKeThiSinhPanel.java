@@ -1,19 +1,45 @@
 package com.quanlytuyensinh.GUI.Panel;
 
+import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import com.quanlytuyensinh.GUI.Component.PaginatedTable;
+import com.quanlytuyensinh.GUI.ThongKe.Support.Chart;
+import com.quanlytuyensinh.GUI.ThongKe.Support.ModelChart;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+
 import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ThongKeThiSinhPanel extends JPanel {
-
+    XtThisinhXetTuyen25BUS TSBUS;
+    java.util.List<XtThisinhXetTuyen25> listTS;
+    private int SoLuongThiSinh;
+    private HashMap<String, Integer> ThongKeTheoKV;
+    private HashMap<String, Integer> ThongKeTheoDT;
+    private List<Map.Entry<String, Integer>> ThongKeTheoTP;
+    private HashMap<String, Integer> ThongKeTheoNamNu;
+    
     // ==================== MÀU SẮC ====================
     private final Color BG_MAIN = new Color(245, 247, 250);
     private final Color STAT_BLUE = new Color(52, 152, 219);
-    private final Color STAT_PURPLE = new Color(155, 89, 182);
+    private final Color STAT_PURPLE = new Color(231, 76, 140);
     private final Color STAT_ORANGE = new Color(230, 126, 34);
-    private final Color STAT_GREEN = new Color(46, 204, 113);
+    private final Color STAT_GREEN = new Color(41, 128, 185);
 
     private final Color TEXT_PRIMARY = new Color(45, 45, 45);
     private final Color TEXT_SECONDARY = new Color(120, 120, 120);
@@ -26,7 +52,15 @@ public class ThongKeThiSinhPanel extends JPanel {
     private final Font FONT_REGULAR = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font FONT_STAT_NUM = new Font("Segoe UI", Font.BOLD, 28);
 
-    public ThongKeThiSinhPanel() {
+    public ThongKeThiSinhPanel(XtThisinhXetTuyen25BUS tsBUS,   java.util.List<XtThisinhXetTuyen25> listThiSinh) {
+        TSBUS = tsBUS;
+        listTS = listThiSinh;
+        this.SoLuongThiSinh = this.listTS.size();
+        this.ThongKeTheoKV = TSBUS.thongKeThiSinhKhuVuc();
+        this.ThongKeTheoDT = this.TSBUS.thongKeThiSinhDoiTuong();
+        this.ThongKeTheoTP = this.TSBUS.thongKeThiSinhTinhThanh();
+        this.ThongKeTheoNamNu = this.TSBUS.thongKeThiSinhNamNu();
+        
         initUI();
     }
 
@@ -35,35 +69,25 @@ public class ThongKeThiSinhPanel extends JPanel {
         setBackground(BG_MAIN);
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ==================== DATA GIẢ ====================
-        int tongThiSinh = 5234;
-        int soNam = 2480;
-        int soNu = 2754;
-        double diemCaoNhat = 29.75;
-
         // ==================== STAT CARDS ====================
         JPanel statsRow = new JPanel(new GridLayout(1, 4, 16, 0));
         statsRow.setOpaque(false);
         statsRow.setPreferredSize(new Dimension(0, 130));
-
-        statsRow.add(createStatCard("👤", "Tổng thí sinh", String.valueOf(tongThiSinh), STAT_BLUE));
-        statsRow.add(createStatCard("👤", "Tổng thí sinh", String.valueOf(tongThiSinh), STAT_BLUE));
-        statsRow.add(createStatCard("🏆", "Điểm cao nhất", String.format("%.2f", diemCaoNhat), STAT_GREEN));
-
+        statsRow.add(createStatCard("👥", "Tổng thí sinh", String.valueOf(this.SoLuongThiSinh), STAT_BLUE));
+        statsRow.add(createStatCard("♂", "Tổng thí sinh Nam", String.valueOf(this.ThongKeTheoNamNu.get("Nam")), STAT_GREEN));
+        statsRow.add(createStatCard("♀", "Điểm cao nhất Nữ", String.valueOf(this.ThongKeTheoNamNu.get("Nữ")), STAT_PURPLE));
         add(statsRow, BorderLayout.NORTH);
 
         // ==================== BOTTOM ====================
-        JPanel bottomRow = new JPanel(new GridLayout(1, 2, 16, 0));
+        JPanel bottomRow = new JPanel(new GridLayout(1, 3, 16, 0));
         bottomRow.setOpaque(false);
-        bottomRow.add(createTopTruongCard());
-        bottomRow.add(createThongKeTheoKhoiCard());
-
+//        bottomRow.add(createTopTruongCard());
+        bottomRow.add(createThongKeTheoDoiTuongCard());
+        bottomRow.add(createThongKeTheoKhuVucCard());
         add(bottomRow, BorderLayout.CENTER);
     }
 
-    // =========================================================
-    // STAT CARD - VIỀN MÀU
-    // =========================================================
+    // STAT CARD
     private JPanel createStatCard(String icon, String label, String value, Color accentColor) {
         JPanel card = new JPanel() {
             @Override
@@ -150,133 +174,327 @@ public class ThongKeThiSinhPanel extends JPanel {
         return card;
     }
 
-    // =========================================================
-    // TOP 10 TRƯỜNG
-    // =========================================================
-    private JPanel createTopTruongCard() {
-        JPanel card = createCardPanel("Top 10 Trường THPT có nhiều thí sinh nhất");
+private JPanel createTopTruongCard() {
 
-        String[] cols = {"STT", "Mã trường", "Tên trường", "Số thí sinh"};
-        DefaultTableModel model = new DefaultTableModel(cols, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+    JPanel card =
+            createCardPanel("Số lượng thí sinh theo tỉnh thành");
 
-        JTable table = new JTable(model);
-        table.setFont(FONT_REGULAR);
-        table.setRowHeight(28);
-        table.setGridColor(TABLE_GRID);
-        table.getTableHeader().setBackground(TABLE_HEADER);
-        table.getTableHeader().setForeground(Color.WHITE);
-        table.getTableHeader().setFont(FONT_BOLD);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+    String[] header = {
+            "STT",
+            "Tỉnh thành",
+            "Số lượng thí sinh"
+    };
 
-        // Column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(45);
-        table.getColumnModel().getColumn(1).setPreferredWidth(100);
-        table.getColumnModel().getColumn(2).setPreferredWidth(280);
-        table.getColumnModel().getColumn(3).setPreferredWidth(90);
+    PaginatedTable paginatedTable =
+            new PaginatedTable(header);
 
-        // Custom renderer
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable t, Object value,
-                    boolean selected, boolean focus, int row, int col) {
-                Component c = super.getTableCellRendererComponent(t, value, selected, focus, row, col);
-                if (!selected) {
-                    c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(248, 249, 250));
-                }
-                setHorizontalAlignment(col == 2 ? SwingConstants.LEFT : SwingConstants.CENTER);
-                setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-                return c;
-            }
-        });
+    JTable table = paginatedTable.getTable();
 
-        // Data mẫu
-        model.addRow(new Object[]{1, "TH001", "THPT Nguyễn Du", 512});
-        model.addRow(new Object[]{2, "TH002", "THPT Lê Quý Đôn", 486});
-        model.addRow(new Object[]{3, "TH003", "THPT Trần Phú", 455});
-        model.addRow(new Object[]{4, "TH004", "THPT Gia Định", 438});
-        model.addRow(new Object[]{5, "TH005", "THPT Nguyễn Thị Minh Khai", 421});
+    // ================= STYLE =================
 
-        JScrollPane sp = new JScrollPane(table);
-        sp.setBorder(BorderFactory.createEmptyBorder());
-        card.add(sp, BorderLayout.CENTER);
+    table.setFocusable(false);
 
-        return card;
+    table.getTableHeader().setFont(
+            new Font("Segoe UI", Font.BOLD, 13)
+    );
+
+    table.getTableHeader().setPreferredSize(
+            new Dimension(0, 40)
+    );
+
+    table.setRowHeight(32);
+
+    table.setGridColor(TABLE_GRID);
+
+    // Center header
+    DefaultTableCellRenderer headerRenderer =
+            (DefaultTableCellRenderer)
+                    table.getTableHeader()
+                            .getDefaultRenderer();
+
+    headerRenderer.setHorizontalAlignment(
+            JLabel.CENTER
+    );
+
+    // Center cell
+    DefaultTableCellRenderer centerRenderer =
+            new DefaultTableCellRenderer();
+
+    centerRenderer.setHorizontalAlignment(
+            JLabel.CENTER
+    );
+
+    for (int i = 0; i < table.getColumnCount(); i++) {
+        table.getColumnModel()
+                .getColumn(i)
+                .setCellRenderer(centerRenderer);
     }
+
+    // ================= DATA =================
+
+    List<Object[]> data = new ArrayList<>();
+
+    int stt = 1;
+
+    for(Map.Entry<String, Integer> entry
+            : this.ThongKeTheoTP){
+
+        data.add(new Object[]{
+                stt++,
+                entry.getKey(),
+                entry.getValue()
+        });
+    }
+    paginatedTable.setData(data);
+
+    card.add(paginatedTable, BorderLayout.CENTER);
+
+    return card;
+}
 
     // =========================================================
     // THỐNG KÊ THEO KHỐI
     // =========================================================
-    private JPanel createThongKeTheoKhoiCard() {
-        JPanel card = createCardPanel("Thống kê theo khối xét tuyển");
+private JPanel createThongKeTheoDoiTuongCard() {
 
-        JPanel content = new JPanel();
-        content.setOpaque(false);
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 0));
+    JPanel card =
+            createCardPanel("Thống kê thí sinh theo ĐỐI TƯỢNG");
 
-        content.add(createSimpleProgressItem("Khối A00", 2100, STAT_BLUE));
-        content.add(Box.createVerticalStrut(18));
-        content.add(createSimpleProgressItem("Khối D01", 1650, STAT_BLUE));
-        content.add(Box.createVerticalStrut(18));
-        content.add(createSimpleProgressItem("Khối B00", 980, STAT_BLUE));
-        content.add(Box.createVerticalStrut(18));
-        content.add(createSimpleProgressItem("Khối C00", 504, STAT_BLUE));
+    JPanel container =
+            new JPanel(new BorderLayout(0, 10));
 
-        card.add(content, BorderLayout.CENTER);
-        return card;
+    container.setOpaque(false);
+
+    // ================= CHART =================
+
+    Chart chart = new Chart();
+
+    chart.addLegend(
+            "Số lượng thí sinh",
+            STAT_BLUE
+    );
+
+    int total = 0;
+
+    // Tính tổng
+    for(Integer value : this.ThongKeTheoDT.values()){
+        total += value;
     }
 
-    private JPanel createSimpleProgressItem(String label, int count, Color color) {
-        int total = 5234;
-        int percent = (int) Math.round(count * 100.0 / total);
+    // Đổ dữ liệu chart
+    for(Map.Entry<String, Integer> entry
+            : this.ThongKeTheoDT.entrySet()){
 
-        JPanel item = new JPanel(new BorderLayout(0, 6));
-        item.setOpaque(false);
-        item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-
-        // Info
-        JPanel infoPanel = new JPanel(new BorderLayout());
-        infoPanel.setOpaque(false);
-
-        JLabel lblName = new JLabel(label);
-        lblName.setFont(FONT_REGULAR);
-        lblName.setForeground(TEXT_PRIMARY);
-
-        JLabel lblInfo = new JLabel(count + " thí sinh • " + percent + "%");
-        lblInfo.setFont(FONT_BOLD);
-        lblInfo.setForeground(color);
-
-        infoPanel.add(lblName, BorderLayout.WEST);
-        infoPanel.add(lblInfo, BorderLayout.EAST);
-
-        // Progress Bar
-        JPanel progressBar = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-                int w = getWidth(), h = getHeight();
-                g2.setColor(new Color(235, 237, 240));
-                g2.fillRoundRect(0, 0, w, h, 12, 12);
-
-                int pw = (int) (w * percent / 100.0);
-                g2.setColor(color);
-                g2.fillRoundRect(0, 0, pw, h, 12, 12);
-
-                g2.dispose();
-            }
-        };
-        progressBar.setPreferredSize(new Dimension(0, 11));
-        progressBar.setOpaque(false);
-
-        item.add(infoPanel, BorderLayout.NORTH);
-        item.add(progressBar, BorderLayout.CENTER);
-        return item;
+        chart.addData(
+                new ModelChart(
+                        entry.getKey(),
+                        new double[]{entry.getValue()}
+                )
+        );
     }
+
+    container.add(chart, BorderLayout.CENTER);
+
+    // ================= TABLE =================
+
+    String[] cols = {
+            "Đối tượng",
+            "Số lượng",
+            "Tỷ lệ"
+    };
+
+    DefaultTableModel model =
+            new DefaultTableModel(cols, 0){
+
+        @Override
+        public boolean isCellEditable(
+                int row,
+                int column
+        ){
+            return false;
+        }
+    };
+
+    JTable table = new JTable(model);
+
+    table.setRowHeight(32);
+
+    table.setFont(FONT_REGULAR);
+
+    table.getTableHeader()
+            .setFont(FONT_BOLD);
+
+    table.getTableHeader()
+            .setBackground(TABLE_HEADER);
+
+    table.getTableHeader()
+            .setForeground(Color.WHITE);
+
+    // Center renderer
+    DefaultTableCellRenderer center =
+            new DefaultTableCellRenderer();
+
+    center.setHorizontalAlignment(
+            JLabel.CENTER
+    );
+
+    table.setDefaultRenderer(
+            Object.class,
+            center
+    );
+
+    // Đổ dữ liệu table
+    for(Map.Entry<String, Integer> entry
+            : this.ThongKeTheoDT.entrySet()){
+
+        int soLuong = entry.getValue();
+
+        double percent =
+                soLuong * 100.0 / total;
+
+        model.addRow(new Object[]{
+                entry.getKey(),
+                soLuong,
+                String.format("%.3f%%", percent)
+        });
+    }
+
+    JScrollPane scroll =
+            new JScrollPane(table);
+
+    scroll.setBorder(
+            BorderFactory.createEmptyBorder()
+    );
+
+    scroll.setPreferredSize(
+            new Dimension(0, 160)
+    );
+
+    container.add(scroll, BorderLayout.SOUTH);
+
+    card.add(container, BorderLayout.CENTER);
+
+    return card;
+}
+private JPanel createThongKeTheoKhuVucCard() {
+
+    JPanel card =
+            createCardPanel("Thống kê thí sinh theo KHU VỰC");
+
+    JPanel container =
+            new JPanel(new BorderLayout(0, 10));
+
+    container.setOpaque(false);
+
+    // ================= CHART =================
+
+    Chart chart = new Chart();
+
+    chart.addLegend(
+            "Số lượng thí sinh",
+            STAT_BLUE
+    );
+
+    int total = 0;
+
+    // Tính tổng
+    for(Integer value : this.ThongKeTheoKV.values()){
+        total += value;
+    }
+
+    // Đổ dữ liệu chart
+    for(Map.Entry<String, Integer> entry
+            : this.ThongKeTheoKV.entrySet()){
+
+        chart.addData(
+                new ModelChart(
+                        entry.getKey(),
+                        new double[]{entry.getValue()}
+                )
+        );
+    }
+
+    container.add(chart, BorderLayout.CENTER);
+
+    // ================= TABLE =================
+
+    String[] cols = {
+            "Khu vực",
+            "Số lượng",
+            "Tỷ lệ"
+    };
+
+    DefaultTableModel model =
+            new DefaultTableModel(cols, 0){
+
+        @Override
+        public boolean isCellEditable(
+                int row,
+                int column
+        ){
+            return false;
+        }
+    };
+
+    JTable table = new JTable(model);
+
+    table.setRowHeight(32);
+
+    table.setFont(FONT_REGULAR);
+
+    table.getTableHeader()
+            .setFont(FONT_BOLD);
+
+    table.getTableHeader()
+            .setBackground(TABLE_HEADER);
+
+    table.getTableHeader()
+            .setForeground(Color.WHITE);
+
+    // Center renderer
+    DefaultTableCellRenderer center =
+            new DefaultTableCellRenderer();
+
+    center.setHorizontalAlignment(
+            JLabel.CENTER
+    );
+
+    table.setDefaultRenderer(
+            Object.class,
+            center
+    );
+
+    // Đổ dữ liệu table
+    for(Map.Entry<String, Integer> entry
+            : this.ThongKeTheoKV.entrySet()){
+
+        int soLuong = entry.getValue();
+
+        double percent =
+                soLuong * 100.0 / total;
+
+        model.addRow(new Object[]{
+                entry.getKey(),
+                soLuong,
+                String.format("%.3f%%", percent)
+        });
+    }
+
+    JScrollPane scroll =
+            new JScrollPane(table);
+
+    scroll.setBorder(
+            BorderFactory.createEmptyBorder()
+    );
+
+    scroll.setPreferredSize(
+            new Dimension(0, 160)
+    );
+
+    container.add(scroll, BorderLayout.SOUTH);
+
+    card.add(container, BorderLayout.CENTER);
+
+    return card;
+}
 }

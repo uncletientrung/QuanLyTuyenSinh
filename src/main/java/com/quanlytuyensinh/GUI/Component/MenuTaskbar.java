@@ -4,9 +4,11 @@
  */
 package com.quanlytuyensinh.GUI.Component;
 
+import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
 import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
-import com.quanlytuyensinh.GUI.Panel.DiemThiPanel;
+import com.quanlytuyensinh.GUI.Panel.DiemThiPanel;  
 import com.quanlytuyensinh.GUI.Panel.NganhPanel;
 import com.quanlytuyensinh.GUI.Panel.TaiKhoanPanel;
 import com.quanlytuyensinh.GUI.Panel.TrangChuPanel;
@@ -28,7 +30,8 @@ import javax.swing.border.EmptyBorder;
  * @author DELL
  */
 public class MenuTaskbar extends JPanel {
-
+    private XtThisinhXetTuyen25BUS TSBUS;
+    private java.util.List<XtThisinhXetTuyen25> listTS;
     String[][] ArrMenu = {
         {"Trang chủ", "home.svg", "trangChu"},
         {"Thí sinh", "students.svg", "thiSinh"},
@@ -50,7 +53,9 @@ public class MenuTaskbar extends JPanel {
     Color DefaultColor = new Color(255, 255, 255);
     Color LineColor = new Color(204, 214, 219); // Màu xanh trắng
 
-    public MenuTaskbar(Main m) {
+    public MenuTaskbar(Main m, XtThisinhXetTuyen25BUS tsBUS,   java.util.List<XtThisinhXetTuyen25> listThiSinh) {
+        TSBUS = tsBUS;
+        listTS = listThiSinh;
         this.main = m;
         initComponent();
     }
@@ -120,7 +125,7 @@ public class MenuTaskbar extends JPanel {
                             main.setPanel(new TrangChuPanel());
                             break;
                         case 1:
-                            main.setPanel(new MainThiSinhPanel(main));
+                            main.setPanel(new MainThiSinhPanel(main, TSBUS, listTS));
                             break;
                         case 2:
                             main.setPanel(new DiemThiPanel(main));

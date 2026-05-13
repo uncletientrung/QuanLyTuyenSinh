@@ -19,6 +19,9 @@ public class ThongKeThiSinhPanel extends JPanel {
     private final HashMap<String, Integer> thongKeDoiTuong;
     private final HashMap<String, Integer> thongKeKhuVuc;
     private final List<Map.Entry<String, Integer>> thongKeTinhThanh;
+    private HashMap<String, Integer> ThongKeTheoNamNu;
+    XtThisinhXetTuyen25BUS TSBUS;
+    List<XtThisinhXetTuyen25> listThiSinh;
 
     // ==================== COLORS ====================
     private final Color BG_MAIN = new Color(245, 247, 250);
@@ -35,13 +38,15 @@ public class ThongKeThiSinhPanel extends JPanel {
     private final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
     private final Font FONT_REGULAR = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font FONT_STAT = new Font("Segoe UI", Font.BOLD, 28);
-
-    public ThongKeThiSinhPanel(XtThisinhXetTuyen25BUS tsBUS, List<XtThisinhXetTuyen25> listThiSinh) {
+    
+    public ThongKeThiSinhPanel() {
+        TSBUS = new XtThisinhXetTuyen25BUS();
+        listThiSinh = TSBUS.getAllThiSinh();
         this.tongThiSinh = listThiSinh.size();
-        this.thongKeDoiTuong = tsBUS.thongKeThiSinhDoiTuong();
-        this.thongKeKhuVuc = tsBUS.thongKeThiSinhKhuVuc();
-        this.thongKeTinhThanh = tsBUS.thongKeThiSinhTinhThanh();
-
+        this.thongKeDoiTuong = TSBUS.thongKeThiSinhDoiTuong();
+        this.thongKeKhuVuc = TSBUS.thongKeThiSinhKhuVuc();
+        this.thongKeTinhThanh = TSBUS.thongKeThiSinhTinhThanh();
+        this.ThongKeTheoNamNu = this.TSBUS.thongKeThiSinhNamNu();
         initUI();
     }
 
@@ -56,8 +61,8 @@ public class ThongKeThiSinhPanel extends JPanel {
         statsRow.setPreferredSize(new Dimension(0, 130));
 
         statsRow.add(createStatCard("👥", "Tổng thí sinh", String.valueOf(tongThiSinh), STAT_BLUE));
-        statsRow.add(createStatCard("♂", "Thí sinh Nam", String.valueOf(thongKeNamNu("Nam")), STAT_GREEN));
-        statsRow.add(createStatCard("♀", "Thí sinh Nữ", String.valueOf(thongKeNamNu("Nữ")), STAT_PURPLE));
+        statsRow.add(createStatCard("♂", "Thí sinh Nam", String.valueOf(this.ThongKeTheoNamNu.get("Nam")), STAT_GREEN));
+        statsRow.add(createStatCard("♀", "Thí sinh Nữ", String.valueOf(this.ThongKeTheoNamNu.get("Nữ")), STAT_PURPLE));
 
         add(statsRow, BorderLayout.NORTH);
 
@@ -210,8 +215,4 @@ public class ThongKeThiSinhPanel extends JPanel {
         return card;
     }
 
-    // Helper lấy số lượng Nam/Nữ
-    private int thongKeNamNu(String gioiTinh) {
-        return new XtThisinhXetTuyen25BUS().thongKeThiSinhNamNu().getOrDefault(gioiTinh, 0);
-    }
 }

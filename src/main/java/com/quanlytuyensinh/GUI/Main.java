@@ -9,6 +9,8 @@ import com.quanlytuyensinh.GUI.Panel.TrangChuPanel;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
+import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,9 +23,14 @@ public class Main extends JFrame {
 
     public JPanel MainContent;
     private MenuTaskbar menuTaskbar;
+    private XtThisinhXetTuyen25BUS TSBUS;
+    private java.util.List<XtThisinhXetTuyen25> listTS;
     Color MainColor = new Color(250, 250, 250);
+    
 
     public Main() {
+        TSBUS = new XtThisinhXetTuyen25BUS();
+        listTS = TSBUS.getAllThiSinh();
         setupLAF();
         initComponent();
     }
@@ -54,7 +61,7 @@ public class Main extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // MENU
-        menuTaskbar = new MenuTaskbar(this);
+        menuTaskbar = new MenuTaskbar(this, TSBUS, listTS);
         menuTaskbar.setPreferredSize(new Dimension(250, 1400));
         this.add(menuTaskbar, BorderLayout.WEST);
 

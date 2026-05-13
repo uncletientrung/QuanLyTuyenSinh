@@ -27,10 +27,10 @@ public class MainThiSinhPanel extends JPanel {
     List<XtThisinhXetTuyen25> listTS;
     private Color BackgroundColor = new Color(240, 247, 250);
 
-    public MainThiSinhPanel(Main main) {
+    public MainThiSinhPanel(Main main, XtThisinhXetTuyen25BUS tsBUS,   List<XtThisinhXetTuyen25> listThiSinh) {
         this.mainFrame = main;
-        TSBUS = new XtThisinhXetTuyen25BUS();
-        listTS = TSBUS.getAllThiSinh();
+        TSBUS = tsBUS;
+        listTS = listThiSinh;
         initComponent();
     }
 
@@ -44,9 +44,18 @@ public class MainThiSinhPanel extends JPanel {
         tabbedPane.setFont(new java.awt.Font(FlatRobotoFont.FAMILY, 1, 14));
         tabbedPane.setBorder(new EmptyBorder(10, 10, 0, 10));
         tabbedPane.setBackground(Color.WHITE);
-        
-        tabbedPane.addTab("Thống kê thí sinh", new ThongKeThiSinhPanel(TSBUS, listTS));
         tabbedPane.addTab("Danh sách thí sinh", new ThiSinhPanel(mainFrame, TSBUS, listTS));
+
+        tabbedPane.addTab("Thống kê thí sinh", new ThongKeThiSinhPanel());
+        tabbedPane.addChangeListener(e -> {
+            int index = tabbedPane.getSelectedIndex();
+
+            // Chỉ reload tab thống kê
+            if(index == 1){
+                listTS = TSBUS.getAllThiSinh();
+                tabbedPane.setComponentAt( 1,new ThongKeThiSinhPanel() );
+            }
+        });
 
         
         this.add(tabbedPane);

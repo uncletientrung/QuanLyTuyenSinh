@@ -23,21 +23,37 @@
                                 <div class="row g-0 justify-content-center">
                                     <div class="col-sm-8 col-xl-6">
                                         <form class="js-validation-signin" th:action="@{/login}" method="POST">
+
+                                            <!-- Thông báo lỗi -->
                                             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
                                             <div class="py-3">
+                                                <!-- CCCD -->
                                                 <div class="mb-4">
-                                                    <input type="text" class="form-control form-control-lg form-control-alt" 
-                                                           id="login-username" name="login-username" placeholder="Username">
+                                                    <input type="text"
+                                                           class="form-control form-control-lg form-control-alt"
+                                                           id="cccd"
+                                                           name="cccd"
+                                                           placeholder="CCCD"
+                                                           required>
                                                 </div>
+
+                                                <!-- Mật khẩu = ngày sinh ddMMyyyy -->
                                                 <div class="mb-4">
-                                                    <input type="password" class="form-control form-control-lg form-control-alt" 
-                                                           id="login-password" name="login-password" placeholder="Password">
+                                                    <input type="password"
+                                                           class="form-control form-control-lg form-control-alt"
+                                                           id="password"
+                                                           name="password"
+                                                           placeholder="Ngày sinh (ddMMyyyy)"
+                                                           required>
                                                 </div>
                                             </div>
+
                                             <div class="mb-4">
-                                                <button type="submit" class="btn w-100 btn-lg btn-hero btn-primary">
-                                                    <i class="fa fa-fw fa-sign-in-alt opacity-50 me-1"></i> Đăng nhập
+                                                <button type="submit"
+                                                        class="btn w-100 btn-lg btn-hero btn-primary">
+                                                    <i class="fa fa-fw fa-sign-in-alt opacity-50 me-1"></i>
+                                                    Đăng nhập
                                                 </button>
                                             </div>
                                         </form>

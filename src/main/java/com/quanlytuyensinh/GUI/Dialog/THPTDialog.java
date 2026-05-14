@@ -251,6 +251,7 @@ public class THPTDialog extends JDialog implements ActionListener{
             set(nk6Field, selectedRow.getNk6());
         }
         JScrollPane container = new JScrollPane(pmain);
+        container.getVerticalScrollBar().setUnitIncrement(16);
         container.setBorder(new EmptyBorder(0, 0, 0, 0));
         this.add(container, BorderLayout.CENTER);
         this.add(pbottom, BorderLayout.SOUTH);

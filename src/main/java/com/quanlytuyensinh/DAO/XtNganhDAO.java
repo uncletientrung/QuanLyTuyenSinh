@@ -151,4 +151,81 @@ public boolean delete(int idnganh) {
             return null;
         }
     }
+        
+    public boolean TangSoLuongPhuongThuc(String phuongThuc, String maNganh) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            XtNganh nganh = session.createQuery(
+                "FROM XtNganh WHERE manganh = :ma", XtNganh.class)
+                .setParameter("ma", maNganh)
+                .uniqueResult();
+
+            if (nganh == null) {
+                transaction.rollback();
+                return false;
+            }
+
+            switch (phuongThuc.toUpperCase()) {
+                case "THPT" -> {
+                    nganh.setSlThpt(nganh.getSlThpt() == null || nganh.getSlThpt() == 0 ? 1 : nganh.getSlThpt() + 1);
+                    if (nganh.getNThpt() == null || "0".equals(nganh.getNThpt())) 
+                        nganh.setNThpt("1");
+                }
+                case "VSAT" -> {
+                    nganh.setSlVsat(nganh.getSlVsat() == null || nganh.getSlVsat() == 0 ? 1 : nganh.getSlVsat() + 1);
+                    if (nganh.getNVsat() == null || "0".equals(nganh.getNVsat())) 
+                        nganh.setNVsat("1");
+                }
+                case "DGNL" -> {
+                    nganh.setSlDgnl(nganh.getSlDgnl() == null || nganh.getSlDgnl() == 0 ? 1 : nganh.getSlDgnl() + 1);
+                    if (nganh.getNDgnl() == null || "0".equals(nganh.getNDgnl())) 
+                        nganh.setNDgnl("1");
+                }
+                case "Tuyển thẳng" -> {
+                    nganh.setSlXtt(nganh.getSlXtt() == null || nganh.getSlXtt() ==  0 ? 1 : nganh.getSlXtt() + 1);
+                    if (nganh.getNTuyenthang() == null || "0".equals(nganh.getNTuyenthang())) 
+                        nganh.setNTuyenthang("1");
+                }
+                default -> {
+                    transaction.rollback();
+                    return false;
+                }
+            }
+
+            session.merge(nganh);
+            transaction.commit();
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean resetAllSoLuongPhuongThuc() {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+
+            String hql = """
+                UPDATE XtNganh 
+                SET slXtt = 0,
+                    slDgnl = 0,
+                    slVsat = 0,
+                    slThpt = 0,
+                    nTuyenthang = NULL,
+                    nDgnl = NULL,
+                    nThpt = NULL,
+                    nVsat = NULL
+                """;
+            int affectedRows = session.createMutationQuery(hql).executeUpdate();
+            transaction.commit();
+            return affectedRows > 0;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

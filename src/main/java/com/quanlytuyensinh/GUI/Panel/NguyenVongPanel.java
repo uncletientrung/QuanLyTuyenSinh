@@ -66,34 +66,55 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     Color BackgroundColor = new Color(240, 247, 250);
     
      // Tác vụ thêm để xử lý
-    private XtNganhBUS NganhBUS =new XtNganhBUS();
+    private XtNganhBUS NganhBUS;
     private List<XtNganh> listNganh;
-    private XtNganhToHopBUS NganhTHBUS = new XtNganhToHopBUS() ;
+    private XtNganhToHopBUS NganhTHBUS;
     private List<XtNganhToHop> listNganhTH;
-    private XtDiemCongXetTuyenBUS DiemCongBUS = new XtDiemCongXetTuyenBUS();
+    private XtDiemCongXetTuyenBUS DiemCongBUS;
     private List<XtDiemCongXetTuyen> listDiemCong;
-    private XtThisinhXetTuyen25BUS TSBUS = new XtThisinhXetTuyen25BUS();
+    private XtThisinhXetTuyen25BUS TSBUS;
     private List<XtThisinhXetTuyen25> listTS;
-    private XtDiemThiXetTuyenBUS DTBUS = new XtDiemThiXetTuyenBUS();
+    private XtDiemThiXetTuyenBUS DTBUS;
     private List<XtDiemThiXetTuyen> listDT;
-    private XtBangQuyDoiBUS BQDBUS = new XtBangQuyDoiBUS();
+    private XtBangQuyDoiBUS BQDBUS;
     private List<XtBangQuyDoi> listBQD;
     
-    public NguyenVongPanel(Main mainF) {
-        this.mainFrame = mainF;
-        NVBUS = new XtNguyenVongXetTuyenBUS();
-        listNV = NVBUS.getAllNguyenVong();
-        
-        this.listDiemCong = DiemCongBUS.getAllDiemCong();
-        this.listNganhTH = NganhTHBUS.getAll();
-        this.listNganh = NganhBUS.getAllNganh();
-        this.listTS = this.TSBUS.getAllThiSinh();
-        this.listDT = DTBUS.getList();
-        this.listBQD = BQDBUS.getAllQuyDoi();
-           
-        initComponent();
-        loadDataTable(listNV);
-    }
+    public NguyenVongPanel(Main mainF,
+                               XtNguyenVongXetTuyenBUS nvBUS, List<XtNguyenVongXetTuyen> listNV,
+                               XtNganhBUS nganhBUS, List<XtNganh> listNganh,
+                               XtNganhToHopBUS nganhTHBUS, List<XtNganhToHop> listNganhTH,
+                               XtDiemCongXetTuyenBUS diemCongBUS, List<XtDiemCongXetTuyen> listDiemCong,
+                               XtThisinhXetTuyen25BUS tsBUS, List<XtThisinhXetTuyen25> listTS,
+                               XtDiemThiXetTuyenBUS dtBUS, List<XtDiemThiXetTuyen> listDT,
+                               XtBangQuyDoiBUS bqdBUS, List<XtBangQuyDoi> listBQD) {
+
+            this.mainFrame = mainF;
+
+            // Gán các BUS và List được truyền vào
+            this.NVBUS = nvBUS;
+            this.listNV = listNV;
+
+            this.NganhBUS = nganhBUS;
+            this.listNganh = listNganh;
+
+            this.NganhTHBUS = nganhTHBUS;
+            this.listNganhTH = listNganhTH;
+
+            this.DiemCongBUS = diemCongBUS;
+            this.listDiemCong = listDiemCong;
+
+            this.TSBUS = tsBUS;
+            this.listTS = listTS;
+
+            this.DTBUS = dtBUS;
+            this.listDT = listDT;
+
+            this.BQDBUS = bqdBUS;
+            this.listBQD = listBQD;
+
+            initComponent();
+            loadDataTable(listNV);
+        }
         
         private void initComponent() {
            this.setBackground(BackgroundColor);
@@ -249,6 +270,61 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         }
         return null;        
     }
+    
+    private void showApproveProgress() {
+        JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this),
+                "Đang xét tuyển tất cả nguyện vọng...", true);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setSize(420, 140);
+        dialog.setLocationRelativeTo(this);
+        dialog.setResizable(false);
+
+        JLabel lblStatus = new JLabel("Đang xử lý...", SwingConstants.CENTER);
+        lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setIndeterminate(true);           // ← Thanh chạy qua chạy lại
+        progressBar.setStringPainted(true);
+        progressBar.setString("Đang xét tuyển...");
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.add(lblStatus, BorderLayout.NORTH);
+        panel.add(progressBar, BorderLayout.CENTER);
+        dialog.add(panel);
+
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return NVBUS.approveAllNguyenVong(NganhBUS);
+            }
+
+            @Override
+            protected void done() {
+                dialog.dispose(); 
+
+                try {
+                    boolean success = get();
+                    if (success) {
+                        JOptionPane.showMessageDialog(NguyenVongPanel.this,
+                                "Xét tuyển tất cả nguyện vọng thành công!",
+                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(NguyenVongPanel.this,
+                                "Xét tuyển thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(NguyenVongPanel.this,
+                            "Đã xảy ra lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+                listNV = NVBUS.getAllNguyenVong();
+                loadDataTable(listNV);
+            }
+        };
+
+        worker.execute();
+        dialog.setVisible(true);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -264,26 +340,17 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         }else if (source == mainFunction.btn.get("import")) {
             importExcel();
         }
-        else if(source == mainFunction.btn.get("approve") ){
+        else if (source == mainFunction.btn.get("approve")) {
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "<html>"
-                        + "<h3 style='color:blue;'>XÁC NHẬN XÉT TUYỂN TẤT CẢ NGUYỆN VỌNG</h3>"
-                        + "<hr>"
-                        + "<b>Số lượng nguyện vọng nguyện vọng:</b> " + listNV.size()+ "<br>"
-                    + "</html>",
-                    "Xác nhận",
-                    JOptionPane.YES_NO_OPTION
-            );
-            if (confirm == JOptionPane.YES_OPTION) {
-                // Xử lý xét duyệt tất cả ngành
-                if (NVBUS.approveAllNguyenVong(NganhBUS)) {
-                    JOptionPane.showMessageDialog(this, "Xét tuyển tất cả nguyện vọng thành công!");
-                    listNV = NVBUS.getAllNguyenVong();
-                    loadDataTable(listNV);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Xét tất cả tuyển nguyện vọng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+                    "<html>" +
+                    "<h3 style='color:blue;'>XÁC NHẬN XÉT TUYỂN TẤT CẢ NGUYỆN VỌNG</h3>" +
+                    "<hr>" +
+                    "<b>Số lượng nguyện vọng:</b> " + listNV.size() + "<br>" +
+                    "</html>",
+                    "Xác nhận", JOptionPane.YES_NO_OPTION);
+
+            if (confirm != JOptionPane.YES_OPTION) return;
+            showApproveProgress();
         }else if(source == mainFunction.btn.get("undo") ){
             int confirm = JOptionPane.showConfirmDialog(this,
                     "<html>"
@@ -296,7 +363,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             );
             if (confirm == JOptionPane.YES_OPTION) {
                 // Xử lý xét duyệt tất cả ngành
-                if (NVBUS.undoAllNguyenVong()) {
+                if (NVBUS.undoAllNguyenVong(this.NganhBUS)) {
                     JOptionPane.showMessageDialog(this, "Hoàn xét tuyển tất cả nguyện vọng thành công!");
                     listNV = NVBUS.getAllNguyenVong();
                     loadDataTable(listNV);
@@ -554,86 +621,6 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
 
                         String tuyenThang =
                                 row.length > 3 ? row[3].trim() : "";
-
-                        // ===== VALIDATE =====
-
-                        boolean cccdExists =
-                                listTS.stream()
-                                        .anyMatch(ts -> ts.getCccd().equals(cccd));
-
-                        boolean nganhExists =
-                                listNganh.stream()
-                                        .anyMatch(n -> n.getManganh().equals(maNganh));
-
-                        if (!cccdExists) {
-
-                            errorMessages.add(
-                                    "CCCD [" + cccd + "] không tồn tại"
-                            );
-
-                            failCount++;
-                            continue;
-                        }
-
-                        if (!nganhExists) {
-
-                            errorMessages.add(
-                                    "Mã ngành [" + maNganh
-                                    + "] không tồn tại - CCCD: " + cccd
-                            );
-
-                            failCount++;
-                            continue;
-                        }
-
-                        if (thuTu <= 0) {
-
-                            errorMessages.add(
-                                    "Thứ tự NV phải > 0 - CCCD: " + cccd
-                            );
-
-                            failCount++;
-                            continue;
-                        }
-
-                        // ===== CHECK TRÙNG =====
-
-                        List<XtNguyenVongXetTuyen> listNVCheck =
-                                NVBUS.getListNVByCCCD(cccd);
-
-                        boolean trung = false;
-
-                        for (XtNguyenVongXetTuyen nv : listNVCheck) {
-
-                            if (nv.getNnCccd().equals(cccd)
-                                    && nv.getNvManganh().equals(maNganh)) {
-
-                                errorMessages.add(
-                                        "Ngành [" + maNganh
-                                        + "] đã tồn tại - CCCD: " + cccd
-                                );
-
-                                trung = true;
-                                break;
-                            }
-
-                            if (nv.getNnCccd().equals(cccd)
-                                    && nv.getNvTt() == thuTu) {
-
-                                errorMessages.add(
-                                        "Thứ tự NV [" + thuTu
-                                        + "] đã tồn tại - CCCD: " + cccd
-                                );
-
-                                trung = true;
-                                break;
-                            }
-                        }
-
-                        if (trung) {
-                            failCount++;
-                            continue;
-                        }
 
                         // ===== TÍNH ĐIỂM =====
 

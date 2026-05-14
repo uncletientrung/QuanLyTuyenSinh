@@ -24,14 +24,45 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
+import com.quanlytuyensinh.BUS.XtBangQuyDoiBUS;
+import com.quanlytuyensinh.BUS.XtDiemCongXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtDiemThiXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtNganhBUS;
+import com.quanlytuyensinh.BUS.XtNganhToHopBUS;
+import com.quanlytuyensinh.BUS.XtNguyenVongXetTuyenBUS;
+import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
+import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
+import com.quanlytuyensinh.ENTITY.XtDiemCongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtNganh;
+import com.quanlytuyensinh.ENTITY.XtNganhToHop;
+import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 /**
  *
  * @author DELL
  */
 public class MenuTaskbar extends JPanel {
+    private XtNguyenVongXetTuyenBUS NVBUS;
+    private java.util.List<XtNguyenVongXetTuyen> listNV;
+
+    private XtNganhBUS NganhBUS;
+    private java.util.List<XtNganh> listNganh;
+
+    private XtNganhToHopBUS NganhTHBUS;
+    private java.util.List<XtNganhToHop> listNganhTH;
+
+    private XtDiemCongXetTuyenBUS DiemCongBUS;
+    private java.util.List<XtDiemCongXetTuyen> listDiemCong;
+
     private XtThisinhXetTuyen25BUS TSBUS;
     private java.util.List<XtThisinhXetTuyen25> listTS;
+
+    private XtDiemThiXetTuyenBUS DTBUS;
+    private java.util.List<XtDiemThiXetTuyen> listDT;
+
+    private XtBangQuyDoiBUS BQDBUS;
+    private java.util.List<XtBangQuyDoi> listBQD;
     String[][] ArrMenu = {
         {"Trang chủ", "home.svg", "trangChu"},
         {"Thí sinh", "students.svg", "thiSinh"},
@@ -53,10 +84,37 @@ public class MenuTaskbar extends JPanel {
     Color DefaultColor = new Color(255, 255, 255);
     Color LineColor = new Color(204, 214, 219); // Màu xanh trắng
 
-    public MenuTaskbar(Main m, XtThisinhXetTuyen25BUS tsBUS,   java.util.List<XtThisinhXetTuyen25> listThiSinh) {
-        TSBUS = tsBUS;
-        listTS = listThiSinh;
+    public MenuTaskbar(Main m,
+                       XtNguyenVongXetTuyenBUS nvBUS, java.util.List<XtNguyenVongXetTuyen> listNV,
+                       XtNganhBUS nganhBUS, java.util.List<XtNganh> listNganh,
+                       XtNganhToHopBUS nganhTHBUS, java.util.List<XtNganhToHop> listNganhTH,
+                       XtDiemCongXetTuyenBUS diemCongBUS, java.util.List<XtDiemCongXetTuyen> listDiemCong,
+                       XtThisinhXetTuyen25BUS tsBUS, java.util.List<XtThisinhXetTuyen25> listTS,
+                       XtDiemThiXetTuyenBUS dtBUS, java.util.List<XtDiemThiXetTuyen> listDT,
+                       XtBangQuyDoiBUS bqdBUS, java.util.List<XtBangQuyDoi> listBQD) {
         this.main = m;
+        // Gán các BUS và List
+        this.NVBUS = nvBUS;
+        this.listNV = listNV;
+
+        this.NganhBUS = nganhBUS;
+        this.listNganh = listNganh;
+
+        this.NganhTHBUS = nganhTHBUS;
+        this.listNganhTH = listNganhTH;
+
+        this.DiemCongBUS = diemCongBUS;
+        this.listDiemCong = listDiemCong;
+
+        this.TSBUS = tsBUS;
+        this.listTS = listTS;
+
+        this.DTBUS = dtBUS;
+        this.listDT = listDT;
+
+        this.BQDBUS = bqdBUS;
+        this.listBQD = listBQD;
+
         initComponent();
     }
 
@@ -131,7 +189,14 @@ public class MenuTaskbar extends JPanel {
                             main.setPanel(new DiemThiPanel(main));
                             break;
                         case 3:
-                            main.setPanel(new NguyenVongPanel(main));
+                            main.setPanel(new NguyenVongPanel(main,
+                                    NVBUS, listNV,
+                                    NganhBUS, listNganh,
+                                    NganhTHBUS, listNganhTH,
+                                    DiemCongBUS, listDiemCong,
+                                    TSBUS, listTS,
+                                    DTBUS, listDT,
+                                    BQDBUS, listBQD));
                             break;
                         case 4:
                             main.setPanel(new ToHopMonPanel(main));

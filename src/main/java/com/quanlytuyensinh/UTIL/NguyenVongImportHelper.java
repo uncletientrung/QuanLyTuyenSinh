@@ -92,16 +92,20 @@ public class NguyenVongImportHelper {
             tong = tong.add(getDiemByMon(nth.getThMon2(), diemTHPT).multiply(BigDecimal.valueOf(nth.getHsMon2())));
             tong = tong.add(getDiemByMon(nth.getThMon3(), diemTHPT).multiply(BigDecimal.valueOf(nth.getHsMon3())));
             BigDecimal tongHeSo = BigDecimal.valueOf(nth.getHsMon1() + nth.getHsMon2() + nth.getHsMon3());
-            tong = tong.divide(tongHeSo.compareTo(BigDecimal.ZERO) != 0 ? tongHeSo : BigDecimal.ONE)
-                       .multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE,5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+            
             BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+            
             XtDiemCongXetTuyen dc = diemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = dc != null && dc.getDiemTong() != null ? dc.getDiemTong() : BigDecimal.ZERO;
-            BigDecimal diemUT   = tsBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
-            BigDecimal diemTH   = tong.subtract(doLech);
-            BigDecimal diemXT   = diemTH.add(diemCong).add(diemUT);
+            
+            BigDecimal diemUT = BigDecimal.ZERO;
+            diemUT = tsBUS.getDiemUuTienByCCCD(cccd, tong, diemCong); // Điểm ưu tiên đã if else 22.5 rồi
+
+            BigDecimal diemTH   = tong;
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) diemXT = new BigDecimal("30");
-            updateBest(diemXT, nth.getMatohop(), diemTH, diemCong, diemUT, doLech, "THPT");
+             updateBest(diemXT, nth.getMatohop(), diemTH, diemCong, diemUT, doLech, "THPT");
         }
     }
 
@@ -116,14 +120,18 @@ public class NguyenVongImportHelper {
             tong = tong.add(getDiemByMon(nth.getThMon2(), diemVSATQD).multiply(BigDecimal.valueOf(nth.getHsMon2())));
             tong = tong.add(getDiemByMon(nth.getThMon3(), diemVSATQD).multiply(BigDecimal.valueOf(nth.getHsMon3())));
             BigDecimal tongHeSo = BigDecimal.valueOf(nth.getHsMon1() + nth.getHsMon2() + nth.getHsMon3());
-            tong = tong.divide(tongHeSo.compareTo(BigDecimal.ZERO) != 0 ? tongHeSo : BigDecimal.ONE)
-                       .multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+            
             BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+            
             XtDiemCongXetTuyen dc = diemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = dc != null && dc.getDiemTong() != null ? dc.getDiemTong() : BigDecimal.ZERO;
-            BigDecimal diemUT   = tsBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
-            BigDecimal diemTH   = tong.subtract(doLech);
-            BigDecimal diemXT   = diemTH.add(diemCong).add(diemUT);
+            
+            BigDecimal diemUT = BigDecimal.ZERO;
+             diemUT = tsBUS.getDiemUuTienByCCCD(cccd, tong, diemCong);
+             
+            BigDecimal diemTH = tong;
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) diemXT = new BigDecimal("30");
             updateBest(diemXT, nth.getMatohop(), diemTH, diemCong, diemUT, doLech, "VSAT");
         }
@@ -135,13 +143,19 @@ public class NguyenVongImportHelper {
         if (listTH == null || diemDGNL == null) return;
         for (XtNganhToHop nth : listTH) {
             BigDecimal diemQD = bqdBUS.getDiemThiDGNLQuyDoi(nth.getMatohop(), diemDGNL);
+            
             BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+            
             XtDiemCongXetTuyen dc = diemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = dc != null && dc.getDiemTong() != null ? dc.getDiemTong() : BigDecimal.ZERO;
+            
             BigDecimal tong = BigDecimal.ZERO;
-            BigDecimal diemUT = tsBUS.getDiemUuTienByCCCD(cccd, tong.subtract(doLech), diemCong);
-            BigDecimal diemTH = tong.subtract(doLech).add(diemQD);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT);
+            
+            BigDecimal diemUT = BigDecimal.ZERO;
+             diemUT = tsBUS.getDiemUuTienByCCCD(cccd, tong, diemCong);
+             
+            BigDecimal diemTH = tong.add(diemQD);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) diemXT = new BigDecimal("30");
             updateBest(diemXT, nth.getMatohop(), diemTH, diemCong, diemUT, doLech, "DGNL");
         }

@@ -97,9 +97,15 @@ public class XtNguyenVongXetTuyenBUS {
             boolean rs= false;
             rs = nvDAO.approveAll();
             if(rs){
+                this.NganhBUS.resetSoLuongPhuongThucNganh(); // Reset số lượng phương thức
                 for(XtNguyenVongXetTuyen nv : listNV){
+                    if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
+                        nv.setNvKetqua("Trúng tuyển");
+                        this.NganhBUS.TangSoLuongPhuongThucNganh("Tuyển thẳng", nv.getNvManganh());
+                    }
+                    
                     BigDecimal diemTT = NganhBUS.getDiemTTByMaNganhBUS(nv.getNvManganh()); 
-                    BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nv.getNvManganh()); 
+                    BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nv.getNvManganh());
                     if (nv.getDiemXettuyen() == null) {
                         nv.setNvKetqua("Chưa có điểm");
                     } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
@@ -108,22 +114,21 @@ public class XtNguyenVongXetTuyenBUS {
                         nv.setNvKetqua("Đang xét");
                     } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
                         nv.setNvKetqua("Trúng tuyển");
+                        this.NganhBUS.TangSoLuongPhuongThucNganh(nv.getTtPhuongthuc(), nv.getNvManganh());
                     } else {
                         nv.setNvKetqua("Không trúng tuyển");
-                    }
-                    
-                    if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
-                        nv.setNvKetqua("Trúng tuyển");
-                    }
+                    }                   
                 }
                 return true;
             }
             return false;
         }
-    public boolean undoAllNguyenVong(){
+    public boolean undoAllNguyenVong(XtNganhBUS nganhBUS){
+        this.NganhBUS = nganhBUS;
         boolean rs= false;
         rs = nvDAO.undoAll();
         if(rs){
+            this.NganhBUS.resetSoLuongPhuongThucNganh();
             for(XtNguyenVongXetTuyen nv : listNV){
                     nv.setNvKetqua("Đang xét");
                 }

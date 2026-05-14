@@ -210,4 +210,10 @@ public class XtNganhBUS {
         if(maNganh == null || maNganh.equals("")) return null; 
         return this.nganhDAO.getNganhByMaNganh(maNganh);
     }
+    public boolean TangSoLuongPhuongThucNganh(String PhuongThuc, String MaNganh){
+        return this.nganhDAO.TangSoLuongPhuongThuc(PhuongThuc, MaNganh);
+    }
+    public boolean resetSoLuongPhuongThucNganh(){
+      return this.nganhDAO.resetAllSoLuongPhuongThuc();
+    }
 }

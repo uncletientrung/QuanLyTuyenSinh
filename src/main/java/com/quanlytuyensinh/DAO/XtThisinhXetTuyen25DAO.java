@@ -115,20 +115,15 @@ public class XtThisinhXetTuyen25DAO {
     }
     
     
-    public XtThisinhXetTuyen25 findByCccdAndPassword(String cccd, String ngaySinhNhap) {
+    public XtThisinhXetTuyen25 findByCccdAndPassword(String cccd, String password) {
         
-        String ngaySinhDB = ngaySinhNhap.substring(4, 8)  
-                          + "-"
-                          + ngaySinhNhap.substring(2, 4)   
-                          + "-"
-                          + ngaySinhNhap.substring(0, 2);  
-
+     
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery(
-                    "FROM XtThisinhXetTuyen25 WHERE cccd = :cccd AND ngaySinh = :ngaySinh",
+                    "FROM XtThisinhXetTuyen25 WHERE cccd = :cccd AND password = :password",
                     XtThisinhXetTuyen25.class)
                     .setParameter("cccd", cccd)
-                    .setParameter("ngaySinh", ngaySinhDB)
+                    .setParameter("password", password)
                     .uniqueResult();
         }
     }

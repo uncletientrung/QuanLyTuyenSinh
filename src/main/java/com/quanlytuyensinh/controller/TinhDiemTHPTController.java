@@ -73,7 +73,7 @@ public class TinhDiemTHPTController {
         model.addAttribute("listKQTHPT", listKQTHPT);
         model.addAttribute("THGoc", THGoc);
         model.addAttribute("ThCaoNhat", ThCaoNhat);
-        model.addAttribute("NguongDauVao", NguongDauVao);
+        model.addAttribute("NguongDauVao", NguongDauVao == BigDecimal.ZERO || NguongDauVao == null ? "Chưa công bố" : NguongDauVao);
         return "tinhdiemTHPT";
     }
 }

@@ -341,24 +341,24 @@ public class tinhDiemService {
             diemTHDTO.setDsMonThi(dsMon);
             diemTHDTO.setDsTenMonThi(dsTenMon);
             // Điểm các môn
-            diemTHDTO.setDiemToan(toan);
-            diemTHDTO.setDiemVan(nguVan);
-            diemTHDTO.setDiemLy(vatLy);
-            diemTHDTO.setDiemHoa(hoaHoc);
-            diemTHDTO.setDiemSinh(sinhHoc);
-            diemTHDTO.setDiemAnh(tiengAnh);
-            diemTHDTO.setDiemSu(lichSu);
-            diemTHDTO.setDiemDia(diaLy);
-            diemTHDTO.setDiemTin(tinHoc);
-            diemTHDTO.setDiemKTPL(ktpl);
-            diemTHDTO.setDiemCnCongNghiep(cnCongNghiep);
-            diemTHDTO.setDiemCnNongNghiep(cnNongNghiep);
+            diemTHDTO.setDiemToan(toan.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemVan(nguVan.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemLy(vatLy.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemHoa(hoaHoc.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemSinh(sinhHoc.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemAnh(tiengAnh.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemSu(lichSu.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemDia(diaLy.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemTin(tinHoc.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemKTPL(ktpl.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemCnCongNghiep(cnCongNghiep.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemCnNongNghiep(cnNongNghiep.setScale(2, RoundingMode.HALF_UP));
             // Điểm xét tuyển
-            diemTHDTO.setDiemTHXT(diemTH);
-            diemTHDTO.setDiemUuTien(diemUT);
-            diemTHDTO.setDiemCong(diemCongXT);
-            diemTHDTO.setDoLech(doLech);
-            diemTHDTO.setDiemXT(diemXT);
+            diemTHDTO.setDiemTHXT(diemTH.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemUuTien(diemUT.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemCong(diemCongXT.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDoLech(doLech.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemXT(diemXT.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setToHopGoc(nth.getMatohop().equals(THGoc));
 
             listKQTHPT.add(diemTHDTO);

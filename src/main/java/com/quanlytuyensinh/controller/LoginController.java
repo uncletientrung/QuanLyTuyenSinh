@@ -29,21 +29,15 @@ public class LoginController {
                         Model model,
                         HttpSession session) {
 
-        //lay thi sinh ra
         XtThisinhXetTuyen25 thiSinh = loginService.login(cccd, password);
 
-        // thong tin sai
         if (thiSinh == null) {
-            model.addAttribute("error",
-                    "CCCD hoặc ngày sinh không đúng.");
+            model.addAttribute("error", "CCCD hoặc ngày sinh không đúng.");
             return "login";
         }
 
-        // luu session
         session.setAttribute("user", thiSinh);
-
-        // dang nhap ok thi chay qua trangtra cuu
-        return "redirect:/tracuu";
+        return "redirect:/tracuu";   // sẽ tự động load kết quả
     }
 
     

@@ -115,7 +115,7 @@ public class XtThisinhXetTuyen25DAO {
     }
     
     
-    public XtThisinhXetTuyen25 findByCccdAndPassword(String cccd, String password) {
+    public XtThisinhXetTuyen25 findByCccdAndPassword2(String cccd, String password) {
         
      
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -124,6 +124,18 @@ public class XtThisinhXetTuyen25DAO {
                     XtThisinhXetTuyen25.class)
                     .setParameter("cccd", cccd)
                     .setParameter("password", password)
+                    .uniqueResult();
+        }
+    }
+    
+    public XtThisinhXetTuyen25 findByCccdAndPassword(String cccd) {
+        
+     
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "FROM XtThisinhXetTuyen25 WHERE cccd = :cccd",
+                    XtThisinhXetTuyen25.class)
+                    .setParameter("cccd", cccd)
                     .uniqueResult();
         }
     }

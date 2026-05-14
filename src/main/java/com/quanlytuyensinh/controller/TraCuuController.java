@@ -1,11 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.quanlytuyensinh.controller;
 
 import com.quanlytuyensinh.ENTITY.KetQuaTraCuuDTO;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.service.TraCuuService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,10 +18,30 @@ public class TraCuuController {
 
     @Autowired
     private TraCuuService traCuuService;
-    
-    // Running on http://localhost:8080/tracuu
+
     @GetMapping("/tracuu")
-    public String showForm() {
+    public String showForm(HttpSession session, 
+                           Model model,
+                           @RequestParam(required = false) String cccd,
+                           @RequestParam(required = false) String ngaySinh) {
+
+        // Nếu chưa có cccd (tức là mới redirect từ login) → tự động tra cứu cho user đang đăng nhập
+        if (cccd == null || cccd.trim().isEmpty()) {
+            XtThisinhXetTuyen25 user = (XtThisinhXetTuyen25) session.getAttribute("user");
+            if (user != null) {
+                cccd = user.getCccd();
+                
+                List<KetQuaTraCuuDTO> dsKetQua = traCuuService.traCuu(cccd, ""); // không cần password
+                model.addAttribute("daTraCuu", true);
+                model.addAttribute("dsKetQua", dsKetQua);
+                model.addAttribute("cccd", cccd);
+                // Không cần set ngaySinh vì là auto load
+                return "tracuu";
+            }
+        }
+
+        // Trường hợp bình thường (truy cập trực tiếp hoặc refresh)
+        model.addAttribute("daTraCuu", false);
         return "tracuu";
     }
 
@@ -34,12 +52,10 @@ public class TraCuuController {
             Model model) {
 
         List<KetQuaTraCuuDTO> dsKetQua = traCuuService.traCuu(cccd, ngaySinh);
-
         model.addAttribute("daTraCuu", true);
         model.addAttribute("dsKetQua", dsKetQua);
         model.addAttribute("cccd", cccd);
         model.addAttribute("ngaySinh", ngaySinh);
-
         return "tracuu";
     }
 }

@@ -20,9 +20,18 @@ public class TraCuuService {
         List<KetQuaTraCuuDTO> result = new ArrayList<>();
 
         // buoc1 tim thi sinh
-        XtThisinhXetTuyen25 ts = thisinhDAO.findByCccdAndPassword(cccd, password);
+        XtThisinhXetTuyen25 ts;
+    
+        if (password == null || password.trim().isEmpty()) {
+            // Trường hợp auto load từ session (đã đăng nhập)
+            ts = thisinhDAO.findByCccdAndPassword(cccd); // method không check password
+        } else {
+            // Tra cứu thủ công (có check password)
+            ts = thisinhDAO.findByCccdAndPassword2(cccd, password);
+        }
+
         if (ts == null) {
-            return result; // Sai thông tin
+            return result;
         }
 
         // b2 lay ds nguyen vong

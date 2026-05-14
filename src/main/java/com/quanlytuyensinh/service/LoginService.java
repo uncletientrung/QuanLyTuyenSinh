@@ -11,6 +11,6 @@ public class LoginService {
             XtThisinhXetTuyen25DAO.getInstance();
 
     public XtThisinhXetTuyen25 login(String cccd, String password) {
-        return thisinhDAO.findByCccdAndPassword(cccd, password);
+        return thisinhDAO.findByCccdAndPassword2(cccd, password);
     }
 }

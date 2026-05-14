@@ -329,171 +329,290 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
         if (fileChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
 
         java.io.File file = fileChooser.getSelectedFile();
-        int successCount = 0;
-        int updateGocCount = 0;
-        java.util.List<String> errorLines = new java.util.ArrayList<>();
 
-        // Cache tb_keys đã tồn tại để kiểm tra trùng
-        java.util.Set<String> existingKeys = new java.util.HashSet<>();
-        for (XtNganhToHop nth : nganhToHopBUS.getAll()) {
-            if (nth.getTbKeys() != null) {
-                existingKeys.add(nth.getTbKeys().trim().toLowerCase());
-            }
-        }
+        // --- Dialog tiến trình ---
+        JDialog progressDialog = new JDialog(
+                (JFrame) SwingUtilities.getWindowAncestor(this),
+                "Đang import...", true);
+        progressDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        progressDialog.setSize(420, 130);
+        progressDialog.setLocationRelativeTo(this);
+        progressDialog.setResizable(false);
 
-        try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook
-                = new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.FileInputStream(file))) {
+        JLabel lblStatus = new JLabel("Đang đọc file...", SwingConstants.CENTER);
+        lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblStatus.setBorder(new javax.swing.border.EmptyBorder(10, 10, 4, 10));
 
-            // Cần FormulaEvaluator để đọc giá trị ô công thức (tb_keys = B2&"_"&F2)
-            org.apache.poi.ss.usermodel.FormulaEvaluator evaluator =
-                    workbook.getCreationHelper().createFormulaEvaluator();
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setStringPainted(true);
+        progressBar.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        progressBar.setBorder(new javax.swing.border.EmptyBorder(0, 16, 0, 16));
 
-            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+        JPanel progressPanel = new JPanel(new BorderLayout(0, 6));
+        progressPanel.setBorder(new javax.swing.border.EmptyBorder(10, 10, 14, 10));
+        progressPanel.add(lblStatus, BorderLayout.NORTH);
+        progressPanel.add(progressBar, BorderLayout.CENTER);
+        progressDialog.add(progressPanel);
 
-            // Dòng 0 = header → dữ liệu bắt đầu từ dòng 1 (index 1)
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
-                if (row == null) continue;
+        // --- SwingWorker chạy import ở background ---
+        SwingWorker<Void, int[]> worker = new SwingWorker<>() {
 
-                int excelRow = i + 1; // số dòng hiển thị theo Excel (1-based)
-                try {
-                    // Cột 1: MANGANH
-                    String maNganh = getCellString(row.getCell(1), evaluator).trim();
+            int successCount   = 0;
+            int updateCount    = 0;
+            int skipCount      = 0;
+            int updateGocCount = 0;
+            java.util.List<String> errorLines = new java.util.ArrayList<>();
 
-                    // Cột 3: MA_TO_HOP dạng "D07(TO-3,HO-5,N1-1)"
-                    String maToHopRaw = getCellString(row.getCell(3), evaluator).trim();
+            @Override
+            protected Void doInBackground() throws Exception {
 
-                    if (maNganh.isEmpty() || maToHopRaw.isEmpty()) continue;
-
-                    // --- Tách mã tổ hợp và phần môn+hệ số ---
-                    // Ví dụ: "D07(TO-3,HO-5,N1-1)"
-                    //   → maToHop = "D07"
-                    //   → monHsList = ["TO-3", "HO-5", "N1-1"]
-                    String maToHop;
-                    String[] monHsParts; // mảng "MON-HS"
-
-                    int parenOpen = maToHopRaw.indexOf('(');
-                    if (parenOpen > 0 && maToHopRaw.endsWith(")")) {
-                        maToHop = maToHopRaw.substring(0, parenOpen).trim().toUpperCase();
-                        String inner = maToHopRaw.substring(parenOpen + 1, maToHopRaw.length() - 1);
-                        monHsParts = inner.split(",");
-                    } else {
-                        // Không có dấu ngoặc → chỉ lấy mã, không có môn
-                        maToHop = maToHopRaw.toUpperCase();
-                        monHsParts = new String[0];
+                // Cache tb_keys đã tồn tại để tra cứu nhanh
+                // Map<tbKeys_lower, XtNganhToHop> để dùng cho cả insert lẫn update
+                java.util.Map<String, XtNganhToHop> existingMap = new java.util.HashMap<>();
+                for (XtNganhToHop nth : nganhToHopBUS.getAll()) {
+                    if (nth.getTbKeys() != null) {
+                        existingMap.put(nth.getTbKeys().trim().toLowerCase(), nth);
                     }
+                }
 
-                    // Parse tối đa 3 môn và hệ số
-                    String mon1 = "", mon2 = "", mon3 = "";
-                    int    hs1  = 1,  hs2  = 1,  hs3  = 1;
+                try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook =
+                        new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                                new java.io.FileInputStream(file))) {
 
-                    for (int k = 0; k < monHsParts.length && k < 3; k++) {
-                        String part = monHsParts[k].trim(); // "TO-3"
-                        int dash = part.lastIndexOf('-');
-                        String tenMon = (dash > 0) ? part.substring(0, dash).trim().toUpperCase() : part.toUpperCase();
-                        int    heSo  = 1;
-                        if (dash > 0) {
-                            try { heSo = Integer.parseInt(part.substring(dash + 1).trim()); }
-                            catch (NumberFormatException ignored) {}
+                    org.apache.poi.ss.usermodel.FormulaEvaluator evaluator =
+                            workbook.getCreationHelper().createFormulaEvaluator();
+
+                    org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+
+                    int lastRow  = sheet.getLastRowNum();
+                    int dataRows = Math.max(0, lastRow); // dòng 0 là header
+                    int processed = 0;
+
+                    for (int i = 1; i <= lastRow; i++) {
+                        org.apache.poi.ss.usermodel.Row row = sheet.getRow(i);
+                        int excelRow = i + 1;
+
+                        if (row == null) {
+                            processed++;
+                            publish(new int[]{processed, dataRows});
+                            continue;
                         }
-                        if      (k == 0) { mon1 = tenMon; hs1 = heSo; }
-                        else if (k == 1) { mon2 = tenMon; hs2 = heSo; }
-                        else             { mon3 = tenMon; hs3 = heSo; }
-                    }
 
-                    // Cột 4: tb_keys (công thức Excel → FormulaEvaluator đọc được)
-                    String tbKeys = getCellString(row.getCell(4), evaluator).trim();
-                    // Fallback nếu ô trống: tự ghép
-                    if (tbKeys.isEmpty()) tbKeys = maNganh + "_" + maToHop;
+                        try {
+                            // Cột 1: MANGANH
+                            String maNganh = getCellString(row.getCell(1), evaluator).trim();
 
-                    // Cột 7: Độ lệch
-                    java.math.BigDecimal dolech = getCellDecimal(row.getCell(7), evaluator);
+                            // Cột 3: MA_TO_HOP dạng "D07(TO-3,HO-5,N1-1)"
+                            String maToHopRaw = getCellString(row.getCell(3), evaluator).trim();
 
-                    // Cột 6: Gốc
-                    String goc = getCellString(row.getCell(6), evaluator).trim();
+                            if (maNganh.isEmpty() || maToHopRaw.isEmpty()) {
+                                processed++;
+                                publish(new int[]{processed, dataRows});
+                                continue;
+                            }
 
-                    // Kiểm tra trùng tb_keys
-                    if (existingKeys.contains(tbKeys.toLowerCase())) {
-                        errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Đã tồn tại, bỏ qua.");
-                        continue;
-                    }
+                            // --- Tách mã tổ hợp và phần môn + hệ số ---
+                            String   maToHop;
+                            String[] monHsParts;
 
-                    // Xây dựng entity
-                    XtNganhToHop nth = new XtNganhToHop();
-                    nth.setManganh(maNganh);
-                    nth.setMatohop(maToHop);
-                    nth.setTbKeys(tbKeys);
-                    nth.setThMon1(mon1.isEmpty() ? null : mon1);
-                    nth.setHsMon1(hs1);
-                    nth.setThMon2(mon2.isEmpty() ? null : mon2);
-                    nth.setHsMon2(hs2);
-                    nth.setThMon3(mon3.isEmpty() ? null : mon3);
-                    nth.setHsMon3(hs3);
-                    nth.setDolech(dolech);
+                            int parenOpen = maToHopRaw.indexOf('(');
+                            if (parenOpen > 0 && maToHopRaw.endsWith(")")) {
+                                maToHop    = maToHopRaw.substring(0, parenOpen).trim().toUpperCase();
+                                String inner = maToHopRaw.substring(parenOpen + 1, maToHopRaw.length() - 1);
+                                monHsParts = inner.split(",");
+                            } else {
+                                maToHop    = maToHopRaw.toUpperCase();
+                                monHsParts = new String[0];
+                            }
 
-                    // Set boolean: môn nào xuất hiện → true, các môn còn lại → false
-                    resetBooleanFields(nth);
-                    if (!mon1.isEmpty()) setSubjectBoolean(nth, mon1);
-                    if (!mon2.isEmpty()) setSubjectBoolean(nth, mon2);
-                    if (!mon3.isEmpty()) setSubjectBoolean(nth, mon3);
+                            // Parse tối đa 3 môn và hệ số
+                            String mon1 = "", mon2 = "", mon3 = "";
+                            int    hs1  = 1,  hs2  = 1,  hs3  = 1;
 
-                    if (nganhToHopBUS.addNTH(nth)) {
-                        successCount++;
-                        existingKeys.add(tbKeys.toLowerCase());
+                            for (int k = 0; k < monHsParts.length && k < 3; k++) {
+                                String part = monHsParts[k].trim();
+                                int dash    = part.lastIndexOf('-');
+                                String tenMon = (dash > 0)
+                                        ? part.substring(0, dash).trim().toUpperCase()
+                                        : part.toUpperCase();
+                                int heSo = 1;
+                                if (dash > 0) {
+                                    try { heSo = Integer.parseInt(part.substring(dash + 1).trim()); }
+                                    catch (NumberFormatException ignored) {}
+                                }
+                                if      (k == 0) { mon1 = tenMon; hs1 = heSo; }
+                                else if (k == 1) { mon2 = tenMon; hs2 = heSo; }
+                                else             { mon3 = tenMon; hs3 = heSo; }
+                            }
 
-                        // Nếu cột Gốc = "Gốc" → update tổ hợp gốc bên bảng ngành
-                        if ("Gốc".equalsIgnoreCase(goc)) {
-                            XtNganh nganh = nganhBUS.getByMaNganh(maNganh);
-                            if (nganh != null) {
-                                nganh.setNTohopgoc(maToHop);
-                                if (nganhBUS.updateNganh(nganh)) {
-                                    updateGocCount++;
+                            // Cột 4: tb_keys
+                            String tbKeys = getCellString(row.getCell(4), evaluator).trim();
+                            if (tbKeys.isEmpty()) tbKeys = maNganh + "_" + maToHop;
+
+                            // Cột 7: Độ lệch
+                            java.math.BigDecimal dolech = getCellDecimal(row.getCell(7), evaluator);
+
+                            // Cột 6: Gốc
+                            String goc = getCellString(row.getCell(6), evaluator).trim();
+
+                            // Cập nhật label trạng thái
+                            final String lblText = tbKeys;
+                            SwingUtilities.invokeLater(() -> lblStatus.setText("Đang xử lý: " + lblText));
+
+                            String keyLower = tbKeys.toLowerCase();
+
+                            if (existingMap.containsKey(keyLower)) {
+                                // --- Đã tồn tại: so sánh dữ liệu ---
+                                XtNganhToHop existing = existingMap.get(keyLower);
+
+                                boolean same = strEq(existing.getThMon1(), mon1.isEmpty() ? null : mon1)
+                                        && strEq(existing.getThMon2(), mon2.isEmpty() ? null : mon2)
+                                        && strEq(existing.getThMon3(), mon3.isEmpty() ? null : mon3)
+                                        && existing.getHsMon1() == hs1
+                                        && existing.getHsMon2() == hs2
+                                        && existing.getHsMon3() == hs3
+                                        && bdEq(existing.getDolech(), dolech);
+
+                                if (same) {
+                                    // Hoàn toàn giống → bỏ qua
+                                    skipCount++;
                                 } else {
-                                    errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Cập nhật tổ hợp gốc thất bại.");
+                                    // Có thay đổi → update
+                                    existing.setThMon1(mon1.isEmpty() ? null : mon1); existing.setHsMon1(hs1);
+                                    existing.setThMon2(mon2.isEmpty() ? null : mon2); existing.setHsMon2(hs2);
+                                    existing.setThMon3(mon3.isEmpty() ? null : mon3); existing.setHsMon3(hs3);
+                                    existing.setDolech(dolech);
+                                    resetBooleanFields(existing);
+                                    if (!mon1.isEmpty()) setSubjectBoolean(existing, mon1);
+                                    if (!mon2.isEmpty()) setSubjectBoolean(existing, mon2);
+                                    if (!mon3.isEmpty()) setSubjectBoolean(existing, mon3);
+
+                                    if (nganhToHopBUS.updateNTH(existing)) {
+                                        updateCount++;
+                                    } else {
+                                        errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Cập nhật DB thất bại.");
+                                    }
+                                }
+                            } else {
+                                // --- Chưa tồn tại → insert mới ---
+                                XtNganhToHop nth = new XtNganhToHop();
+                                nth.setManganh(maNganh);
+                                nth.setMatohop(maToHop);
+                                nth.setTbKeys(tbKeys);
+                                nth.setThMon1(mon1.isEmpty() ? null : mon1); nth.setHsMon1(hs1);
+                                nth.setThMon2(mon2.isEmpty() ? null : mon2); nth.setHsMon2(hs2);
+                                nth.setThMon3(mon3.isEmpty() ? null : mon3); nth.setHsMon3(hs3);
+                                nth.setDolech(dolech);
+                                resetBooleanFields(nth);
+                                if (!mon1.isEmpty()) setSubjectBoolean(nth, mon1);
+                                if (!mon2.isEmpty()) setSubjectBoolean(nth, mon2);
+                                if (!mon3.isEmpty()) setSubjectBoolean(nth, mon3);
+
+                                if (nganhToHopBUS.addNTH(nth)) {
+                                    successCount++;
+                                    existingMap.put(keyLower, nth);
+
+                                    // Nếu cột Gốc = "Gốc" → update tổ hợp gốc bên bảng ngành
+                                    if ("Gốc".equalsIgnoreCase(goc)) {
+                                        XtNganh nganh = nganhBUS.getByMaNganh(maNganh);
+                                        if (nganh != null) {
+                                            nganh.setNTohopgoc(maToHop);
+                                            if (nganhBUS.updateNganh(nganh)) {
+                                                updateGocCount++;
+                                            } else {
+                                                errorLines.add("  • Dòng " + excelRow + " [" + maNganh + "]: Cập nhật tổ hợp gốc thất bại.");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Thêm vào DB thất bại.");
                                 }
                             }
-                            // Nếu không tìm thấy ngành thì bỏ qua (không báo lỗi)
+
+                        } catch (Exception ex) {
+                            errorLines.add("  • Dòng " + excelRow + ": Lỗi xử lý - " + ex.getMessage());
                         }
-                    } else {
-                        errorLines.add("  • Dòng " + excelRow + " [" + tbKeys + "]: Thêm vào DB thất bại.");
+
+                        processed++;
+                        publish(new int[]{processed, dataRows});
                     }
 
                 } catch (Exception ex) {
-                    errorLines.add("  • Dòng " + excelRow + ": Lỗi xử lý - " + ex.getMessage());
+                    SwingUtilities.invokeLater(() -> {
+                        progressDialog.dispose();
+                        JOptionPane.showMessageDialog(
+                                NganhToHopPanel.this,   // ← đổi thành tên class hiện tại của bạn
+                                "Lỗi đọc file Excel: " + ex.getMessage(),
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    });
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(java.util.List<int[]> chunks) {
+                int[] latest = chunks.get(chunks.size() - 1);
+                int done  = latest[0];
+                int total = latest[1];
+                if (total > 0) {
+                    int pct = (int) ((done * 100.0) / total);
+                    progressBar.setValue(pct);
+                    progressBar.setString(done + " / " + total + "  (" + pct + "%)");
                 }
             }
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Lỗi đọc file Excel: " + ex.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            @Override
+            protected void done() {
+                progressDialog.dispose();
 
-        // Hiển thị kết quả
-        StringBuilder sb = new StringBuilder();
-        sb.append("Import hoàn tất!\n");
-        sb.append("Thành công: ").append(successCount).append(" dòng\n");
-        if (updateGocCount > 0) {
-            sb.append("Cập nhật tổ hợp gốc ngành: ").append(updateGocCount).append(" ngành\n");
-        }
-        sb.append("Bỏ qua/Lỗi: ").append(errorLines.size()).append(" dòng");
-        if (!errorLines.isEmpty()) {
-            sb.append("\n\nChi tiết:\n");
-            errorLines.forEach(e -> sb.append(e).append("\n"));
-        }
+                StringBuilder sb = new StringBuilder();
+                sb.append("Import hoàn tất!\n\n");
+                sb.append("✔  Thêm mới      : ").append(successCount).append(" dòng\n");
+                sb.append("🔄  Cập nhật      : ").append(updateCount).append(" dòng\n");
+                sb.append("—   Bỏ qua       : ").append(skipCount).append(" dòng (trùng, không đổi)\n");
+                if (updateGocCount > 0) {
+                    sb.append("📌  Cập nhật gốc  : ").append(updateGocCount).append(" ngành\n");
+                }
+                sb.append("✘  Lỗi           : ").append(errorLines.size()).append(" dòng");
 
-        JOptionPane.showMessageDialog(this, sb.toString(), "Kết quả Import",
-                errorLines.isEmpty() ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE);
+                if (!errorLines.isEmpty()) {
+                    sb.append("\n\nChi tiết:\n");
+                    errorLines.forEach(e -> sb.append(e).append("\n"));
+                }
 
-        listNganhToHop = nganhToHopBUS.getAll();
-        loadDataTable(listNganhToHop);
+                JOptionPane.showMessageDialog(
+                        NganhToHopPanel.this,   // ← đổi thành tên class hiện tại của bạn
+                        sb.toString(),
+                        "Kết quả Import",
+                        errorLines.isEmpty() ? JOptionPane.INFORMATION_MESSAGE
+                                             : JOptionPane.WARNING_MESSAGE);
+
+                listNganhToHop = nganhToHopBUS.getAll();
+                loadDataTable(listNganhToHop);
+            }
+        };
+
+        worker.execute();
+        progressDialog.setVisible(true); // blocking trên EDT, worker chạy riêng
     }
 
+    // ── Helper: so sánh null-safe String ──────────────────────────────────────
+    private boolean strEq(String a, String b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.trim().equalsIgnoreCase(b.trim());
+    }
 
+    // ── Helper: so sánh null-safe BigDecimal ──────────────────────────────────
+    private boolean bdEq(java.math.BigDecimal a, java.math.BigDecimal b) {
+        if (a == null && b == null) return true;
+        if (a == null || b == null) return false;
+        return a.compareTo(b) == 0;
+    }
 
+    // ── Helper: đọc cell có hỗ trợ FormulaEvaluator ──────────────────────────
     private String getCellString(org.apache.poi.ss.usermodel.Cell cell,
-                                  org.apache.poi.ss.usermodel.FormulaEvaluator evaluator) {
+                                 org.apache.poi.ss.usermodel.FormulaEvaluator evaluator) {
         if (cell == null) return "";
         org.apache.poi.ss.usermodel.CellValue cv = evaluator.evaluate(cell);
         if (cv == null) return "";
@@ -507,20 +626,23 @@ public class NganhToHopPanel extends JPanel implements ActionListener, ItemListe
     }
 
     private java.math.BigDecimal getCellDecimal(org.apache.poi.ss.usermodel.Cell cell,
-                                                 org.apache.poi.ss.usermodel.FormulaEvaluator evaluator) {
-        if (cell == null) return java.math.BigDecimal.ZERO;
+                                                org.apache.poi.ss.usermodel.FormulaEvaluator evaluator) {
+        if (cell == null) return null;
         try {
             org.apache.poi.ss.usermodel.CellValue cv = evaluator.evaluate(cell);
-            if (cv == null) return java.math.BigDecimal.ZERO;
+            if (cv == null) return null;
             switch (cv.getCellType()) {
                 case NUMERIC: return java.math.BigDecimal.valueOf(cv.getNumberValue());
                 case STRING:  String s = cv.getStringValue().trim();
-                              return s.isEmpty() ? java.math.BigDecimal.ZERO : new java.math.BigDecimal(s);
-                default:      return java.math.BigDecimal.ZERO;
+                              return s.isEmpty() ? null : new java.math.BigDecimal(s);
+                default:      return null;
             }
-        } catch (Exception e) { return java.math.BigDecimal.ZERO; }
+        } catch (Exception e) { return null; }
     }
 
+
+
+    
 
 
     private int getCellInt(org.apache.poi.ss.usermodel.Cell cell) {

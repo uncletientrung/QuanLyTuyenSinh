@@ -461,136 +461,385 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     public void setListBQD(List<XtBangQuyDoi> listBQD) {
         this.listBQD = listBQD;
     }
-    private void importExcel() {
+ private void importExcel() {
+
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Chọn file Excel nguyện vọng");
-    fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-            "Excel Files (*.xlsx, *.xls)", "xlsx", "xls"));
+
+    fileChooser.setFileFilter(
+            new javax.swing.filechooser.FileNameExtensionFilter(
+                    "Excel Files (*.xlsx, *.xls)",
+                    "xlsx",
+                    "xls"
+            )
+    );
 
     int result = fileChooser.showOpenDialog(this);
-    if (result != JFileChooser.APPROVE_OPTION) return;
+
+    if (result != JFileChooser.APPROVE_OPTION) {
+        return;
+    }
 
     File file = fileChooser.getSelectedFile();
 
-    // Đọc dữ liệu từ Excel
-    List<String[]> rows;
-    try {
-        rows = ExcelImportUtil.readNguyenVongExcel(file);
-    } catch (Exception ex) {
-        JOptionPane.showMessageDialog(this,
-                "Không thể đọc file Excel: " + ex.getMessage(),
-                "Lỗi", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+    // ================= PROGRESS UI =================
 
-    if (rows == null || rows.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "File Excel không có dữ liệu!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
+    JProgressBar progressBar = new JProgressBar(0, 100);
+    progressBar.setStringPainted(true);
+    progressBar.setValue(0);
 
-    int successCount = 0;
-    int failCount = 0;
-    List<String> errorMessages = new ArrayList<>();
+    JLabel lblStatus = new JLabel("Đang import dữ liệu...");
 
-    for (String[] row : rows) {
-        // row[0] = CCCD, row[1] = Thứ tự NV, row[2] = Mã xét tuyển (mã ngành)
-        try {
-            String cccd     = row[0].trim();
-            int    thuTu    = Integer.parseInt(row[1].trim());
-            String maNganh  = row[2].trim();
-            String tuyenThang = row.length > 3 ? row[3].trim() : "";
+    JPanel panel = new JPanel(new BorderLayout(10, 10));
+    panel.add(lblStatus, BorderLayout.NORTH);
+    panel.add(progressBar, BorderLayout.CENTER);
 
-            // --- Validate cơ bản ---
-            boolean cccdExists  = listTS.stream().anyMatch(ts -> ts.getCccd().equals(cccd));
-            boolean nganhExists = listNganh.stream().anyMatch(n -> n.getManganh().equals(maNganh));
+    JDialog dialog = new JDialog(
+            (JFrame) SwingUtilities.getWindowAncestor(this),
+            "Import Excel Nguyện Vọng",
+            true
+    );
 
-            if (!cccdExists) {
-                errorMessages.add("CCCD [" + cccd + "] không tồn tại trong hệ thống");
-                failCount++; continue;
-            }
-            if (!nganhExists) {
-                errorMessages.add("Mã ngành [" + maNganh + "] không tồn tại - CCCD: " + cccd);
-                failCount++; continue;
-            }
-            if (thuTu <= 0) {
-                errorMessages.add("Thứ tự NV phải > 0 - CCCD: " + cccd);
-                failCount++; continue;
-            }
+    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+    dialog.getContentPane().add(panel);
+    dialog.setSize(400, 120);
+    dialog.setLocationRelativeTo(this);
 
-            // --- Kiểm tra trùng (giống validateInput trong Dialog) ---
-            List<XtNguyenVongXetTuyen> listNVCheck = NVBUS.getListNVByCCCD(cccd);
-            boolean trung = false;
-            for (XtNguyenVongXetTuyen nv : listNVCheck) {
-                if (nv.getNnCccd().equals(cccd) && nv.getNvManganh().equals(maNganh)) {
-                    errorMessages.add("Ngành [" + maNganh + "] đã có trong NV của CCCD: " + cccd);
-                    trung = true; break;
+    // ================= WORKER =================
+
+    SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+
+        int successCount = 0;
+        int failCount = 0;
+
+        List<String> errorMessages = new ArrayList<>();
+
+        @Override
+        protected Void doInBackground() {
+
+            try {
+
+                // ===== ĐỌC EXCEL =====
+
+                List<String[]> rows = ExcelImportUtil.readNguyenVongExcel(file);
+
+                if (rows == null || rows.isEmpty()) {
+
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(
+                                NguyenVongPanel.this,
+                                "File Excel không có dữ liệu!",
+                                "Thông báo",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                    });
+
+                    return null;
                 }
-                if (nv.getNnCccd().equals(cccd) && nv.getNvTt() == thuTu) {
-                    errorMessages.add("Thứ tự NV [" + thuTu + "] đã tồn tại - CCCD: " + cccd);
-                    trung = true; break;
+
+                int total = rows.size();
+                int current = 0;
+
+                // ===== IMPORT =====
+
+                for (String[] row : rows) {
+
+                    current++;
+
+                    try {
+
+                        String cccd = row[0].trim();
+                        int thuTu = Integer.parseInt(row[1].trim());
+                        String maNganh = row[2].trim();
+
+                        String tuyenThang =
+                                row.length > 3 ? row[3].trim() : "";
+
+                        // ===== VALIDATE =====
+
+                        boolean cccdExists =
+                                listTS.stream()
+                                        .anyMatch(ts -> ts.getCccd().equals(cccd));
+
+                        boolean nganhExists =
+                                listNganh.stream()
+                                        .anyMatch(n -> n.getManganh().equals(maNganh));
+
+                        if (!cccdExists) {
+
+                            errorMessages.add(
+                                    "CCCD [" + cccd + "] không tồn tại"
+                            );
+
+                            failCount++;
+                            continue;
+                        }
+
+                        if (!nganhExists) {
+
+                            errorMessages.add(
+                                    "Mã ngành [" + maNganh
+                                    + "] không tồn tại - CCCD: " + cccd
+                            );
+
+                            failCount++;
+                            continue;
+                        }
+
+                        if (thuTu <= 0) {
+
+                            errorMessages.add(
+                                    "Thứ tự NV phải > 0 - CCCD: " + cccd
+                            );
+
+                            failCount++;
+                            continue;
+                        }
+
+                        // ===== CHECK TRÙNG =====
+
+                        List<XtNguyenVongXetTuyen> listNVCheck =
+                                NVBUS.getListNVByCCCD(cccd);
+
+                        boolean trung = false;
+
+                        for (XtNguyenVongXetTuyen nv : listNVCheck) {
+
+                            if (nv.getNnCccd().equals(cccd)
+                                    && nv.getNvManganh().equals(maNganh)) {
+
+                                errorMessages.add(
+                                        "Ngành [" + maNganh
+                                        + "] đã tồn tại - CCCD: " + cccd
+                                );
+
+                                trung = true;
+                                break;
+                            }
+
+                            if (nv.getNnCccd().equals(cccd)
+                                    && nv.getNvTt() == thuTu) {
+
+                                errorMessages.add(
+                                        "Thứ tự NV [" + thuTu
+                                        + "] đã tồn tại - CCCD: " + cccd
+                                );
+
+                                trung = true;
+                                break;
+                            }
+                        }
+
+                        if (trung) {
+                            failCount++;
+                            continue;
+                        }
+
+                        // ===== TÍNH ĐIỂM =====
+
+                        NguyenVongImportHelper helper =
+                                new NguyenVongImportHelper(
+                                        cccd,
+                                        maNganh,
+                                        NganhBUS,
+                                        NganhTHBUS,
+                                        DiemCongBUS,
+                                        TSBUS,
+                                        DTBUS,
+                                        BQDBUS,
+                                        listNganhTH,
+                                        listDiemCong,
+                                        listDT,
+                                        listBQD
+                                );
+
+                        helper.tinhDiem();
+
+                        // ===== BUILD ENTITY =====
+
+                        XtNguyenVongXetTuyen nv =
+                                new XtNguyenVongXetTuyen();
+
+                        nv.setNnCccd(cccd);
+                        nv.setNvManganh(maNganh);
+                        nv.setNvTt(thuTu);
+
+                        nv.setDiemThxt(helper.getBestDiemTH());
+                        nv.setDiemUtqd(helper.getBestDiemUT());
+                        nv.setDiemCong(helper.getBestDiemCong());
+
+                        nv.setDiemXettuyen(helper.getMaxDiemXT());
+
+                        if (tuyenThang.equalsIgnoreCase("x")) {
+
+                            nv.setTtPhuongthuc("Tuyển thẳng");
+                            nv.setNvKetqua("Trúng tuyển");
+
+                        } else {
+
+                            nv.setTtPhuongthuc(
+                                    helper.getBestPhuongThuc()
+                            );
+
+                            nv.setNvKetqua("Đang xét");
+                        }
+
+                        nv.setTtThm(helper.getBestToHop());
+
+                        nv.setNvKeys(
+                                cccd + "_" + maNganh + "_" + thuTu
+                        );
+
+                        // ===== INSERT =====
+
+                        if (NVBUS.insertNguyenVong(nv)) {
+
+                            successCount++;
+
+                        } else {
+
+                            errorMessages.add(
+                                    "Lỗi insert DB - CCCD: "
+                                    + cccd
+                                    + ", Ngành: "
+                                    + maNganh
+                            );
+
+                            failCount++;
+                        }
+
+                    } catch (NumberFormatException ex) {
+
+                        errorMessages.add(
+                                "Thứ tự NV không hợp lệ: "
+                                + java.util.Arrays.toString(row)
+                        );
+
+                        failCount++;
+
+                    } catch (Exception ex) {
+
+                        errorMessages.add(
+                                "Lỗi dòng ["
+                                + row[0]
+                                + "]: "
+                                + ex.getMessage()
+                        );
+
+                        failCount++;
+                    }
+
+                    // ===== UPDATE PROGRESS =====
+
+                    int percent = (current * 100) / total;
+
+                    publish(percent);
                 }
-            }
-            if (trung) { failCount++; continue; }
 
-            // --- Tính điểm (tái sử dụng logic từ NguyenVongDialog) ---
-            NguyenVongImportHelper helper = new NguyenVongImportHelper(
-                    cccd, maNganh,
-                    NganhBUS, NganhTHBUS, DiemCongBUS, TSBUS, DTBUS, BQDBUS,
-                    listNganhTH, listDiemCong, listDT, listBQD
-            );
-            helper.tinhDiem();
+            } catch (Exception ex) {
 
-            // --- Build entity (giống saveNguyenVong trong Dialog) ---
-            XtNguyenVongXetTuyen nv = new XtNguyenVongXetTuyen();
-            nv.setNnCccd(cccd);
-            nv.setNvManganh(maNganh);
-            nv.setNvTt(thuTu);
-            nv.setDiemThxt(helper.getBestDiemTH());
-            nv.setDiemUtqd(helper.getBestDiemUT());
-            nv.setDiemCong(helper.getBestDiemCong());
-            nv.setDiemXettuyen(helper.getMaxDiemXT());
-            if (tuyenThang.equalsIgnoreCase("x")) {
-                nv.setTtPhuongthuc("Tuyển thẳng");
-                nv.setNvKetqua("Trúng tuyển");
-            } else {
-                nv.setTtPhuongthuc(helper.getBestPhuongThuc());
-                nv.setNvKetqua("Đang xét");
-            }
-            nv.setTtThm(helper.getBestToHop());
-            nv.setNvKeys(cccd + "_" + maNganh + "_" + thuTu);
+                SwingUtilities.invokeLater(() -> {
 
-            if (NVBUS.insertNguyenVong(nv)) {
-                successCount++;
-            } else {
-                errorMessages.add("Lỗi insert DB - CCCD: " + cccd + ", Ngành: " + maNganh);
-                failCount++;
+                    JOptionPane.showMessageDialog(
+                            NguyenVongPanel.this,
+                            "Lỗi import:\n" + ex.getMessage(),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                });
             }
 
-        } catch (NumberFormatException ex) {
-            errorMessages.add("Thứ tự NV không hợp lệ ở dòng: " + java.util.Arrays.toString(row));
-            failCount++;
-        } catch (Exception ex) {
-            errorMessages.add("Lỗi dòng [" + row[0] + "]: " + ex.getMessage());
-            failCount++;
+            return null;
         }
-    }
 
-    // --- Refresh table ---
-    listNV = NVBUS.getAllNguyenVong();
-    loadDataTable(listNV);
+        @Override
+        protected void process(List<Integer> chunks) {
 
-    // --- Thông báo kết quả ---
-    StringBuilder msg = new StringBuilder();
-    msg.append("Import hoàn tất!\n")
-       .append("✔ Thành công: ").append(successCount).append(" dòng\n")
-       .append("✘ Thất bại:   ").append(failCount).append(" dòng");
-    if (!errorMessages.isEmpty()) {
-        msg.append("\n\nChi tiết lỗi:\n");
-        for (String err : errorMessages) msg.append("- ").append(err).append("\n");
-    }
-    JOptionPane.showMessageDialog(this, msg.toString(),
-            failCount > 0 ? "Import có lỗi" : "Import thành công",
-            failCount > 0 ? JOptionPane.WARNING_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
+            int value = chunks.get(chunks.size() - 1);
+
+            progressBar.setValue(value);
+
+            lblStatus.setText(
+                    "Đang import... " + value + "%"
+            );
+        }
+
+        @Override
+        protected void done() {
+
+            dialog.dispose();
+
+            // ===== REFRESH TABLE =====
+
+            listNV = NVBUS.getAllNguyenVong();
+
+            loadDataTable(listNV);
+
+            // ===== THÔNG BÁO =====
+
+            if (!errorMessages.isEmpty()) {
+
+                JTextArea textArea =
+                        new JTextArea();
+
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("Import hoàn tất!\n\n");
+                sb.append("✔ Thành công: ")
+                        .append(successCount)
+                        .append("\n");
+
+                sb.append("✘ Thất bại: ")
+                        .append(failCount)
+                        .append("\n\n");
+
+                for (String err : errorMessages) {
+                    sb.append("- ")
+                            .append(err)
+                            .append("\n");
+                }
+
+                textArea.setText(sb.toString());
+
+                textArea.setEditable(false);
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+
+                JScrollPane scroll =
+                        new JScrollPane(textArea);
+
+                scroll.setPreferredSize(
+                        new Dimension(650, 300)
+                );
+
+                JOptionPane.showMessageDialog(
+                        NguyenVongPanel.this,
+                        scroll,
+                        "Kết quả Import",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        NguyenVongPanel.this,
+                        "Import hoàn tất!\n\n"
+                        + "✔ Thành công: "
+                        + successCount
+                        + "\n"
+                        + "✘ Thất bại: "
+                        + failCount,
+                        "Import thành công",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        }
+    };
+
+    worker.execute();
+
+    dialog.setVisible(true);
 }
 
 }

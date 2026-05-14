@@ -18,13 +18,13 @@
                     <div class="block block-rounded">
                         <div class="block-header block-header-default">
                             <h3 class="block-title">Tính quy đổi điểm xét tuyển ĐGNL:
-                                <span class="fw-bold text-primary">Quản lý giáo dục (7140114)</span>
+                                <span class="fw-bold text-primary" th:text="|${ketqua.tenNganh} (${nganh})|"></span>
                             </h3>
                         </div>
                         <div class="block-content">
                             <p>
                                 Tổ hợp gốc quy đổi theo ngành:
-                                <span class="fw-bold text-primary">D01</span>,
+                                <span class="fw-bold text-primary" th:text="${ketqua.toHopGoc}"></span>,
                                 Ngưỡng đầu vào:
                             </p>
 
@@ -53,28 +53,28 @@
                                     <tbody class="fs-sm">
                                         <tr>
                                             <td>Điểm thi ĐGNL</td>
-                                            <td>890.00</td>
+                                            <td th:text="${ketqua.diemThi}"></td>
                                         </tr>
                                         <tr>
-                                            <td>Công thức quy đổi về thang 30 <span class="fw-bold text-primary">(THXT gốc: D01)</span>
+                                            <td>Công thức quy đổi về thang 30 <span class="fw-bold text-primary" th:text="|(THXT gốc: ${ketqua.toHopGoc})|"></span>
                                             </td>
-                                            <td>22.25 + (890 - 889.00) / (895.00 - 889.00) * (22.25 - 22.25)</td>
+                                            <td th:text="${ketqua.ctQuyDoi}"></td>
                                         </tr>
                                         <tr>
                                             <td>Điểm thi quy đổi</td>
-                                            <td>22.25</td>
+                                            <td th:text="${ketqua.diemThiQuyDoi}"></td>
                                         </tr>
                                         <tr>
                                             <td>Điểm cộng</td>
-                                            <td>2.00</td>
+                                            <td th:text="${ketqua.diemCong}"></td>
                                         </tr>
                                         <tr>
                                             <td>Điểm ưu tiên quy đổi</td>
-                                            <td>0</td>
+                                            <td th:text="${ketqua.diemUuTien}"></td>
                                         </tr>
                                         <tr>
                                             <td>Điểm xét tuyển = <code>Điểm quy đổi + Điểm cộng + Điểm ưu tiên quy đổi</code></td>
-                                            <td>24.25</td>
+                                            <td th:text="${ketqua.diemXetTuyen}"></td>
                                         </tr>
                                     </tbody>
                                 </table>

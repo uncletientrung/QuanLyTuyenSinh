@@ -15,6 +15,7 @@ import com.quanlytuyensinh.DAO.XtThisinhXetTuyen25DAO;
 import com.quanlytuyensinh.DAO.XtToHopMonThiDAO;
 import com.quanlytuyensinh.ENTITY.KetQuaTraCuuDTO;
 import com.quanlytuyensinh.ENTITY.KetQuaTraCuuVSATDTO;
+import com.quanlytuyensinh.ENTITY.TinhDiemDGNL;
 import com.quanlytuyensinh.ENTITY.TinhDiemTHPTDTO;
 import com.quanlytuyensinh.ENTITY.TinhDiemVSAT;
 import com.quanlytuyensinh.ENTITY.XtBangQuyDoi;
@@ -26,6 +27,7 @@ import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.ENTITY.XtToHopMonThi;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -459,7 +461,37 @@ public class tinhDiemService {
         return listkq;
         
     }
-   
-   
-    
+
+    public TinhDiemDGNL tinhDiemDGNL(String nganh, String diemCong, String khuVuc, String doiTuong, String diemThi) {
+        XtNganh nganhXet = listNganh.stream().filter(n -> nganh.equals(n.getManganh()))
+                                            .findAny()
+                                            .orElse(null);
+        
+        if (nganhXet == null) {
+            System.out.println("Không tìm thấy mã ngành" + nganh);
+            return null;
+        } 
+        String tenNganh = nganhXet.getTennganh();
+        String toHopGoc = nganhXet.getNTohopgoc();
+
+        BigDecimal diemThiDGNL = new BigDecimal(diemThi);
+
+        XtBangQuyDoi quyDoi = listQuyDoi.stream().filter(q -> (q.getDDiema().compareTo(diemThiDGNL) < 0 && q.getDDiemb().compareTo(diemThiDGNL) > 0))
+                                                .findAny()
+                                                .orElse(null);
+        if (quyDoi == null) {
+            System.out.println("Không tìm thấy phân vị quy đổi");
+            return null;
+        }
+
+        String ctQuyDoi = quyDoi.getDDiemc() + " + (" + diemThiDGNL + " - " + quyDoi.getDDiema() + ") / (" + quyDoi.getDDiemb() + " - " + quyDoi.getDDiema() + ") * (" + quyDoi.getDDiemd() + " - " + quyDoi.getDDiemc() + ")";
+        BigDecimal diemThiQuyDoi = quyDoi.getDDiemc().add(diemThiDGNL.subtract(quyDoi.getDDiema()).divide(quyDoi.getDDiemb().subtract(quyDoi.getDDiema()), MathContext.DECIMAL128).multiply(quyDoi.getDDiemd().subtract(quyDoi.getDDiemc())));    
+        diemThiQuyDoi = diemThiQuyDoi.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal diemCongVal = new BigDecimal(diemCong);
+        BigDecimal diemUuTien = DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong));
+        BigDecimal diemXetTuyen = diemThiQuyDoi.add(diemCongVal).add(diemUuTien);
+        diemXetTuyen = diemXetTuyen.setScale(2, RoundingMode.HALF_UP);
+
+        return new TinhDiemDGNL(tenNganh, toHopGoc, diemThiDGNL, ctQuyDoi, diemThiQuyDoi, diemCongVal, diemUuTien, diemXetTuyen);
+    }
 }

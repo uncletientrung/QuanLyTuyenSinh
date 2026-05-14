@@ -30,17 +30,13 @@
                                             <!-- TODO: Should use <option th:each> to replace hardcode -->
                                             <label class="form-label" for="nganh-select">Chọn ngành</label>
                                             <select class="form-select" id="nganh-select" name="nganh-select">
-                                                <option selected>Open this select menu</option>
-                                                <option value="1">Option #1</option>
-                                                <option value="2">Option #2</option>
-                                                <option value="3">Option #3</option>
-                                                <option value="4">Option #4</option>
-                                                <option value="5">Option #5</option>
-                                                <option value="6">Option #6</option>
-                                                <option value="7">Option #7</option>
-                                                <option value="8">Option #8</option>
-                                                <option value="9">Option #9</option>
-                                                <option value="10">Option #10</option>
+                                               <option value="">-- Chọn ngành --</option>
+
+                                                <option th:each="nganh : ${listNganh}"
+                                                        th:value="${nganh.manganh}"
+                                                        th:text="${nganh.manganh + ' - ' + nganh.tennganh}"
+                                                        th:selected="${nganh.manganh == selectedNganh}">
+                                                </option>
                                             </select>
                                         </div>
                                         <div class="mb-4">

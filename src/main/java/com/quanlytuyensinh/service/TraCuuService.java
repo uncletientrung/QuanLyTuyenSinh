@@ -5,6 +5,7 @@ import com.quanlytuyensinh.DAO.XtNganhDAO;
 import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtThisinhXetTuyen25DAO;
 import com.quanlytuyensinh.ENTITY.*;
+import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class TraCuuService {
 
         XtThisinhXetTuyen25 ts = thisinhDAO.findByCccdAndPassword(cccd);
         if (ts == null) return new TraCuuResultWrapper(new ArrayList<>(), new ArrayList<>());
-
+        
         // Lấy danh sách nguyện vọng → map DTO 
         List<XtNguyenVongXetTuyen> dsNV = nguyenVongDAO.findByCccdOrderByThuTu(cccd);
         List<KetQuaTraCuuDTO> dsKetQua = new ArrayList<>();
@@ -30,15 +31,17 @@ public class TraCuuService {
             String tenNganh = nv.getNvManganh();
             XtNganh nganh = nganhDAO.getNganhByMaNganh(nv.getNvManganh());
             if (nganh != null) tenNganh = nganh.getTennganh();
-
+            BigDecimal diemThxt     = lamTron2sothapphan(nv.getDiemThxt());
+            BigDecimal diemUtqd     = lamTron2sothapphan(nv.getDiemUtqd());
+            BigDecimal diemXettuyen = lamTron2sothapphan(nv.getDiemXettuyen());
             dsKetQua.add(new KetQuaTraCuuDTO(
                 ts.getCccd(), ts.getHo(), ts.getTen(), ts.getNgaySinh(),
                 ts.getDoiTuong(), ts.getKhuVuc(),
                 nv.getNvManganh(), tenNganh, nv.getNvTt(),
                 nv.getTtThm(), nv.getNvKetqua(), nv.getTtPhuongthuc(),
-                nv.getDiemThxt(),
-                    nv.getDiemUtqd(),nv.getDiemCong(),
-                nv.getDiemXettuyen()
+                diemThxt,
+                    diemUtqd,nv.getDiemCong(),
+                diemXettuyen
             ));
         }
 
@@ -46,5 +49,13 @@ public class TraCuuService {
         List<XtDiemThiXetTuyen> dsDiem = diemDAO.findByCccd(cccd);
 
         return new TraCuuResultWrapper(dsKetQua, dsDiem);
+    }
+    
+
+    private BigDecimal lamTron2sothapphan(BigDecimal value) {
+        if (value == null) {
+            return null;
+        }
+        return value.setScale(2, java.math.RoundingMode.HALF_UP);
     }
 }

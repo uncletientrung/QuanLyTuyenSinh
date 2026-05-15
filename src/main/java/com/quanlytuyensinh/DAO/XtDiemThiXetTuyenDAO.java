@@ -235,4 +235,14 @@ public class XtDiemThiXetTuyenDAO {
             e.printStackTrace();
         }
     }
+    
+    public List<XtDiemThiXetTuyen> findByCccd(String cccd) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery(
+                    "FROM XtDiemThiXetTuyen WHERE cccd = :cccd",
+                    XtDiemThiXetTuyen.class)
+                .setParameter("cccd", cccd)
+                .list();
+        }
+    }
 }

@@ -16,14 +16,22 @@ public class KetQuaTraCuuDTO {
     private int thuTuNguyenVong;
     private String toHopTrungTuyen;
     private String ketQuaTrungTuyen;
-    private String phuongThuc;
+    private String phuongThuc;//day la phuong thuc trong bang nguyen vong
+    private BigDecimal diemThxt;
+    private BigDecimal diemUtqd;
+    private BigDecimal diemCong;
     private BigDecimal diemXettuyen;
+    
+    // nhung truong can lay o bang diemthi
+    // can lay phuong thuc trong bang thi sinh va diem cua cac mon cua phuong thuc do
+    
 
     public KetQuaTraCuuDTO(String cccd, String ho, String ten, String ngaySinh,
                            String doiTuong, String khuVuc,
                            String maNganhTrungTuyen, String tenNganh,
                            int thuTuNguyenVong, String toHopTrungTuyen,
-                           String ketQuaTrungTuyen, String phuongThuc,
+                           String ketQuaTrungTuyen, String phuongThuc,BigDecimal diemThxt,
+                           BigDecimal diemUtqd, BigDecimal diemCong,
                            BigDecimal diemXettuyen) {
         this.cccd = cccd;
         this.ho = ho;
@@ -37,6 +45,9 @@ public class KetQuaTraCuuDTO {
         this.toHopTrungTuyen = toHopTrungTuyen;
         this.ketQuaTrungTuyen = ketQuaTrungTuyen;
         this.phuongThuc = phuongThuc;
+        this.diemThxt=diemThxt;
+        this.diemUtqd= diemUtqd;
+        this.diemCong= diemCong;
         this.diemXettuyen = diemXettuyen;
     }
 
@@ -99,5 +110,29 @@ public class KetQuaTraCuuDTO {
 
     public BigDecimal getDiemXettuyen() { return diemXettuyen; }
     public void setDiemXettuyen(BigDecimal diemXettuyen) { this.diemXettuyen = diemXettuyen; }
+
+    public BigDecimal getDiemThxt() {
+        return diemThxt;
+    }
+
+    public void setDiemThxt(BigDecimal diemThxt) {
+        this.diemThxt = diemThxt;
+    }
+
+    public BigDecimal getDiemUtqd() {
+        return diemUtqd;
+    }
+
+    public void setDiemUtqd(BigDecimal diemUtqd) {
+        this.diemUtqd = diemUtqd;
+    }
+
+    public BigDecimal getDiemCong() {
+        return diemCong;
+    }
+
+    public void setDiemCong(BigDecimal diemCong) {
+        this.diemCong = diemCong;
+    }
 
 }

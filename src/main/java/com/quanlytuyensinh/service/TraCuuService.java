@@ -1,5 +1,6 @@
 package com.quanlytuyensinh.service;
 
+import com.quanlytuyensinh.DAO.XtDiemThiXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtNganhDAO;
 import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtThisinhXetTuyen25DAO;
@@ -12,60 +13,38 @@ import java.util.List;
 @Service
 public class TraCuuService {
 
-    private final XtThisinhXetTuyen25DAO thisinhDAO = XtThisinhXetTuyen25DAO.getInstance();
-    private final XtNguyenVongXetTuyenDAO nguyenVongDAO = XtNguyenVongXetTuyenDAO.getInstance();
-    private final XtNganhDAO nganhDAO = XtNganhDAO.getInstance();
+    private final XtThisinhXetTuyen25DAO  thisinhDAO   = XtThisinhXetTuyen25DAO.getInstance();
+    private final XtNguyenVongXetTuyenDAO nguyenVongDAO= XtNguyenVongXetTuyenDAO.getInstance();
+    private final XtNganhDAO              nganhDAO     = XtNganhDAO.getInstance();
+    private final XtDiemThiXetTuyenDAO    diemDAO      = XtDiemThiXetTuyenDAO.getInstance(); 
 
-    public List<KetQuaTraCuuDTO> traCuu(String cccd, String password) {
-        List<KetQuaTraCuuDTO> result = new ArrayList<>();
+    public TraCuuResultWrapper traCuu(String cccd) {  
 
-        // buoc1 tim thi sinh
-        XtThisinhXetTuyen25 ts;
-    
-        if (password == null || password.trim().isEmpty()) {
-            // Trường hợp auto load từ session (đã đăng nhập)
-            ts = thisinhDAO.findByCccdAndPassword(cccd); // method không check password
-        } else {
-            // Tra cứu thủ công (có check password)
-            ts = thisinhDAO.findByCccdAndPassword2(cccd, password);
-        }
+        XtThisinhXetTuyen25 ts = thisinhDAO.findByCccdAndPassword(cccd);
+        if (ts == null) return new TraCuuResultWrapper(new ArrayList<>(), new ArrayList<>());
 
-        if (ts == null) {
-            return result;
-        }
-
-        // b2 lay ds nguyen vong
+        // Lấy danh sách nguyện vọng → map DTO 
         List<XtNguyenVongXetTuyen> dsNV = nguyenVongDAO.findByCccdOrderByThuTu(cccd);
-
-        //map sang DTO
+        List<KetQuaTraCuuDTO> dsKetQua = new ArrayList<>();
         for (XtNguyenVongXetTuyen nv : dsNV) {
-
-            
-            String tenNganh = nv.getNvManganh(); 
+            String tenNganh = nv.getNvManganh();
             XtNganh nganh = nganhDAO.getNganhByMaNganh(nv.getNvManganh());
-            if (nganh != null) {
-                tenNganh = nganh.getTennganh();
-            }
+            if (nganh != null) tenNganh = nganh.getTennganh();
 
-            KetQuaTraCuuDTO dto = new KetQuaTraCuuDTO(
-                ts.getCccd(),
-                ts.getHo(),
-                ts.getTen(),
-                ts.getNgaySinh(),
-                ts.getDoiTuong(),
-                ts.getKhuVuc(),
-                nv.getNvManganh(),
-                tenNganh,
-                nv.getNvTt(),
-                nv.getTtThm(),        
-                nv.getNvKetqua(),
-                nv.getTtPhuongthuc(),
+            dsKetQua.add(new KetQuaTraCuuDTO(
+                ts.getCccd(), ts.getHo(), ts.getTen(), ts.getNgaySinh(),
+                ts.getDoiTuong(), ts.getKhuVuc(),
+                nv.getNvManganh(), tenNganh, nv.getNvTt(),
+                nv.getTtThm(), nv.getNvKetqua(), nv.getTtPhuongthuc(),
+                nv.getDiemThxt(),
+                    nv.getDiemUtqd(),nv.getDiemCong(),
                 nv.getDiemXettuyen()
-            );
-
-            result.add(dto);
+            ));
         }
 
-        return result;
+        // lấy tất cả dòng điểm của thí sinh 
+        List<XtDiemThiXetTuyen> dsDiem = diemDAO.findByCccd(cccd);
+
+        return new TraCuuResultWrapper(dsKetQua, dsDiem);
     }
 }

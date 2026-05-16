@@ -16,7 +16,7 @@ import javax.swing.text.PlainDocument;
 
 public class NganhDialog extends JDialog {
 
-    private VerticalInputForm txtMaNganh, txtTenNganh, txtChiTieu,
+    private VerticalInputForm txtMaNganh, txtTenNganh, txtToHopGoc, txtChiTieu,
             txtDiemSan, txtDiemTrungTuyen,
             txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt;
     private VerticalComboBoxForm cbbTuyenThang, cbbDgnl, cbbThpt, cbbVsat;
@@ -25,7 +25,6 @@ public class NganhDialog extends JDialog {
     private NganhPanel parent;
     private XtNganh currentNganh;
     private JPanel pnlMain, pnlButtons;
-    private JComboBox<String> cbbToHopGoc;
 
     public NganhDialog(NganhPanel parent, JFrame owner, String title, boolean modal, String type, XtNganh nganh) {
         super(owner, title, modal);
@@ -68,7 +67,7 @@ public class NganhDialog extends JDialog {
         // Tạo components
         txtMaNganh = new VerticalInputForm("Mã ngành");
         txtTenNganh = new VerticalInputForm("Tên ngành");
-        cbbToHopGoc = buildComboToHopGoc();
+        txtToHopGoc = new VerticalInputForm("Tổ hợp gốc");
 
         txtChiTieu = new VerticalInputForm("Chỉ tiêu");
         txtDiemSan = new VerticalInputForm("Điểm sàn");
@@ -105,12 +104,7 @@ public class NganhDialog extends JDialog {
         if (currentNganh != null) {
             txtMaNganh.setText(currentNganh.getManganh());
             txtTenNganh.setText(currentNganh.getTennganh());
-            if (currentNganh.getNTohopgoc() == null
-                    || currentNganh.getNTohopgoc().trim().isEmpty()) {
-                cbbToHopGoc.setSelectedIndex(0);
-            } else {
-                cbbToHopGoc.setSelectedItem(currentNganh.getNTohopgoc());
-            }
+            txtToHopGoc.setText(currentNganh.getNTohopgoc() != null ? currentNganh.getNTohopgoc().trim() : "");
             txtChiTieu.setText(currentNganh.getNChitieu() > 0 ? String.valueOf(currentNganh.getNChitieu()) : "");
             txtDiemSan.setText(currentNganh.getNDiemsan() != null ? currentNganh.getNDiemsan().toString() : "");
             txtDiemTrungTuyen.setText(currentNganh.getNDiemtrungtuyen() != null ? currentNganh.getNDiemtrungtuyen().toString() : "");
@@ -128,7 +122,7 @@ public class NganhDialog extends JDialog {
 
         pnlLeft.add(txtMaNganh);
         pnlLeft.add(txtTenNganh);
-        pnlLeft.add(wrapCombo("Tổ hợp gốc", cbbToHopGoc));
+        pnlLeft.add(txtToHopGoc);
         pnlLeft.add(cbbTuyenThang);
         pnlLeft.add(cbbDgnl);
         pnlLeft.add(cbbVsat);
@@ -146,39 +140,6 @@ public class NganhDialog extends JDialog {
         pnlMain.add(pnlRight);
     }
 
-    private JComboBox<String> buildComboToHopGoc() {
-        JComboBox<String> cbb = new JComboBox<>();
-        cbb.addItem("-- Chọn tổ hợp gốc--");
-        cbb.addItem("A00");
-        cbb.addItem("A01");
-        cbb.addItem("B00");
-        cbb.addItem("C00");
-        cbb.addItem("C01");
-        cbb.addItem("D01");
-        styleCombo(cbb);
-        return cbb;
-    }
-
-    private void styleCombo(JComboBox<String> cbb) {
-        cbb.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        cbb.setBackground(Color.WHITE);
-        cbb.setPreferredSize(new Dimension(0, 38));
-    }
-
-    private JPanel wrapCombo(String labelText, JComboBox<String> cbb) {
-        JPanel panel = new JPanel(new BorderLayout(0, 5));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-        JLabel lbl = new JLabel(labelText);
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lbl.setForeground(new Color(60, 60, 60));
-
-        panel.add(lbl, BorderLayout.NORTH);
-        panel.add(cbb, BorderLayout.CENTER);
-        return panel;
-    }
-
     private void setNumericFilter(VerticalInputForm... fields) {
         for (VerticalInputForm f : fields) {
             PlainDocument doc = (PlainDocument) f.getTxtForm().getDocument();
@@ -187,13 +148,12 @@ public class NganhDialog extends JDialog {
     }
 
     private void setAllFieldsDisable() {
-        VerticalInputForm[] fields = {txtMaNganh, txtTenNganh, txtChiTieu,
+        VerticalInputForm[] fields = {txtMaNganh, txtTenNganh, txtToHopGoc, txtChiTieu,
             txtDiemSan, txtDiemTrungTuyen,
             txtSlXtt, txtSlDgnl, txtSlVsat, txtSlThpt};
         for (VerticalInputForm f : fields) {
             f.setDisable();
         }
-        cbbToHopGoc.setEnabled(false);
         cbbTuyenThang.setDisable();
         cbbDgnl.setDisable();
         cbbThpt.setDisable();
@@ -242,11 +202,8 @@ public class NganhDialog extends JDialog {
 
             nganh.setManganh(txtMaNganh.getText().trim());
             nganh.setTennganh(txtTenNganh.getText().trim());
-            if (cbbToHopGoc.getSelectedIndex() == 0) {
-                nganh.setNTohopgoc(null);
-            } else {
-                nganh.setNTohopgoc(cbbToHopGoc.getSelectedItem().toString());
-            }
+            String toHopGoc = txtToHopGoc.getText().trim();
+            nganh.setNTohopgoc(toHopGoc.isEmpty() ? null : toHopGoc);
             nganh.setNChitieu(Integer.parseInt(txtChiTieu.getText().trim()));
             nganh.setNDiemsan(parseBigDecimal(txtDiemSan.getText()));
             nganh.setNDiemtrungtuyen(parseBigDecimal(txtDiemTrungTuyen.getText()));

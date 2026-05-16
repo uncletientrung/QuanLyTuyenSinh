@@ -38,6 +38,7 @@ import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
+import com.quanlytuyensinh.GUI.Login;
 /**
  *
  * @author DELL
@@ -79,6 +80,7 @@ public class MenuTaskbar extends JPanel {
     };
     private Main main;
     private itemTaskbar[] listItem;
+    private Login login;
     JScrollPane scrollPane;
     JPanel pnlCenter, pnlTop, pnlBottom, bar1, bar2, bar3, bar4;
     Color DefaultColor = new Color(255, 255, 255);
@@ -219,6 +221,9 @@ public class MenuTaskbar extends JPanel {
                         case 10:
                             main.setPanel(new ThongKe());
                             break;
+                        case 11:
+                            dangxuat();
+                            break;
                     }
                 }
             });
@@ -231,7 +236,30 @@ public class MenuTaskbar extends JPanel {
             listItem[i].setForeground(new Color(96, 125, 139));
         }
     }
+    public void dangxuat(){
+     
 
+               int confirm = JOptionPane.showConfirmDialog(
+    this.main,
+    "Bạn có chắc chắn muốn đăng xuất không?",
+    "Xác nhận đăng xuất",
+    JOptionPane.YES_NO_OPTION
+);
+    
+           if (confirm == JOptionPane.YES_OPTION) {
+        if (this.main != null) {
+            this.main.dispose(); 
+        }
+        
+        // 2. Khởi tạo và hiển thị lại màn hình Login
+        // Chỗ này bạn xem class Login của bạn constructor viết thế nào nhé, thường là new Login().setVisible(true);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Login().setVisible(true); 
+            }
+        });
+    }
+    }
     public void pnlMenuTaskbarMousePress(MouseEvent evt) {
         for (int i = 0; i < ArrMenu.length; i++) {
             if (evt.getSource() == listItem[i]) {

@@ -655,7 +655,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                         nv.setDiemUtqd(helper.getBestDiemUT());
                         nv.setDiemCong(helper.getBestDiemCong());
 
-                        nv.setDiemXettuyen(helper.getMaxDiemXT());
+                        nv.setDiemXettuyen(helper.getMaxDiemXT());  
 
                         if (tuyenThang.equalsIgnoreCase("x")) {
 

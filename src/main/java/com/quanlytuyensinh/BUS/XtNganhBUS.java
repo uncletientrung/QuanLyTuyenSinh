@@ -213,6 +213,9 @@ public class XtNganhBUS {
     public boolean TangSoLuongPhuongThucNganh(String PhuongThuc, String MaNganh){
         return this.nganhDAO.TangSoLuongPhuongThuc(PhuongThuc, MaNganh);
     }
+    public boolean TruSoLuongPhuongThucNganh(String PhuongThuc, String MaNganh){
+        return this.nganhDAO.TruSoLuongPhuongThuc(PhuongThuc, MaNganh);
+    }
     public boolean resetSoLuongPhuongThucNganh(){
       return this.nganhDAO.resetAllSoLuongPhuongThuc();
     }

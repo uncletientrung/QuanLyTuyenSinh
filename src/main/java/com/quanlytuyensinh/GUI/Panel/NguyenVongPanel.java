@@ -341,7 +341,27 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             importExcel();
         }
         else if (source == mainFunction.btn.get("approve")) {
-            int confirm = JOptionPane.showConfirmDialog(this,
+            int row = paginatedTable.getTable().getSelectedRow();
+            if (row != -1){ // Nếu chọn 1 nguyện vọng
+                XtNguyenVongXetTuyen NguyenVongDuocChon = getSelectedNguyenVong();
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "<html>"
+                            + "<h3 style='color:blue;'>Xác nhận xét tuyển nguyện vọng</h3>"
+                            + "<hr>"
+                            + "<b>Thứ tự nguyện vọng:</b> " + NguyenVongDuocChon.getNvTt() + "<br>"
+                            + "<b>CCCD:</b> " + NguyenVongDuocChon.getNnCccd() + "<br>"
+                            + "<b>Mã ngành:</b> " + NguyenVongDuocChon.getNvManganh()
+                        + "</html>",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirm != JOptionPane.YES_OPTION) return;
+                this.NVBUS.approveNguyenVong(NganhBUS, NguyenVongDuocChon);
+                listNV = NVBUS.getAllNguyenVong();
+                loadDataTable(listNV);
+            }else{ // Xét tuyển tất cả
+                int confirm = JOptionPane.showConfirmDialog(this,
                     "<html>" +
                     "<h3 style='color:blue;'>XÁC NHẬN XÉT TUYỂN TẤT CẢ NGUYỆN VỌNG</h3>" +
                     "<hr>" +
@@ -349,26 +369,48 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                     "</html>",
                     "Xác nhận", JOptionPane.YES_NO_OPTION);
 
-            if (confirm != JOptionPane.YES_OPTION) return;
-            showApproveProgress();
+                if (confirm != JOptionPane.YES_OPTION) return;
+                showApproveProgress();
+            }
         }else if(source == mainFunction.btn.get("undo") ){
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "<html>"
-                        + "<h3 style='color:blue;'>XÁC NHẬN HOÀN XÉT TUYỂN TẤT CẢ NGUYỆN VỌNG</h3>"
-                        + "<hr>"
-                        + "<b>Số lượng nguyện vọng nguyện vọng hoàn:</b> " + listNV.size()+ "<br>"
-                    + "</html>",
-                    "Xác nhận",
-                    JOptionPane.YES_NO_OPTION
-            );
-            if (confirm == JOptionPane.YES_OPTION) {
-                // Xử lý xét duyệt tất cả ngành
-                if (NVBUS.undoAllNguyenVong(this.NganhBUS)) {
-                    JOptionPane.showMessageDialog(this, "Hoàn xét tuyển tất cả nguyện vọng thành công!");
-                    listNV = NVBUS.getAllNguyenVong();
-                    loadDataTable(listNV);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Hoàn xét xét tuyển tất cả nguyện vọng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            int row = paginatedTable.getTable().getSelectedRow();
+            if (row != -1){ // Nếu chọn 1 nguyện vọng
+                XtNguyenVongXetTuyen NguyenVongDuocChon = getSelectedNguyenVong();
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "<html>"
+                            + "<h3 style='color:blue;'>Xác nhận hoàn xét tuyển nguyện vọng</h3>"
+                            + "<hr>"
+                            + "<b>Thứ tự nguyện vọng:</b> " + NguyenVongDuocChon.getNvTt() + "<br>"
+                            + "<b>CCCD:</b> " + NguyenVongDuocChon.getNnCccd() + "<br>"
+                            + "<b>Mã ngành:</b> " + NguyenVongDuocChon.getNvManganh()
+                        + "</html>",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirm != JOptionPane.YES_OPTION) return;
+                this.NVBUS.undoNguyenVong(NganhBUS, NguyenVongDuocChon);
+                listNV = NVBUS.getAllNguyenVong();
+                loadDataTable(listNV);
+            }else{ // Xét tuyển tất cả            
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "<html>"
+                            + "<h3 style='color:blue;'>XÁC NHẬN HOÀN XÉT TUYỂN TẤT CẢ NGUYỆN VỌNG</h3>"
+                            + "<hr>"
+                            + "<b>Số lượng nguyện vọng nguyện vọng hoàn:</b> " + listNV.size()+ "<br>"
+                        + "</html>",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION
+                );
+                if (confirm == JOptionPane.YES_OPTION) {
+                    // Xử lý xét duyệt tất cả ngành
+                    if (NVBUS.undoAllNguyenVong(this.NganhBUS)) {
+                        JOptionPane.showMessageDialog(this, "Hoàn xét tuyển tất cả nguyện vọng thành công!");
+                        listNV = NVBUS.getAllNguyenVong();
+                        loadDataTable(listNV);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Hoàn xét xét tuyển tất cả nguyện vọng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         }

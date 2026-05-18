@@ -106,15 +106,32 @@ public class XtNguyenVongXetTuyenDAO {
         }
     }
     // SỬA TRẠNG THÁI KẾT QUẢ
-    public boolean approve(int idnv, String ketQua) {
+    public boolean approve(XtNguyenVongXetTuyen nvDuocChon) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            XtNguyenVongXetTuyen nv = session.get(XtNguyenVongXetTuyen.class, idnv);
-            if (nv == null) return false;
-            nv.setNvKetqua(ketQua);
+            XtNguyenVongXetTuyen nv = session.get(XtNguyenVongXetTuyen.class, nvDuocChon.getIdnv());
+            BigDecimal diemTT = nganhDAO.getDiemTTByMaNganh(nv.getNvManganh()); 
+            BigDecimal diemSan = nganhDAO.getDiemSanByMaNganh(nv.getNvManganh()); 
+            if (nv.getDiemXettuyen() == null) {
+                nv.setNvKetqua("Chưa có điểm");
+            } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
+                nv.setNvKetqua("Rớt điểm sàn");
+            } else if (diemTT == null) {
+                nv.setNvKetqua("Đang xét");
+            } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                nv.setNvKetqua("Trúng tuyển");
+            } else {
+                nv.setNvKetqua("Không trúng tuyển");
+            }
+
+            if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
+                nv.setNvKetqua("Trúng tuyển");
+            }
+            session.merge(nv);
             transaction.commit();
             return true;
+            
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
             e.printStackTrace();
@@ -148,7 +165,7 @@ public class XtNguyenVongXetTuyenDAO {
                     nv.setNvKetqua("Trúng tuyển");
                 }
                     session.merge(nv);
-                }
+            }
             transaction.commit();
             return true;
         } catch (Exception e) {
@@ -170,6 +187,28 @@ public class XtNguyenVongXetTuyenDAO {
                     nv.setNvKetqua("Đang xét");
                 session.merge(nv);
             }
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+        public boolean undo(int idnv) {
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            XtNguyenVongXetTuyen nv =
+                    session.get(XtNguyenVongXetTuyen.class, idnv);
+            if (nv == null) {
+                transaction.rollback();
+                return false;
+            }
+            nv.setNvKetqua("Đang xét");
+            session.merge(nv);
             transaction.commit();
             return true;
         } catch (Exception e) {

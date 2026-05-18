@@ -76,18 +76,36 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;  
     }
-    public boolean approveNguyenVong(XtNguyenVongXetTuyen nvXetTuyen, BigDecimal diemTT){
-        if(nvXetTuyen == null || diemTT == null) return false;
+    public boolean approveNguyenVong(XtNganhBUS nganhBUS, XtNguyenVongXetTuyen nvDuocChon){
+        if(nganhBUS == null ) return false;
+        this.NganhBUS = nganhBUS;
         boolean rs= false;
-        String ketQuaStr = nvXetTuyen.getDiemXettuyen().compareTo(diemTT) >= 0 ? "Trúng tuyển"  : "Rớt trúng tuyển";
-        rs = nvDAO.approve(nvXetTuyen.getIdnv(), ketQuaStr);
+        rs = nvDAO.approve(nvDuocChon);
         if(rs){
-            for(XtNguyenVongXetTuyen nv : listNV){
-                if(nv.getIdnv() == nvXetTuyen.getIdnv()){
-                    nv.setNvKetqua(ketQuaStr);
-                    return true;
-                }
+            if(nvDuocChon.getNvKetqua().equals("Trúng tuyển")){
+                this.NganhBUS.TruSoLuongPhuongThucNganh(nvDuocChon.getTtPhuongthuc(), nvDuocChon.getNvManganh());
             }
+            
+            if(nvDuocChon.getTtPhuongthuc().equals("Tuyển thẳng")){
+               nvDuocChon.setNvKetqua("Trúng tuyển");
+               this.NganhBUS.TangSoLuongPhuongThucNganh("Tuyển thẳng", nvDuocChon.getNvManganh());
+            }           
+            BigDecimal diemTT = NganhBUS.getDiemTTByMaNganhBUS(nvDuocChon.getNvManganh()); 
+            BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nvDuocChon.getNvManganh());
+            if (nvDuocChon.getDiemXettuyen() == null) {
+                nvDuocChon.setNvKetqua("Chưa có điểm");
+            } else if (diemSan != null  && nvDuocChon.getDiemXettuyen().compareTo(diemSan) < 0) {
+                nvDuocChon.setNvKetqua("Rớt điểm sàn");
+            } else if (diemTT == null) {
+                nvDuocChon.setNvKetqua("Đang xét");
+            } else if (nvDuocChon.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                nvDuocChon.setNvKetqua("Trúng tuyển");
+                this.NganhBUS.TangSoLuongPhuongThucNganh(nvDuocChon.getTtPhuongthuc(), nvDuocChon.getNvManganh());
+            } else {
+                nvDuocChon.setNvKetqua("Không trúng tuyển");
+            }      
+            
+            return true;
         }
         return false;
     }
@@ -136,18 +154,21 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;
     }
-    public boolean undoNguyenVong(XtNguyenVongXetTuyen nvXetTuyen){
-        if(nvXetTuyen == null) return false;
+    public boolean undoNguyenVong(XtNganhBUS nganhBUS, XtNguyenVongXetTuyen nvDuocChon){
+        this.NganhBUS = nganhBUS;
         boolean rs= false;
-        String ketQuaStr = "Đang xét";
-        rs = nvDAO.approve(nvXetTuyen.getIdnv(), ketQuaStr); // Tái sử dụng
+        rs = nvDAO.undo(nvDuocChon.getIdnv());
+        
         if(rs){
-            for(XtNguyenVongXetTuyen nv : listNV){
-                if(nv.getIdnv() == nvXetTuyen.getIdnv()){
-                    nv.setNvKetqua(ketQuaStr);
-                    return true;
+            if(nvDuocChon.getNvKetqua().equals("Trúng tuyển")){
+                this.NganhBUS.TruSoLuongPhuongThucNganh(nvDuocChon.getTtPhuongthuc(), nvDuocChon.getNvManganh());
+            }
+            for (XtNguyenVongXetTuyen nv : listNV) {
+                if (nv.getIdnv() == nvDuocChon.getIdnv()) {
+                    nv.setNvKetqua("Đang xét");
                 }
             }
+            return true;
         }
         return false;
     }

@@ -151,7 +151,80 @@ public boolean delete(int idnganh) {
             return null;
         }
     }
+public boolean TruSoLuongPhuongThuc(String phuongThuc, String maNganh) {
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+        Transaction transaction = session.beginTransaction();
+
+        XtNganh nganh = session.createQuery(
+                "FROM XtNganh WHERE manganh = :ma",
+                XtNganh.class
+        )
+        .setParameter("ma", maNganh)
+        .uniqueResult();
         
+        if (nganh == null) {
+            transaction.rollback();
+            return false;
+        }
+        switch (phuongThuc.toUpperCase()) {
+            case "THPT" -> {
+                int sl = nganh.getSlThpt() == null ? 0 : nganh.getSlThpt();
+                System.err.println(sl);
+                sl = Math.max(0, sl - 1);
+                System.err.println(sl);
+                nganh.setSlThpt(sl);
+                System.err.println(nganh.getSlThpt());
+                if (sl == 0) {
+                    nganh.setNThpt(null);
+                }
+             
+            }
+
+            case "VSAT" -> {
+                int sl = nganh.getSlVsat() == null? 0  : nganh.getSlVsat();
+                sl = Math.max(0, sl - 1);
+                nganh.setSlVsat(sl);
+                if (sl == 0) {
+                    nganh.setNVsat(null);
+                }
+            }
+
+            case "DGNL" -> {
+                int sl = nganh.getSlDgnl() == null ? 0 : nganh.getSlDgnl();
+                sl = Math.max(0, sl - 1);
+                nganh.setSlDgnl(sl);
+                if (sl == 0) {
+                    nganh.setNDgnl(null);
+                }
+            }
+
+            case "TUYỂN THẲNG" -> {
+                int sl = nganh.getSlXtt() == null ? 0  : nganh.getSlXtt();
+                sl = Math.max(0, sl - 1);
+                nganh.setSlXtt(sl);
+                if (sl == 0) {
+                    nganh.setNTuyenthang(null);
+                }
+            }
+
+            default -> {
+                transaction.rollback();
+                return false;
+            }
+        }
+
+        session.merge(nganh);
+        transaction.commit();
+        return true;
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        return false;
+    }
+}
     public boolean TangSoLuongPhuongThuc(String phuongThuc, String maNganh) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
@@ -228,4 +301,5 @@ public boolean delete(int idnganh) {
             return false;
         }
     }
+    
 }

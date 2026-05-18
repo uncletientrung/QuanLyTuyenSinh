@@ -115,10 +115,11 @@ public class XtNguyenVongXetTuyenBUS {
         if(nganhBUS == null ) return false;
         this.NganhBUS = nganhBUS;
         boolean rs= false;
-        Map<String, BigDecimal> MapDiemTT = this.NganhBUS.getListHaveDiemTT(listNV);
+        
         rs = nvDAO.approveAll();
         if(rs){
             this.NganhBUS.resetSoLuongPhuongThucNganh(); // Reset số lượng phương thức
+            Map<String, BigDecimal> MapDiemTT = this.NganhBUS.getListHaveDiemTT(listNV);
             for(XtNguyenVongXetTuyen nv : listNV){
                 if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
                     nv.setNvKetqua("Trúng tuyển");

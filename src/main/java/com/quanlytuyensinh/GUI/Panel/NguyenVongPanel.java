@@ -325,6 +325,57 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         worker.execute();
         dialog.setVisible(true);
     }
+    
+    private void showUndoProgress() {
+        JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this),
+                "Đang hoàn xét tuyển tất cả nguyện vọng...", true);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setSize(450, 140);
+        dialog.setLocationRelativeTo(this);
+        dialog.setResizable(false);
+        JLabel lblStatus = new JLabel("Đang xử lý...", SwingConstants.CENTER);
+        lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        JProgressBar progressBar = new JProgressBar(0, 100);
+        progressBar.setIndeterminate(true); 
+        progressBar.setStringPainted(true);
+        progressBar.setString("Đang hoàn xét tuyển...");
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.add(lblStatus, BorderLayout.NORTH);
+        panel.add(progressBar, BorderLayout.CENTER);
+        dialog.add(panel);
+
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return NVBUS.undoAllNguyenVong(NganhBUS);
+            }
+
+            @Override
+            protected void done() {
+                dialog.dispose();
+                try {
+                    boolean success = get();
+                    if (success) {
+                        JOptionPane.showMessageDialog(NguyenVongPanel.this,
+                                "Hoàn xét tuyển tất cả nguyện vọng thành công!",
+                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(NguyenVongPanel.this,
+                                "Hoàn xét tuyển thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(NguyenVongPanel.this,
+                            "Đã xảy ra lỗi: " + ex.getMessage(), 
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+                listNV = NVBUS.getAllNguyenVong();
+                loadDataTable(listNV);
+            }
+        };
+        worker.execute();
+        dialog.setVisible(true);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -392,7 +443,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                 this.NVBUS.undoNguyenVong(NganhBUS, NguyenVongDuocChon);
                 listNV = NVBUS.getAllNguyenVong();
                 loadDataTable(listNV);
-            }else{ // Xét tuyển tất cả            
+            }else{ // Hoàn Xét tuyển tất cả            
                 int confirm = JOptionPane.showConfirmDialog(this,
                         "<html>"
                             + "<h3 style='color:blue;'>XÁC NHẬN HOÀN XÉT TUYỂN TẤT CẢ NGUYỆN VỌNG</h3>"
@@ -404,13 +455,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                 );
                 if (confirm == JOptionPane.YES_OPTION) {
                     // Xử lý xét duyệt tất cả ngành
-                    if (NVBUS.undoAllNguyenVong(this.NganhBUS)) {
-                        JOptionPane.showMessageDialog(this, "Hoàn xét tuyển tất cả nguyện vọng thành công!");
-                        listNV = NVBUS.getAllNguyenVong();
-                        loadDataTable(listNV);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Hoàn xét xét tuyển tất cả nguyện vọng thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    }
+                        showUndoProgress();
                 }
             }
         }

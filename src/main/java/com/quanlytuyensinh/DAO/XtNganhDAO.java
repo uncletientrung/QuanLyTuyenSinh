@@ -275,34 +275,48 @@ public boolean TruSoLuongPhuongThuc(String phuongThuc, String maNganh) {
             return false;
         }
     }
-    public boolean resetAllSoLuongPhuongThuc() {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            String hql = """
-                UPDATE XtNganh 
-                SET slXtt = 0,
-                    slDgnl = 0,
-                    slVsat = 0,
-                    slThpt = 0,
-                    nTuyenthang = NULL,
-                    nDgnl = NULL,
-                    nThpt = NULL,
-                    nVsat = NULL
-                """;
-            int affectedRows = session.createMutationQuery(hql).executeUpdate();
-            transaction.commit();
-            return affectedRows > 0;
-        } catch (Exception e) {
-            if (transaction != null) {
+public boolean resetAllSoLuongPhuongThuc() {
+    Transaction transaction = null;
+    Session session = null;
+    try {
+        session = HibernateUtil.getSessionFactory().openSession();
+        transaction = session.beginTransaction();
+        
+        String hql = """
+            UPDATE XtNganh 
+            SET slXtt = 0,
+                slDgnl = 0,
+                slVsat = 0,
+                slThpt = 0,
+                nTuyenthang = NULL,
+                nDgnl = NULL,
+                nThpt = NULL,
+                nVsat = NULL,
+                nDiemtrungtuyen = NULL
+            """;
+            
+        int affectedRows = session.createMutationQuery(hql).executeUpdate();
+        
+        transaction.commit();
+        return affectedRows > 0;
+        
+    } catch (Exception e) {
+        if (transaction != null) {
+            try {
                 transaction.rollback();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            e.printStackTrace();
-            return false;
+        }
+        e.printStackTrace();
+        return false;
+    } finally {
+        if (session != null && session.isOpen()) {
+            session.close();
         }
     }
-    
+} 
+   
     public Map<String, BigDecimal> getListNganhHaveDiemTT(List<XtNguyenVongXetTuyen> listNV) {
         Map<String, BigDecimal> result = new HashMap<>();
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {

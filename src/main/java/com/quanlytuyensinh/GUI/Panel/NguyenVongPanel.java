@@ -43,6 +43,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -615,305 +616,130 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     public void setListBQD(List<XtBangQuyDoi> listBQD) {
         this.listBQD = listBQD;
     }
- private void importExcel() {
-
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Chọn file Excel nguyện vọng");
-
-    fileChooser.setFileFilter(
-            new javax.swing.filechooser.FileNameExtensionFilter(
-                    "Excel Files (*.xlsx, *.xls)",
-                    "xlsx",
-                    "xls"
-            )
-    );
-
-    int result = fileChooser.showOpenDialog(this);
-
-    if (result != JFileChooser.APPROVE_OPTION) {
-        return;
-    }
-
-    File file = fileChooser.getSelectedFile();
-
-    // ================= PROGRESS UI =================
-
-    JProgressBar progressBar = new JProgressBar(0, 100);
-    progressBar.setStringPainted(true);
-    progressBar.setValue(0);
-
-    JLabel lblStatus = new JLabel("Đang import dữ liệu...");
-
-    JPanel panel = new JPanel(new BorderLayout(10, 10));
-    panel.add(lblStatus, BorderLayout.NORTH);
-    panel.add(progressBar, BorderLayout.CENTER);
-
-    JDialog dialog = new JDialog(
-            (JFrame) SwingUtilities.getWindowAncestor(this),
-            "Import Excel Nguyện Vọng",
-            true
-    );
-
-    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-    dialog.getContentPane().add(panel);
-    dialog.setSize(400, 120);
-    dialog.setLocationRelativeTo(this);
-
-    // ================= WORKER =================
-
-    SwingWorker<Void, Integer> worker = new SwingWorker<>() {
-
-        int successCount = 0;
-        int failCount = 0;
-
-        List<String> errorMessages = new ArrayList<>();
-
-        @Override
-        protected Void doInBackground() {
-
-            try {
-
-                // ===== ĐỌC EXCEL =====
-
-                List<String[]> rows = ExcelImportUtil.readNguyenVongExcel(file);
-
-                if (rows == null || rows.isEmpty()) {
-
-                    SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(
-                                NguyenVongPanel.this,
-                                "File Excel không có dữ liệu!",
-                                "Thông báo",
-                                JOptionPane.WARNING_MESSAGE
-                        );
-                    });
-
-                    return null;
-                }
-
-                int total = rows.size();
-                int current = 0;
-
-                // ===== IMPORT =====
-
-                for (String[] row : rows) {
-
-                    current++;
-
-                    try {
-
-                        String cccd = row[0].trim();
-                        int thuTu = Integer.parseInt(row[1].trim());
-                        String maNganh = row[2].trim();
-
-                        String tuyenThang =
-                                row.length > 3 ? row[3].trim() : "";
-
-                        // ===== TÍNH ĐIỂM =====
-
-                        NguyenVongImportHelper helper =
-                                new NguyenVongImportHelper(
-                                        cccd,
-                                        maNganh,
-                                        NganhBUS,
-                                        NganhTHBUS,
-                                        DiemCongBUS,
-                                        TSBUS,
-                                        DTBUS,
-                                        BQDBUS,
-                                        listNganhTH,
-                                        listDiemCong,
-                                        listDT,
-                                        listBQD
-                                );
-
-                        helper.tinhDiem();
-
-                        // ===== BUILD ENTITY =====
-
-                        XtNguyenVongXetTuyen nv =
-                                new XtNguyenVongXetTuyen();
-
-                        nv.setNnCccd(cccd);
-                        nv.setNvManganh(maNganh);
-                        nv.setNvTt(thuTu);
-
-                        nv.setDiemThxt(helper.getBestDiemTH());
-                        nv.setDiemUtqd(helper.getBestDiemUT());
-                        nv.setDiemCong(helper.getBestDiemCong());
-
-                        nv.setDiemXettuyen(helper.getMaxDiemXT());  
-
-                        if (tuyenThang.equalsIgnoreCase("x")) {
-
-                            nv.setTtPhuongthuc("Tuyển thẳng");
-                            nv.setNvKetqua("Trúng tuyển");
-
-                        } else {
-
-                            nv.setTtPhuongthuc(
-                                    helper.getBestPhuongThuc()
-                            );
-
-                            nv.setNvKetqua("Đang xét");
-                        }
-
-                        nv.setTtThm(helper.getBestToHop());
-
-                        nv.setNvKeys(
-                                cccd + "_" + maNganh + "_" + thuTu
-                        );
-
-                        // ===== INSERT =====
-
-                        if (NVBUS.insertNguyenVong(nv)) {
-
-                            successCount++;
-
-                        } else {
-
-                            errorMessages.add(
-                                    "Lỗi insert DB - CCCD: "
-                                    + cccd
-                                    + ", Ngành: "
-                                    + maNganh
-                            );
-
-                            failCount++;
-                        }
-
-                    } catch (NumberFormatException ex) {
-
-                        errorMessages.add(
-                                "Thứ tự NV không hợp lệ: "
-                                + java.util.Arrays.toString(row)
-                        );
-
-                        failCount++;
-
-                    } catch (Exception ex) {
-
-                        errorMessages.add(
-                                "Lỗi dòng ["
-                                + row[0]
-                                + "]: "
-                                + ex.getMessage()
-                        );
-
-                        failCount++;
-                    }
-
-                    // ===== UPDATE PROGRESS =====
-
-                    int percent = (current * 100) / total;
-
-                    publish(percent);
-                }
-
-            } catch (Exception ex) {
-
-                SwingUtilities.invokeLater(() -> {
-
-                    JOptionPane.showMessageDialog(
-                            NguyenVongPanel.this,
-                            "Lỗi import:\n" + ex.getMessage(),
-                            "Lỗi",
-                            JOptionPane.ERROR_MESSAGE
-                    );
-
-                });
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void process(List<Integer> chunks) {
-
-            int value = chunks.get(chunks.size() - 1);
-
-            progressBar.setValue(value);
-
-            lblStatus.setText(
-                    "Đang import... " + value + "%"
-            );
-        }
-
-        @Override
-        protected void done() {
-
-            dialog.dispose();
-
-            // ===== REFRESH TABLE =====
-
-            listNV = NVBUS.getAllNguyenVong();
-
-            loadDataTable(listNV);
-
-            // ===== THÔNG BÁO =====
-
-            if (!errorMessages.isEmpty()) {
-
-                JTextArea textArea =
-                        new JTextArea();
-
-                StringBuilder sb = new StringBuilder();
-
-                sb.append("Import hoàn tất!\n\n");
-                sb.append("✔ Thành công: ")
-                        .append(successCount)
-                        .append("\n");
-
-                sb.append("✘ Thất bại: ")
-                        .append(failCount)
-                        .append("\n\n");
-
-                for (String err : errorMessages) {
-                    sb.append("- ")
-                            .append(err)
-                            .append("\n");
-                }
-
-                textArea.setText(sb.toString());
-
-                textArea.setEditable(false);
-                textArea.setLineWrap(true);
-                textArea.setWrapStyleWord(true);
-
-                JScrollPane scroll =
-                        new JScrollPane(textArea);
-
-                scroll.setPreferredSize(
-                        new Dimension(650, 300)
-                );
-
-                JOptionPane.showMessageDialog(
-                        NguyenVongPanel.this,
-                        scroll,
-                        "Kết quả Import",
-                        JOptionPane.WARNING_MESSAGE
-                );
-
-            } else {
-
-                JOptionPane.showMessageDialog(
-                        NguyenVongPanel.this,
-                        "Import hoàn tất!\n\n"
-                        + "✔ Thành công: "
-                        + successCount
-                        + "\n"
-                        + "✘ Thất bại: "
-                        + failCount,
-                        "Import thành công",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-            }
-        }
-    };
-
-    worker.execute();
-
-    dialog.setVisible(true);
-}
+    private void importExcel() { // Excel
+       JFileChooser fileChooser = new JFileChooser();
+       fileChooser.setDialogTitle("Chọn file Excel nguyện vọng");
+       fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx", "xls"));
+
+       int result = fileChooser.showOpenDialog(this);
+       if (result != JFileChooser.APPROVE_OPTION) return;
+
+       File file = fileChooser.getSelectedFile();
+
+       // Progress Dialog
+       JProgressBar progressBar = new JProgressBar(0, 100);
+       progressBar.setStringPainted(true);
+       JLabel lblStatus = new JLabel("Đang import dữ liệu...");
+       JPanel panel = new JPanel(new BorderLayout(10, 10));
+       panel.add(lblStatus, BorderLayout.NORTH);
+       panel.add(progressBar, BorderLayout.CENTER);
+
+       JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Import Excel Nguyện Vọng", true);
+       dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+       dialog.getContentPane().add(panel);
+       dialog.setSize(400, 120);
+       dialog.setLocationRelativeTo(this);
+
+       // SwingWorker
+       SwingWorker<Void, Integer> worker = new SwingWorker<>() {
+           int successCount = 0, failCount = 0;
+           List<String> errorMessages = new ArrayList<>();
+
+           @Override
+           protected Void doInBackground() {
+               try {
+                   List<String[]> rows = ExcelImportUtil.readNguyenVongExcel(file);
+                   if (rows == null || rows.isEmpty()) {
+                       SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(NguyenVongPanel.this, "File Excel không có dữ liệu!", "Thông báo", JOptionPane.WARNING_MESSAGE));
+                       return null;
+                   }
+
+                   int total = rows.size();
+                   for (int i = 0; i < rows.size(); i++) {
+                       String[] row = rows.get(i);
+                       try {
+                           String cccd = row[0].trim();
+                           int thuTu = Integer.parseInt(row[1].trim());
+                           String maNganh = row[2].trim();
+                           String tuyenThang = (row.length > 3) ? row[3].trim() : "";
+
+                           NguyenVongImportHelper helper = new NguyenVongImportHelper(cccd, maNganh, NganhBUS, NganhTHBUS, DiemCongBUS, TSBUS, DTBUS, BQDBUS, listNganhTH, listDiemCong, listDT, listBQD);
+                           helper.tinhDiem();
+
+                           XtNguyenVongXetTuyen nv = new XtNguyenVongXetTuyen();
+                           nv.setNnCccd(cccd);
+                           nv.setNvManganh(maNganh);
+                           nv.setNvTt(thuTu);
+                           nv.setDiemThxt(helper.getBestDiemTH());
+                           nv.setDiemUtqd(helper.getBestDiemUT());
+                           nv.setDiemCong(helper.getBestDiemCong());
+                           nv.setDiemXettuyen(helper.getMaxDiemXT());
+
+                           if (tuyenThang.equalsIgnoreCase("x")) {
+                               nv.setTtPhuongthuc("Tuyển thẳng");
+                               nv.setNvKetqua("Trúng tuyển");
+                           } else {
+                               nv.setTtPhuongthuc(helper.getBestPhuongThuc());
+                               nv.setNvKetqua("Đang xét");
+                           }
+                           nv.setTtThm(helper.getBestToHop());
+                           nv.setNvKeys(cccd + "_" + maNganh + "_" + thuTu);
+
+                           if (NVBUS.insertNguyenVong(nv)) {
+                               successCount++;
+                           } else {
+                               errorMessages.add("Lỗi insert DB - CCCD: " + cccd + ", Ngành: " + maNganh);
+                               failCount++;
+                           }
+                       } catch (NumberFormatException ex) {
+                           errorMessages.add("Thứ tự NV không hợp lệ: " + Arrays.toString(row));
+                           failCount++;
+                       } catch (Exception ex) {
+                           errorMessages.add("Lỗi dòng [" + row[0] + "]: " + ex.getMessage());
+                           failCount++;
+                       }
+
+                       publish((i + 1) * 100 / total);
+                   }
+               } catch (Exception ex) {
+                   SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(NguyenVongPanel.this, "Lỗi import:\n" + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE));
+               }
+               return null;
+           }
+
+           @Override
+           protected void process(List<Integer> chunks) {
+               int value = chunks.get(chunks.size() - 1);
+               progressBar.setValue(value);
+               lblStatus.setText("Đang import... " + value + "%");
+           }
+
+           @Override
+           protected void done() {
+               dialog.dispose();
+               listNV = NVBUS.getAllNguyenVong();
+               loadDataTable(listNV);
+
+               if (!errorMessages.isEmpty()) {
+                   JTextArea textArea = new JTextArea();
+                   StringBuilder sb = new StringBuilder("Import hoàn tất!\n\n✔ Thành công: " + successCount + "\n✘ Thất bại: " + failCount + "\n\n");
+                   errorMessages.forEach(err -> sb.append("- ").append(err).append("\n"));
+                   textArea.setText(sb.toString());
+                   textArea.setEditable(false);
+                   textArea.setLineWrap(true);
+                   textArea.setWrapStyleWord(true);
+
+                   JScrollPane scroll = new JScrollPane(textArea);
+                   scroll.setPreferredSize(new Dimension(650, 300));
+                   JOptionPane.showMessageDialog(NguyenVongPanel.this, scroll, "Kết quả Import", JOptionPane.WARNING_MESSAGE);
+               } else {
+                   JOptionPane.showMessageDialog(NguyenVongPanel.this, "Import hoàn tất!\n\n✔ Thành công: " + successCount + "\n✘ Thất bại: " + failCount, "Import thành công", JOptionPane.INFORMATION_MESSAGE);
+               }
+           }
+       };
+
+       worker.execute();
+       dialog.setVisible(true);
+   }
 
 }

@@ -363,6 +363,12 @@ public class NguyenVongDialog extends JDialog{
             case "KTPL": return getDiemSafe(d.getKtpl());
             case "CNCN": return getDiemSafe(d.getCncn());
             case "CNNN": return getDiemSafe(d.getCnnn());
+            case "NK1": return getDiemSafe(d.getNk1());
+            case "NK2": return getDiemSafe(d.getNk2());
+            case "NK3": return getDiemSafe(d.getNk3());
+            case "NK4": return getDiemSafe(d.getNk4());
+            case "NK5": return getDiemSafe(d.getNk5());
+            case "NK6": return getDiemSafe(d.getNk6());
             case "N1":
                 if (d.getN1Cc() != null && d.getN1Thi() != null)
                     return d.getN1Cc().compareTo(d.getN1Thi()) > 0 ? d.getN1Cc() : d.getN1Thi();

@@ -2,8 +2,10 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtNganhDAO;
 import com.quanlytuyensinh.ENTITY.XtNganh;
+import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public class XtNganhBUS {
 
@@ -218,5 +220,9 @@ public class XtNganhBUS {
     }
     public boolean resetSoLuongPhuongThucNganh(){
       return this.nganhDAO.resetAllSoLuongPhuongThuc();
+    }
+    
+    public Map<String, BigDecimal> getListHaveDiemTT(List<XtNguyenVongXetTuyen> listNV){
+        return this.nganhDAO.getListNganhHaveDiemTT(listNV);
     }
 }

@@ -5,12 +5,15 @@
 package com.quanlytuyensinh.DAO;
 
 import com.quanlytuyensinh.ENTITY.XtNganh;
+import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.UTIL.HibernateUtil;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -153,9 +156,7 @@ public boolean delete(int idnganh) {
     }
 public boolean TruSoLuongPhuongThuc(String phuongThuc, String maNganh) {
     try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
         Transaction transaction = session.beginTransaction();
-
         XtNganh nganh = session.createQuery(
                 "FROM XtNganh WHERE manganh = :ma",
                 XtNganh.class
@@ -300,6 +301,42 @@ public boolean TruSoLuongPhuongThuc(String phuongThuc, String maNganh) {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    public Map<String, BigDecimal> getListNganhHaveDiemTT(List<XtNguyenVongXetTuyen> listNV) {
+        Map<String, BigDecimal> result = new HashMap<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            List<XtNganh> listNganh = session .createQuery("FROM XtNganh", XtNganh.class) .list();
+            for (XtNganh nganh : listNganh) {
+                int chiTieu = nganh.getNChitieu();
+                if (chiTieu <= 0) continue;
+                    List<BigDecimal> list = session.createNativeQuery("""
+                        SELECT diem_xettuyen
+                        FROM xt_nguyenvongxettuyen
+                        WHERE nv_manganh = :maNganh
+                          AND diem_xettuyen IS NOT NULL
+                        ORDER BY diem_xettuyen DESC
+                        LIMIT :chiTieu
+                    """, BigDecimal.class)
+                    .setParameter("maNganh", nganh.getManganh())
+                    .setParameter("chiTieu", chiTieu)
+                    .list();
+                if (!list.isEmpty()) { // set điểm trúng tuyển vào ngành
+                    BigDecimal diemTT = list.get(list.size() - 1); // người cuối cùng
+                    nganh.setNDiemtrungtuyen(diemTT);
+                    result.put(nganh.getManganh(), diemTT);
+                }
+            }
+            Transaction transaction = session.beginTransaction();
+            for (XtNganh nganh : listNganh) {
+                session.merge(nganh);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
     
 }

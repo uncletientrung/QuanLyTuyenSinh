@@ -2,10 +2,12 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
+import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 
 public class XtNguyenVongXetTuyenBUS {
@@ -109,36 +111,36 @@ public class XtNguyenVongXetTuyenBUS {
         }
         return false;
     }
-        public boolean approveAllNguyenVong(XtNganhBUS nganhBUS){
-            if(nganhBUS == null ) return false;
-            this.NganhBUS = nganhBUS;
-            boolean rs= false;
-            rs = nvDAO.approveAll();
-            if(rs){
-                this.NganhBUS.resetSoLuongPhuongThucNganh(); // Reset số lượng phương thức
-                for(XtNguyenVongXetTuyen nv : listNV){
-                    if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
-                        nv.setNvKetqua("Trúng tuyển");
-                        this.NganhBUS.TangSoLuongPhuongThucNganh("Tuyển thẳng", nv.getNvManganh());
-                    }
-                    
-                    BigDecimal diemTT = NganhBUS.getDiemTTByMaNganhBUS(nv.getNvManganh()); 
-                    BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nv.getNvManganh());
-                    if (nv.getDiemXettuyen() == null) {
-                        nv.setNvKetqua("Chưa có điểm");
-                    } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
-                        nv.setNvKetqua("Rớt điểm sàn");
-                    } else if (diemTT == null) {
-                        nv.setNvKetqua("Đang xét");
-                    } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
-                        nv.setNvKetqua("Trúng tuyển");
-                        this.NganhBUS.TangSoLuongPhuongThucNganh(nv.getTtPhuongthuc(), nv.getNvManganh());
-                    } else {
-                        nv.setNvKetqua("Không trúng tuyển");
-                    }                   
+    public boolean approveAllNguyenVong(XtNganhBUS nganhBUS){
+        if(nganhBUS == null ) return false;
+        this.NganhBUS = nganhBUS;
+        boolean rs= false;
+        Map<String, BigDecimal> MapDiemTT = this.NganhBUS.getListHaveDiemTT(listNV);
+        rs = nvDAO.approveAll();
+        if(rs){
+            this.NganhBUS.resetSoLuongPhuongThucNganh(); // Reset số lượng phương thức
+            for(XtNguyenVongXetTuyen nv : listNV){
+                if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
+                    nv.setNvKetqua("Trúng tuyển");
+                    this.NganhBUS.TangSoLuongPhuongThucNganh("Tuyển thẳng", nv.getNvManganh());
                 }
-                return true;
+                BigDecimal diemTT = MapDiemTT.get(nv.getNvManganh());
+                BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nv.getNvManganh());
+                if (nv.getDiemXettuyen() == null) {
+                    nv.setNvKetqua("Chưa có điểm");
+                } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
+                    nv.setNvKetqua("Rớt điểm sàn");
+                } else if (diemTT == null) {
+                    nv.setNvKetqua("Đang xét");
+                } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                    nv.setNvKetqua("Trúng tuyển");
+                    this.NganhBUS.TangSoLuongPhuongThucNganh(nv.getTtPhuongthuc(), nv.getNvManganh());
+                } else {
+                    nv.setNvKetqua("Không trúng tuyển");
+                }                   
             }
+            return true;
+        }
             return false;
         }
     public boolean undoAllNguyenVong(XtNganhBUS nganhBUS){

@@ -11,6 +11,7 @@ import com.quanlytuyensinh.DAO.XtBangQuyDoiDAO;
 import com.quanlytuyensinh.DAO.XtDiemCongXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtDiemThiXetTuyenDAO;
 import com.quanlytuyensinh.DAO.XtNganhDAO;
+import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import java.util.List;
 import com.quanlytuyensinh.ENTITY.TaiKhoan;
 import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
@@ -35,9 +36,9 @@ public class testGUI {
          XtDiemThiXetTuyenDAO DTDAO = XtDiemThiXetTuyenDAO.getInstance();
           XtBangQuyDoiDAO xtbangquydoiDAO = XtBangQuyDoiDAO.getInstance();
           XtNganhDAO nganhDAO = XtNganhDAO.getInstance();
+          XtNguyenVongXetTuyenDAO nvDAO = XtNguyenVongXetTuyenDAO.getInstance();
            System.out.println("===== DANH SACH TAI KHOAN 1=====");
-          System.out.println(NVBUS.checkExistsNV("079201000001", "7480201"));
-          System.out.println(NVBUS.checkExistsNV("079201000022201", "7480201"));
+          System.out.println(nvDAO.findByCccdOrderByThuTu("TS_2798"));
         System.out.println("===== DANH SACH TAI KHOAN 2 =====");
         
 //        for (XtDiemThiXetTuyen nv : listDT) {

@@ -2,6 +2,7 @@ package com.quanlytuyensinh.BUS;
 
 import com.quanlytuyensinh.DAO.XtNguyenVongXetTuyenDAO;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
+import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -230,4 +231,16 @@ public class XtNguyenVongXetTuyenBUS {
 
         return result;
     }
+    
+    public Map<String, List<XtNguyenVongXetTuyen>> getMapCccdNVOrderByNvTT(XtThisinhXetTuyen25BUS TSBUS){
+        if(TSBUS == null){
+            TSBUS = new XtThisinhXetTuyen25BUS();
+        }
+        List<XtThisinhXetTuyen25> listTS = TSBUS.getAllThiSinh();
+        for(XtThisinhXetTuyen25 ts: listTS){
+            
+        }
+        return null;
+    }
+    
 }

@@ -387,18 +387,28 @@ public class tinhDiemService {
         for(XtNganhToHop thxt : listTHXT)
         {
             String maToHop = thxt.getMatohop();
-            String TenTHMT = this.tohopDAO.findByMa(thxt.getMatohop()).getTentohop();
+         
+           XtToHopMonThi toHopEntity = this.tohopDAO.findByMa(maToHop);
+   
+
+             String TenTHMT = toHopEntity.getTentohop();
             BigDecimal tong = BigDecimal.ZERO;
+            BigDecimal m1 = getDiemByMon(thxt.getThMon1(), diemquydoi);
+            BigDecimal m2 = getDiemByMon(thxt.getThMon2(), diemquydoi);
+            BigDecimal m3 = getDiemByMon(thxt.getThMon3(), diemquydoi);
+            if (m1 == null || m2 == null || m3 == null) {
+                continue; 
+            }
              // Môn 1
-             BigDecimal m1 = getDiemByMon(thxt.getThMon1(), diemquydoi);
+          
              tong = tong.add(m1.multiply(BigDecimal.valueOf(thxt.getHsMon1())));
 
              // Môn 2
-             BigDecimal m2 = getDiemByMon(thxt.getThMon2(), diemquydoi);
+         
              tong = tong.add(m2.multiply(BigDecimal.valueOf(thxt.getHsMon2())));
 
              // Môn 3
-             BigDecimal m3 = getDiemByMon(thxt.getThMon3(), diemquydoi);
+          
              tong = tong.add(m3.multiply(BigDecimal.valueOf(thxt.getHsMon3())));
 
              //Công thức đổi THPT sang THPT hệ 30,  Chia cho tổng hệ số rồi x3
@@ -416,7 +426,10 @@ public class tinhDiemService {
            
           diemUT = this.getDiemUuTien(khuVuc, doiTuong, tong, diemCongXT); // Điểm ưu tiên đã if else 22.5 rồi
            BigDecimal diemTH = tong;
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+           BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+                    if (diemXT.compareTo(new BigDecimal("30")) > 0) {
+              diemXT = new BigDecimal("30"); // 
+          }
             
           TinhDiemVSAT dto = new TinhDiemVSAT();
            dto.setMaToHop(thxt.getMatohop());
@@ -442,18 +455,19 @@ public class tinhDiemService {
                 dsMon.add(thxt.getThMon3());
                 dsTenMon.add(getTenMonHoc(thxt.getThMon3()));
             }
+             
           dto.setDsMonThi(dsMon);
             dto.setDsTenMonThi(dsTenMon);
             // Điểm các môn
-            dto.setDiemToan(diemquydoi.getTo().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemVan(diemquydoi.getVa().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemLy(diemquydoi.getLi().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemHoa(diemquydoi.getHo().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemSinh(diemquydoi.getSi().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemAnh(diemquydoi.getN1Thi().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemSu(diemquydoi.getSu().setScale(2, RoundingMode.HALF_UP));
-            dto.setDiemDia(diemquydoi.getDi().setScale(2, RoundingMode.HALF_UP));
-            
+           dto.setDiemToan(diemquydoi.getTo() != null ? diemquydoi.getTo().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemVan(diemquydoi.getVa() != null ? diemquydoi.getVa().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemLy(diemquydoi.getLi() != null ? diemquydoi.getLi().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemHoa(diemquydoi.getHo() != null ? diemquydoi.getHo().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemSinh(diemquydoi.getSi() != null ? diemquydoi.getSi().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemAnh(diemquydoi.getN1Thi() != null ? diemquydoi.getN1Thi().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemSu(diemquydoi.getSu() != null ? diemquydoi.getSu().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        dto.setDiemDia(diemquydoi.getDi() != null ? diemquydoi.getDi().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+
          dto.setDiemTHXT(diemTH.setScale(2, RoundingMode.HALF_UP));
             dto.setDiemUuTien(diemUT.setScale(2, RoundingMode.HALF_UP));
             dto.setDiemCong(diemCongXT);
@@ -462,11 +476,13 @@ public class tinhDiemService {
             dto.setToHopGoc(thxt.getMatohop().equals(THGoc));
           
           listkq.add(dto);
-        }
+        
         listkq.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
-        return listkq;
         
     }
+        
+           return listkq;
+}
 
     public TinhDiemDGNL tinhDiemDGNL(String nganh, String diemCong, String khuVuc, String doiTuong, String diemThi) {
         XtNganh nganhXet = listNganh.stream().filter(n -> nganh.equals(n.getManganh()))

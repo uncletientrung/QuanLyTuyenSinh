@@ -58,7 +58,10 @@ public class TinhDiemVSATController {
             
             List<TinhDiemVSAT> listKQVSAT = tinhDiemService.tinhdiemxettuyenVSAT(Manganh, toan, nguVan, vatLy, hoaHoc, sinhHoc, tiengAnh, lichSu, diaLy, 
                    khuVuc, doiTuong, diemCong);
+          
+          
          String THGoc = this.tinhDiemSV.getTHGoc(Manganh);
+         
            TinhDiemVSAT ThCaoNhat = listKQVSAT.get(0);
           BigDecimal NguongDauVao = this.tinhDiemSV.getDiemSan(Manganh);
            String tenNganh = this.tinhDiemSV.getTenNganhByMaNganh(Manganh);

@@ -18,6 +18,7 @@ import com.quanlytuyensinh.ENTITY.XtDiemThiXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  *
@@ -40,13 +41,20 @@ public class testGUI {
            System.out.println("===== DANH SACH TAI KHOAN 1=====");
           System.out.println(nvDAO.findByCccdOrderByThuTu("TS_2798"));
         System.out.println("===== DANH SACH TAI KHOAN 2 =====");
-        
-//        for (XtDiemThiXetTuyen nv : listDT) {
-//
-//            System.out.println(
-//                    nv.toString()
-//            );
-//        }
+        Map<String, List<XtNguyenVongXetTuyen>> test = NVBUS.getMapCccdNVOrderByNvTT();
+for (Map.Entry<String, List<XtNguyenVongXetTuyen>> entry : test.entrySet()) {
+
+    String cccd = entry.getKey();
+    List<XtNguyenVongXetTuyen> listNV = entry.getValue();
+
+    System.out.println("CCCD: " + cccd);
+
+    for (XtNguyenVongXetTuyen nv : listNV) {
+        System.out.println(nv);
+    }
+
+    System.out.println("-------------------");
+}
 
     }
 }

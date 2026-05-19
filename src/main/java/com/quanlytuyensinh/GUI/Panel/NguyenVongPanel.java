@@ -297,7 +297,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
         SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
             @Override
             protected Boolean doInBackground() throws Exception {
-                return NVBUS.approveAllNguyenVong(NganhBUS);
+                return NVBUS.approveAllNguyenVong2(NganhBUS);
             }
 
             @Override

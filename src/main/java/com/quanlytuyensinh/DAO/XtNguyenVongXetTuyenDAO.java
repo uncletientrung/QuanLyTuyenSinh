@@ -254,4 +254,28 @@ public class XtNguyenVongXetTuyenDAO {
                     .list();
         }
     }
+    public boolean updateAll(List<XtNguyenVongXetTuyen> list) { // Update lại danh sách nguyện vọng ở DAO
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            int batchSize = 50;
+            for (int i = 0; i < list.size(); i++) {
+                session.merge(list.get(i));
+                if ((i + 1) % batchSize == 0) {
+                    session.flush();
+                    session.clear();
+                }
+            }
+            session.flush();
+            session.clear();
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

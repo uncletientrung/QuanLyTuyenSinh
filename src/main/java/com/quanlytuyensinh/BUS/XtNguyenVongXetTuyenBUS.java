@@ -6,6 +6,8 @@ import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Panel.NguyenVongPanel;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import java.util.List;
 import java.util.Map;
@@ -232,15 +234,69 @@ public class XtNguyenVongXetTuyenBUS {
         return result;
     }
     
-    public Map<String, List<XtNguyenVongXetTuyen>> getMapCccdNVOrderByNvTT(XtThisinhXetTuyen25BUS TSBUS){
-        if(TSBUS == null){
-            TSBUS = new XtThisinhXetTuyen25BUS();
+    public Map<String, List<XtNguyenVongXetTuyen>> getMapCccdNVOrderByNvTT(){ // Nguyện vọng đã xếp theo thứ tự
+        Map<String, List<XtNguyenVongXetTuyen>> rs = new HashMap<>();
+        for (XtNguyenVongXetTuyen nv : this.listNV) {
+            rs.computeIfAbsent(nv.getNnCccd(), k -> new ArrayList<>()).add(nv);
         }
-        List<XtThisinhXetTuyen25> listTS = TSBUS.getAllThiSinh();
-        for(XtThisinhXetTuyen25 ts: listTS){
-            
+        for (List<XtNguyenVongXetTuyen> list : rs.values()) {
+            list.sort(Comparator.comparing(XtNguyenVongXetTuyen::getNvTt));
         }
-        return null;
+        return rs;
     }
-    
+    public boolean approveAllNguyenVong2(XtNganhBUS nganhBUS){
+        if(nganhBUS == null ) return false;
+        this.NganhBUS = nganhBUS;
+        boolean rs= false;
+        
+        rs = nvDAO.approveAll();
+        if(rs){
+            this.NganhBUS.resetSoLuongPhuongThucNganh(); // Reset số lượng phương thức
+            Map<String, BigDecimal> MapDiemTT = this.NganhBUS.getListHaveDiemTT(listNV);
+            Map<String, List<XtNguyenVongXetTuyen>>  mapNguyenVongDaSort = this.getMapCccdNVOrderByNvTT();
+            List<XtNguyenVongXetTuyen> updateList = new ArrayList<>(); // Danh sách nguyện vọng update
+            for (Map.Entry<String, List<XtNguyenVongXetTuyen>> entry : mapNguyenVongDaSort.entrySet()) {
+                boolean daTrungTuyen = false;
+                List<XtNguyenVongXetTuyen> listNVTS = entry.getValue();
+                for (XtNguyenVongXetTuyen nv : listNVTS) {
+                    if(!daTrungTuyen){ // Nếu chưa trúng tuyển nguyện vọng nào
+                        if(nv.getTtPhuongthuc().equals("Tuyển thẳng")){
+                            nv.setNvKetqua("Trúng tuyển");
+                            this.NganhBUS.TangSoLuongPhuongThucNganh("Tuyển thẳng", nv.getNvManganh());
+                             daTrungTuyen = true;
+                             updateList.add(nv);
+                             continue;
+                        }
+                        BigDecimal diemTT = MapDiemTT.get(nv.getNvManganh());
+                        BigDecimal diemSan = NganhBUS.getDiemSanByMaNganhBUS(nv.getNvManganh());
+                        if (nv.getDiemXettuyen() == null) {
+                            nv.setNvKetqua("Chưa có điểm");
+                        } else if (diemSan != null  && nv.getDiemXettuyen().compareTo(diemSan) < 0) {
+                            nv.setNvKetqua("Rớt điểm sàn");
+                        } else if (diemTT == null) {
+                            nv.setNvKetqua("Đang xét");
+                        } else if (nv.getDiemXettuyen().compareTo(diemTT) >= 0) {
+                            nv.setNvKetqua("Trúng tuyển");
+                            this.NganhBUS.TangSoLuongPhuongThucNganh(nv.getTtPhuongthuc(), nv.getNvManganh());
+                            daTrungTuyen = true;
+                        } else {
+                            nv.setNvKetqua("Không trúng tuyển");
+                        }  
+                        
+                    }else{
+                        nv.setNvKetqua("Không trúng tuyển");
+                    }
+                    updateList.add(nv);
+                }
+
+            }
+            boolean updateListNV = this.nvDAO.updateAll(updateList);
+            if(updateListNV){
+                return true;
+            }else{
+                return false;
+            }
+        }
+            return false;
+    }
 }

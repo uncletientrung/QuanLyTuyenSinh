@@ -91,14 +91,14 @@
                                     <tbody class="fs-sm">
                                         <tr th:each="mon, iter : ${tohop.dsTenMonThi}">
                                             <td class="text-center"></td>
-                                            <td class="fw-semibold" th:text="'Điểm môn ' + ${mon}"></td>
-                                            <td th:with="diem=${#lists.size(tohop.dsMonThi) > iter.index ? tohop.getDiemTheoMaMon(tohop.dsMonThi[iter.index]) : null}">
+                                            <td class="fw-semibold" th:text="'Điểm môn ' + ${mon} + ': ' + ${tohop.getDiemGocTheoMaMon(tohop.dsMonThi[iter.index])}"></td>
+                                            <td th:with="diem=${#lists.size(tohop.dsMonThi) > iter.index ? tohop.getctDiemTheoMaMon(tohop.dsMonThi[iter.index]) : null}">
 
-                                                <span th:if="${diem != null and diem.signum() == 0}" class="text-danger">
+                                                <span th:if="${diem != null and diem.isEmpty()}" class="text-danger">
                                                       Lỗi, điểm nhập vào không nằm trong phân vị nào = 0
                                                     </span>
 
-                                                <span th:if="${diem != null and diem.signum() !=0}" th:text="${diem}"></span>
+                                                <span th:if="${diem != null and !diem.isEmpty()}" th:text="${diem}"></span>
 
                                             </td>
                                         </tr>

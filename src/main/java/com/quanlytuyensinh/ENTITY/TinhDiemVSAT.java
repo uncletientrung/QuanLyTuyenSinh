@@ -25,6 +25,22 @@ public class TinhDiemVSAT {
     private BigDecimal  diemAnh;
     private BigDecimal  diemSu;
     private BigDecimal   diemDia;
+    private BigDecimal diemGocToan;
+    private BigDecimal diemGocVan;
+    private BigDecimal diemGocLy;
+    private BigDecimal diemGocHoa;
+    private BigDecimal diemGocSinh;
+    private BigDecimal diemGocAnh;
+    private BigDecimal diemGocSu;
+    private BigDecimal diemGocDia;
+      private String  congthucdiemToan;
+    private String  congthucdiemVan;
+    private String  congthucdiemLy;
+    private String  congthucdiemHoa;
+    private String  congthucdiemSinh;
+    private String  congthucdiemAnh;
+    private String  congthucdiemSu;
+    private String   congthucdiemDia;
      private BigDecimal diemTHXT;      
     private BigDecimal diemUuTien;
     private BigDecimal diemCong;
@@ -148,9 +164,133 @@ public class TinhDiemVSAT {
     public void setDiemDia(BigDecimal diemDia) {
         this.diemDia = diemDia;
     }
+    public String getcongthucDiemToan() {
+        return congthucdiemToan;
+    }
 
+    public void setcongthucDiemToan(String ctdiemToan) {
+        this.congthucdiemToan = ctdiemToan;
+    }
+
+    public String getcongthucDiemVan() {
+        return congthucdiemVan;
+    }
+
+    public void setcongthucDiemVan(String ctdiemVan) {
+        this.congthucdiemVan = ctdiemVan;
+    }
+
+    public String getcongthucDiemLy() {
+        return congthucdiemLy;
+    }
+
+    public void setcongthucDiemLy(String ctdiemLy) {
+        this.congthucdiemLy = ctdiemLy;
+    }
+
+    public String getcongthucDiemHoa() {
+        return congthucdiemHoa;
+    }
+
+    public void setcongthucDiemHoa(String ctdiemHoa) {
+        this.congthucdiemHoa = ctdiemHoa;
+    }
+
+    public String getcongthucDiemSinh() {
+        return congthucdiemSinh;
+    }
+
+    public void setcongthucDiemSinh(String ctdiemSinh) {
+        this.congthucdiemSinh = ctdiemSinh;
+    }
+
+    public String getcongthucDiemAnh() {
+        return congthucdiemAnh;
+    }
+
+    public void setcongthucDiemAnh(String ctdiemAnh) {
+        this.congthucdiemAnh = ctdiemAnh;
+    }
+
+    public String getcongthucDiemSu() {
+        return congthucdiemSu;
+    }
+
+    public void setcongthucDiemSu(String ctdiemSu) {
+        this.congthucdiemSu = ctdiemSu;
+    }
+
+    public String getcongthucDiemDia() {
+        return congthucdiemDia;
+    }
+
+    public void setcongthucDiemDia(String ctdiemDia) {
+        this.congthucdiemDia = ctdiemDia;
+    }
   
+public BigDecimal getDiemGocToan() {
+        return diemGocToan;
+    }
 
+    public void setDiemGocToan(BigDecimal diemGocToan) {
+        this.diemGocToan = diemGocToan;
+    }
+
+    public BigDecimal getDiemGocVan() {
+        return diemGocVan;
+    }
+
+    public void setDiemGocVan(BigDecimal diemGocVan) {
+        this.diemGocVan = diemGocVan;
+    }
+
+    public BigDecimal getDiemGocLy() {
+        return diemGocLy;
+    }
+
+    public void setDiemGocLy(BigDecimal diemGocLy) {
+        this.diemGocLy = diemGocLy;
+    }
+
+    public BigDecimal getDiemGocHoa() {
+        return diemGocHoa;
+    }
+
+    public void setDiemGocHoa(BigDecimal diemGocHoa) {
+        this.diemGocHoa = diemGocHoa;
+    }
+
+    public BigDecimal getDiemGocSinh() {
+        return diemGocSinh;
+    }
+
+    public void setDiemGocSinh(BigDecimal diemGocSinh) {
+        this.diemGocSinh = diemGocSinh;
+    }
+
+    public BigDecimal getDiemGocAnh() {
+        return diemGocAnh;
+    }
+
+    public void setDiemGocAnh(BigDecimal diemGocAnh) {
+        this.diemGocAnh = diemGocAnh;
+    }
+
+    public BigDecimal getDiemGocSu() {
+        return diemGocSu;
+    }
+
+    public void setDiemGocSu(BigDecimal diemGocSu) {
+        this.diemGocSu = diemGocSu;
+    }
+
+    public BigDecimal getDiemGocDia() {
+        return diemGocDia;
+    }
+
+    public void setDiemGocDia(BigDecimal diemGocDia) {
+        this.diemGocDia = diemGocDia;
+    }
 
     public BigDecimal getDiemTHXT() {
         return diemTHXT;
@@ -223,6 +363,35 @@ public class TinhDiemVSAT {
             case "SU": return getDiemSu();
             case "DI": return getDiemDia();
             case "N1": return getDiemAnh();
+            default: return BigDecimal.ZERO;
+        }
+    }
+     public String getctDiemTheoMaMon(String maMon) {
+        if (maMon == null) return "";
+        switch (maMon) {
+            case "TO": return getcongthucDiemToan();
+            case "VA": return getcongthucDiemVan();
+            case "LI": return getcongthucDiemLy();
+            case "HO": return getcongthucDiemHoa();
+            case "SI": return getcongthucDiemSinh();
+            case "SU": return getcongthucDiemSu();
+            case "DI": return getcongthucDiemDia();
+            case "N1": return getcongthucDiemAnh();
+            default: return "";
+        }
+    }
+     public BigDecimal getDiemGocTheoMaMon(String maMon) {
+        if (maMon == null) return BigDecimal.ZERO;
+        
+        switch (maMon) {
+            case "TO": return getDiemGocToan();
+            case "VA": return getDiemGocVan();
+            case "LI": return getDiemGocLy();
+            case "HO": return getDiemGocHoa();
+            case "SI": return getDiemGocSinh();
+            case "SU": return getDiemGocSu();
+            case "DI": return getDiemGocDia();
+            case "N1": return getDiemGocAnh();
             default: return BigDecimal.ZERO;
         }
     }

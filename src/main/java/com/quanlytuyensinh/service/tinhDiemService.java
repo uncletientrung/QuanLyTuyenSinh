@@ -366,7 +366,7 @@ public class tinhDiemService {
             diemTHDTO.setDoLech(doLech.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemXT(diemXT.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setToHopGoc(nth.getMatohop().equals(THGoc));
-
+            
             listKQTHPT.add(diemTHDTO);
     }
         listKQTHPT.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
@@ -467,6 +467,41 @@ public class tinhDiemService {
         dto.setDiemAnh(diemquydoi.getN1Thi() != null ? diemquydoi.getN1Thi().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
         dto.setDiemSu(diemquydoi.getSu() != null ? diemquydoi.getSu().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
         dto.setDiemDia(diemquydoi.getDi() != null ? diemquydoi.getDi().setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        
+        dto.setDiemGocToan(toan != null ? toan : BigDecimal.ZERO);
+        dto.setDiemGocVan(nguVan != null ? nguVan : BigDecimal.ZERO);
+        dto.setDiemGocLy(vatLy != null ? vatLy : BigDecimal.ZERO);
+        dto.setDiemGocHoa(hoaHoc != null ? hoaHoc : BigDecimal.ZERO);
+        dto.setDiemGocSinh(sinhHoc != null ? sinhHoc : BigDecimal.ZERO);
+        dto.setDiemGocAnh(tiengAnh != null ? tiengAnh : BigDecimal.ZERO);
+        dto.setDiemGocSu(lichSu != null ? lichSu : BigDecimal.ZERO);
+        dto.setDiemGocDia(diaLy != null ? diaLy : BigDecimal.ZERO);
+            dto.setcongthucDiemToan(diemThiGiaLap.getTo() != null ? 
+          quydoidiemvsatkemcongthuc("TO", diemThiGiaLap.getTo()) : "");
+
+dto.setcongthucDiemToan(diemThiGiaLap.getTo() != null ? 
+    this.quydoidiemvsatkemcongthuc("TO", diemThiGiaLap.getTo()) : "");
+
+dto.setcongthucDiemVan(diemThiGiaLap.getVa() != null ? 
+    this.quydoidiemvsatkemcongthuc("VA", diemThiGiaLap.getVa()) : "");
+
+dto.setcongthucDiemLy(diemThiGiaLap.getLi() != null ? 
+    this.quydoidiemvsatkemcongthuc("LI", diemThiGiaLap.getLi()) : "");
+
+dto.setcongthucDiemHoa(diemThiGiaLap.getHo() != null ? 
+    this.quydoidiemvsatkemcongthuc("HO", diemThiGiaLap.getHo()) : "");
+
+dto.setcongthucDiemSinh(diemThiGiaLap.getSi() != null ? 
+    this.quydoidiemvsatkemcongthuc("SI", diemThiGiaLap.getSi()) : "");
+
+dto.setcongthucDiemAnh(diemThiGiaLap.getN1Thi() != null ? 
+    this.quydoidiemvsatkemcongthuc("N1", diemThiGiaLap.getN1Thi()) : ""); 
+
+dto.setcongthucDiemSu(diemThiGiaLap.getSu() != null ? 
+    this.quydoidiemvsatkemcongthuc("SU", diemThiGiaLap.getSu()) : "");
+
+dto.setcongthucDiemDia(diemThiGiaLap.getDi() != null ? 
+    this.quydoidiemvsatkemcongthuc("DI", diemThiGiaLap.getDi()) : "");
 
          dto.setDiemTHXT(diemTH.setScale(2, RoundingMode.HALF_UP));
             dto.setDiemUuTien(diemUT.setScale(2, RoundingMode.HALF_UP));
@@ -480,9 +515,37 @@ public class tinhDiemService {
         listkq.sort((a, b) -> b.getDiemXT().compareTo(a.getDiemXT()));
         
     }
-        
+            
            return listkq;
 }
+    public XtBangQuyDoi getBQDByPhuongThucVaMonVaDiem(String phuongThuc, String mon, BigDecimal Diem){
+            return xtbangquydoiDAO.getBQDVSATByPhuongThucVaMonVaDiemDAO(phuongThuc, mon, Diem);
+        }
+     public String quydoidiemvsatkemcongthuc(String mon, BigDecimal Diem)
+        {
+            if (Diem != null && Diem.compareTo(BigDecimal.ZERO) == 0) {
+               return "";
+    }
+             XtBangQuyDoi bangQuyDoi = getBQDByPhuongThucVaMonVaDiem("VSAT", mon, Diem);
+             if(bangQuyDoi==null)
+             {
+                 return "";
+             }
+            
+            BigDecimal  a= bangQuyDoi.getDDiema();
+            BigDecimal  b= bangQuyDoi.getDDiemb();
+            BigDecimal  c= bangQuyDoi.getDDiemc();
+            BigDecimal  d= bangQuyDoi.getDDiemd();
+            BigDecimal  x= Diem;
+            BigDecimal y = c.add(
+                (x.subtract(a))
+                .divide(b.subtract(a), 5, RoundingMode.HALF_UP)
+                .multiply(d.subtract(c))
+            );
+            BigDecimal ketQuaCuoi = y.setScale(2, RoundingMode.HALF_UP); 
+           String chuoiCongThuc = c + " + ( " + x + " - " + a + " ) / ( " + b + " - " + a + " ) * ( " + d + " - " + c + " ) = " + ketQuaCuoi;
+           return chuoiCongThuc;
+        }
 
     public TinhDiemDGNL tinhDiemDGNL(String nganh, String diemCong, String khuVuc, String doiTuong, String diemThi) {
         XtNganh nganhXet = listNganh.stream().filter(n -> nganh.equals(n.getManganh()))

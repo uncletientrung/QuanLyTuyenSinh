@@ -192,7 +192,8 @@ public class tinhDiemService {
     
     public XtDiemThiXetTuyen getDiemThiGiaLap(BigDecimal toan, BigDecimal nguVan, BigDecimal vatLy, BigDecimal hoaHoc, 
             BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, BigDecimal tinHoc, BigDecimal ktpl, BigDecimal cnCongNghiep, 
-            BigDecimal cnNongNghiep){
+            BigDecimal cnNongNghiep, BigDecimal nangKhieu1,  BigDecimal nangKhieu2, BigDecimal nangKhieu3, BigDecimal nangKhieu4, BigDecimal nangKhieu5,
+         BigDecimal nangKhieu6){
         XtDiemThiXetTuyen diemThiGiaLap = new XtDiemThiXetTuyen();
         diemThiGiaLap.setCccd(null);
         diemThiGiaLap.setDPhuongthuc("THPT");
@@ -211,12 +212,12 @@ public class tinhDiemService {
         // Không dùng
         diemThiGiaLap.setN1Cc(null);
         diemThiGiaLap.setNl1(null);
-        diemThiGiaLap.setNk1(null);
-        diemThiGiaLap.setNk2(null);
-        diemThiGiaLap.setNk3(null);
-        diemThiGiaLap.setNk4(null);
-        diemThiGiaLap.setNk5(null);
-        diemThiGiaLap.setNk6(null);
+        diemThiGiaLap.setNk1(nangKhieu1);
+        diemThiGiaLap.setNk2(nangKhieu2);
+        diemThiGiaLap.setNk3(nangKhieu3);
+        diemThiGiaLap.setNk4(nangKhieu4);
+        diemThiGiaLap.setNk5(nangKhieu5);
+        diemThiGiaLap.setNk6(nangKhieu6);
         
         return diemThiGiaLap;
     }
@@ -262,6 +263,13 @@ public class tinhDiemService {
                 case "CNCN": return "CN Công nghiệp";
                 case "CNNN": return "CN Nông nghiệp";
                 case "KTPL": return "GD Kinh tế Pháp luật";
+                case "NK1": return "Năng khiếu 1";
+                case "NK2": return "Năng khiếu 2";
+                case "NK3": return "Năng khiếu 3";
+                case "NK4": return "Năng khiếu 4";
+                case "NK5": return "Năng khiếu 5";
+                case "NK6": return "Năng khiếu 6";
+                
                 default: return maMon;
             }
     }
@@ -272,13 +280,14 @@ public class tinhDiemService {
        
     public  List<TinhDiemTHPTDTO> tinhDiemTHPTTatCaToHop(String maNganh,  BigDecimal toan, BigDecimal nguVan, BigDecimal vatLy, BigDecimal hoaHoc, 
          BigDecimal sinhHoc, BigDecimal tiengAnh, BigDecimal lichSu, BigDecimal diaLy, BigDecimal tinHoc, BigDecimal ktpl, BigDecimal cnCongNghiep, 
-         BigDecimal cnNongNghiep, String khuVuc, String doiTuong, BigDecimal diemCong) {
+         BigDecimal cnNongNghiep, BigDecimal nangKhieu1,  BigDecimal nangKhieu2, BigDecimal nangKhieu3, BigDecimal nangKhieu4, BigDecimal nangKhieu5,
+         BigDecimal nangKhieu6, String khuVuc, String doiTuong, BigDecimal diemCong) {
          List<TinhDiemTHPTDTO> listKQTHPT = new ArrayList<>();
          List<XtNganhToHop> listTH =this.getNTHByMaNganh(maNganh);
          String THGoc = getTHGoc(maNganh);
          // Tạo điểm thi Entity giả lập
          XtDiemThiXetTuyen diemThiGiaLap = this.getDiemThiGiaLap( toan, nguVan, vatLy, hoaHoc, sinhHoc, tiengAnh, lichSu, diaLy,
-                 tinHoc, ktpl, cnCongNghiep, cnNongNghiep);
+                 tinHoc, ktpl, cnCongNghiep, cnNongNghiep, nangKhieu1, nangKhieu2, nangKhieu3, nangKhieu4, nangKhieu5, nangKhieu6);
          
         for (XtNganhToHop nth : listTH) {
             // Tên tổ hợp môn thi
@@ -359,6 +368,12 @@ public class tinhDiemService {
             diemTHDTO.setDiemKTPL(ktpl.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemCnCongNghiep(cnCongNghiep.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemCnNongNghiep(cnNongNghiep.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemNangKhieu1(nangKhieu1.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemNangKhieu2(nangKhieu2.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemNangKhieu3(nangKhieu3.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemNangKhieu4(nangKhieu4.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemNangKhieu5(nangKhieu5.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemNangKhieu6(nangKhieu6.setScale(2, RoundingMode.HALF_UP));
             // Điểm xét tuyển
             diemTHDTO.setDiemTHXT(diemTH.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemUuTien(diemUT.setScale(2, RoundingMode.HALF_UP));

@@ -51,13 +51,20 @@ public class TinhDiemTHPTController {
         @RequestParam("tinHoc") BigDecimal tinHoc,
         @RequestParam("ktpl") BigDecimal ktpl,
         @RequestParam("cnCongNghiep") BigDecimal cnCongNghiep,
-        @RequestParam("cnNongNghiep") BigDecimal cnNongNghiep, Model model
+        @RequestParam("cnNongNghiep") BigDecimal cnNongNghiep, 
+        @RequestParam("nangKhieu1") BigDecimal nangKhieu1, 
+        @RequestParam("nangKhieu2") BigDecimal nangKhieu2, 
+        @RequestParam("nangKhieu3") BigDecimal nangKhieu3, 
+        @RequestParam("nangKhieu4") BigDecimal nangKhieu4, 
+        @RequestParam("nangKhieu5") BigDecimal nangKhieu5, 
+        @RequestParam("nangKhieu6") BigDecimal nangKhieu6, 
+        Model model
     ) {
 
         List<TinhDiemTHPTDTO> listKQTHPT = new ArrayList<>();
         
         listKQTHPT = this.tinhDiemSV.tinhDiemTHPTTatCaToHop(nganh, toan, nguVan, vatLy, hoaHoc, sinhHoc, tiengAnh, lichSu, diaLy, tinHoc, 
-                ktpl, cnCongNghiep, cnNongNghiep, khuVuc, doiTuong, diemCong);
+                ktpl, cnCongNghiep, cnNongNghiep, nangKhieu1, nangKhieu2, nangKhieu3, nangKhieu4, nangKhieu5, nangKhieu6, khuVuc, doiTuong, diemCong);
         String THGoc = this.tinhDiemSV.getTHGoc(nganh);
         TinhDiemTHPTDTO ThCaoNhat = listKQTHPT.get(0);
         BigDecimal NguongDauVao = this.tinhDiemSV.getDiemSan(nganh);

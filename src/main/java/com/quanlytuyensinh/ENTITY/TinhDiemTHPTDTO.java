@@ -35,6 +35,12 @@ public class TinhDiemTHPTDTO {
     private BigDecimal  diemKTPL;
     private BigDecimal  diemCnCongNghiep;
     private BigDecimal  diemCnNongNghiep;
+    private BigDecimal  diemNangKhieu1;
+    private BigDecimal  diemNangKhieu2;
+    private BigDecimal  diemNangKhieu3;
+    private BigDecimal  diemNangKhieu4;
+    private BigDecimal  diemNangKhieu5;
+    private BigDecimal  diemNangKhieu6;
 
     private BigDecimal diemTHXT;      
     private BigDecimal diemUuTien;
@@ -52,7 +58,8 @@ public class TinhDiemTHPTDTO {
             BigDecimal diemHoa, BigDecimal diemSinh, BigDecimal diemAnh,
             BigDecimal diemSu, BigDecimal diemDia, BigDecimal diemTin,
             BigDecimal diemKTPL, BigDecimal diemCnCongNghiep,
-            BigDecimal diemCnNongNghiep, BigDecimal diemTHXT,
+            BigDecimal diemCnNongNghiep, BigDecimal nangKhieu1,  BigDecimal nangKhieu2, BigDecimal nangKhieu3, BigDecimal nangKhieu4, BigDecimal nangKhieu5,
+         BigDecimal nangKhieu6, BigDecimal diemTHXT,
             BigDecimal diemUuTien, BigDecimal diemCong, BigDecimal doLech,
             BigDecimal diemXT, boolean isToHopGoc) {
 
@@ -71,6 +78,12 @@ public class TinhDiemTHPTDTO {
         this.diemKTPL = diemKTPL;
         this.diemCnCongNghiep = diemCnCongNghiep;
         this.diemCnNongNghiep = diemCnNongNghiep;
+        this.diemNangKhieu1 = nangKhieu1;
+        this.diemNangKhieu2 = nangKhieu2;
+        this.diemNangKhieu3 = nangKhieu3;
+        this.diemNangKhieu4 = nangKhieu4;
+        this.diemNangKhieu5 = nangKhieu5;
+        this.diemNangKhieu6 = nangKhieu6;
         this.diemTHXT = diemTHXT;
         this.diemUuTien = diemUuTien;
         this.diemCong = diemCong;
@@ -199,6 +212,53 @@ public class TinhDiemTHPTDTO {
         this.diemCnNongNghiep = diemCnNongNghiep;
     }
 
+    public BigDecimal getDiemNangKhieu1() {
+        return diemNangKhieu1;
+    }
+
+    public void setDiemNangKhieu1(BigDecimal diemNangKhieu1) {
+        this.diemNangKhieu1 = diemNangKhieu1;
+    }
+
+    public BigDecimal getDiemNangKhieu2() {
+        return diemNangKhieu2;
+    }
+
+    public void setDiemNangKhieu2(BigDecimal diemNangKhieu2) {
+        this.diemNangKhieu2 = diemNangKhieu2;
+    }
+
+    public BigDecimal getDiemNangKhieu3() {
+        return diemNangKhieu3;
+    }
+
+    public void setDiemNangKhieu3(BigDecimal diemNangKhieu3) {
+        this.diemNangKhieu3 = diemNangKhieu3;
+    }
+
+    public BigDecimal getDiemNangKhieu4() {
+        return diemNangKhieu4;
+    }
+
+    public void setDiemNangKhieu4(BigDecimal diemNangKhieu4) {
+        this.diemNangKhieu4 = diemNangKhieu4;
+    }
+
+    public BigDecimal getDiemNangKhieu5() {
+        return diemNangKhieu5;
+    }
+
+    public void setDiemNangKhieu5(BigDecimal diemNangKhieu5) {
+        this.diemNangKhieu5 = diemNangKhieu5;
+    }
+
+    public BigDecimal getDiemNangKhieu6() {
+        return diemNangKhieu6;
+    }
+
+    public void setDiemNangKhieu6(BigDecimal diemNangKhieu6) {
+        this.diemNangKhieu6 = diemNangKhieu6;
+    }
     public BigDecimal getDiemTHXT() {
         return diemTHXT;
     }
@@ -274,6 +334,12 @@ public class TinhDiemTHPTDTO {
             case "KTPL": return getDiemKTPL();
             case "CNCN": return getDiemCnCongNghiep();
             case "CNNN": return getDiemCnNongNghiep();
+            case "NK1" : return getDiemNangKhieu1();
+            case "NK2" : return getDiemNangKhieu2();
+            case "NK3" : return getDiemNangKhieu3();
+            case "NK4" : return getDiemNangKhieu4();
+            case "NK5" : return getDiemNangKhieu5();
+            case "NK6" : return getDiemNangKhieu6();
             default: return BigDecimal.ZERO;
         }
     }

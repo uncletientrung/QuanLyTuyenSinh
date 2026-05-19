@@ -79,7 +79,43 @@ Dashmix.onLoad((() => class {
                     number: true,
                     min: 0,
                     max: 10
-                }
+                },
+                "nangKhieu1": {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 10
+                },
+                "nangKhieu2": {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 10
+                },
+                "nangKhieu3": {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 10
+                },
+                "nangKhieu4": {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 10
+                },
+                "nangKhieu5": {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 10
+                },
+                "nangKhieu6": {
+                    required: true,
+                    number: true,
+                    min: 0,
+                    max: 10
+                },
             },
             messages: {
                 "nganh": {
@@ -156,7 +192,43 @@ Dashmix.onLoad((() => class {
                     number: "Điểm phải là số",
                     min: "Điểm tối thiểu là 0",
                     max: "Điểm tối đa là 10"
-                }
+                },
+                "nangKhieu1": {
+                    required: "Vui lòng nhập điểm Năng khiếu 1",
+                    number: "Điểm phải là số",
+                    min: "Điểm tối thiểu là 0",
+                    max: "Điểm tối đa là 10"
+                },
+                "nangKhieu2": {
+                    required: "Vui lòng nhập điểm Năng khiếu 2",
+                    number: "Điểm phải là số",
+                    min: "Điểm tối thiểu là 0",
+                    max: "Điểm tối đa là 10"
+                },
+                "nangKhieu3": {
+                    required: "Vui lòng nhập điểm Năng khiếu 3",
+                    number: "Điểm phải là số",
+                    min: "Điểm tối thiểu là 0",
+                    max: "Điểm tối đa là 10"
+                },
+                "nangKhieu4": {
+                    required: "Vui lòng nhập điểm Năng khiếu 4",
+                    number: "Điểm phải là số",
+                    min: "Điểm tối thiểu là 0",
+                    max: "Điểm tối đa là 10"
+                },
+                "nangKhieu5": {
+                    required: "Vui lòng nhập điểm Năng khiếu 5",
+                    number: "Điểm phải là số",
+                    min: "Điểm tối thiểu là 0",
+                    max: "Điểm tối đa là 10"
+                },
+                "nangKhieu6": {
+                    required: "Vui lòng nhập điểm Năng khiếu 6",
+                    number: "Điểm phải là số",
+                    min: "Điểm tối thiểu là 0",
+                    max: "Điểm tối đa là 10"
+                },
             },
             errorClass: 'invalid-feedback animated fadeIn',
             errorElement: 'div',

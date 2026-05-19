@@ -52,9 +52,9 @@ public class Main extends JFrame {
     private java.util.List<XtDiemThiXetTuyen> listDT;
     private XtBangQuyDoiBUS BQDBUS;
     private java.util.List<XtBangQuyDoi> listBQD;
-    
+    private int maquyen;
 
-    public Main() {
+    public Main(int maquyen) {
         TSBUS = new XtThisinhXetTuyen25BUS();
         DTBUS = new XtDiemThiXetTuyenBUS();
         NVBUS = new XtNguyenVongXetTuyenBUS();
@@ -70,7 +70,7 @@ public class Main extends JFrame {
         this.listNganhTH = NganhTHBUS.getAll();
         this.listBQD = BQDBUS.getAllQuyDoi();
         this.listDiemCong = DiemCongBUS.getAllDiemCong();
-        
+        this.maquyen = maquyen;
         
         setupLAF();
         initComponent();
@@ -109,7 +109,7 @@ public class Main extends JFrame {
                         DiemCongBUS, listDiemCong,
                         TSBUS, listTS,
                         DTBUS, listDT,
-                        BQDBUS, listBQD);
+                        BQDBUS, listBQD,maquyen);
         menuTaskbar.setPreferredSize(new Dimension(250, 1400));
         this.add(menuTaskbar, BorderLayout.WEST);
 

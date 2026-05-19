@@ -64,6 +64,8 @@ public class MenuTaskbar extends JPanel {
 
     private XtBangQuyDoiBUS BQDBUS;
     private java.util.List<XtBangQuyDoi> listBQD;
+    
+    private int maquyen;
     String[][] ArrMenu = {
         {"Trang chủ", "home.svg", "trangChu"},
         {"Thí sinh", "students.svg", "thiSinh"},
@@ -93,7 +95,7 @@ public class MenuTaskbar extends JPanel {
                        XtDiemCongXetTuyenBUS diemCongBUS, java.util.List<XtDiemCongXetTuyen> listDiemCong,
                        XtThisinhXetTuyen25BUS tsBUS, java.util.List<XtThisinhXetTuyen25> listTS,
                        XtDiemThiXetTuyenBUS dtBUS, java.util.List<XtDiemThiXetTuyen> listDT,
-                       XtBangQuyDoiBUS bqdBUS, java.util.List<XtBangQuyDoi> listBQD) {
+                       XtBangQuyDoiBUS bqdBUS, java.util.List<XtBangQuyDoi> listBQD,int maquyen) {
         this.main = m;
         // Gán các BUS và List
         this.NVBUS = nvBUS;
@@ -116,7 +118,8 @@ public class MenuTaskbar extends JPanel {
 
         this.BQDBUS = bqdBUS;
         this.listBQD = listBQD;
-
+        
+        this.maquyen = maquyen;
         initComponent();
     }
 
@@ -130,8 +133,14 @@ public class MenuTaskbar extends JPanel {
         pnlTop.setPreferredSize(new Dimension(250, 80));
         pnlTop.setBackground(new Color(48, 103, 204)); // Xanh biển
         this.add(pnlTop, BorderLayout.NORTH);
-
-        JLabel lblLogo = new JLabel("USER", SwingConstants.CENTER);
+        JLabel lblLogo;
+        if(maquyen==1)
+        {
+           lblLogo = new JLabel("ADMIN", SwingConstants.CENTER);
+        }
+        else{
+        lblLogo = new JLabel("USER", SwingConstants.CENTER);
+        }
         lblLogo.setFont(new Font("Roboto", Font.BOLD, 18));
         lblLogo.setForeground(Color.WHITE);
         pnlTop.add(lblLogo, BorderLayout.CENTER);

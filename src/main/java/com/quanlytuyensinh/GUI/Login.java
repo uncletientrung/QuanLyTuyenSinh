@@ -142,7 +142,7 @@ public class Login extends JFrame implements KeyListener {
         // Đăng nhập thành công
         this.dispose();
         try {
-            Main main = new Main();
+            Main main = new Main(nd.getMaphanquyen());
             main.setVisible(true);
         } catch (Exception ex) {
             ex.printStackTrace();

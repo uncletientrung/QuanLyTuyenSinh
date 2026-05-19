@@ -225,4 +225,7 @@ public class XtNganhBUS {
     public Map<String, BigDecimal> getListHaveDiemTT(List<XtNguyenVongXetTuyen> listNV){
         return this.nganhDAO.getListNganhHaveDiemTT(listNV);
     }
+    public boolean UpdateSoLuongAllNganh(List<XtNganh> listNganh){
+        return this.nganhDAO.updateSoLuongAllNganh(listNganh);
+    }
 }

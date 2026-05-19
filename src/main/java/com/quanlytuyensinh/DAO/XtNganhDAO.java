@@ -352,5 +352,29 @@ public boolean resetAllSoLuongPhuongThuc() {
 
         return result;
     }
+    public boolean updateSoLuongAllNganh(List<XtNganh> listNganh){
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            int batchSize = 50;
+            for (int i = 0; i < listNganh.size(); i++) {
+                session.merge(listNganh.get(i));
+                if ((i + 1) % batchSize == 0) {
+                    session.flush();
+                    session.clear();
+                }
+            }
+            session.flush();
+            session.clear();
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
     
 }

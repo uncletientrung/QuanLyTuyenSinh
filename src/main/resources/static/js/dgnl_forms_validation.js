@@ -17,7 +17,8 @@ Dashmix.onLoad((() => class {
                     required: true,
                     number: true,
                     min: 0,
-                    max: 3
+                    max: 3,
+                    step: 0.1
                 },
                 "diem-thi-input": {
                     required: true,
@@ -34,7 +35,8 @@ Dashmix.onLoad((() => class {
                     required: "Vui lòng nhập điểm cộng",
                     number: "Điểm cộng phải là số",
                     min: "Điểm cộng tối thiểu là 0",
-                    max: "Điểm cộng tối đa là 3"
+                    max: "Điểm cộng tối đa là 3",
+                    step: "Điểm cộng chỉ được chứa tối đa 1 chữ số thập phân"
                 },
                 "diem-thi-input": {
                     required: "Vui lòng nhập điểm thi",

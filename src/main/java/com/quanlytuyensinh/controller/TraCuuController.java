@@ -1,6 +1,5 @@
 package com.quanlytuyensinh.controller;
 
-import com.quanlytuyensinh.ENTITY.KetQuaTraCuuDTO;
 import com.quanlytuyensinh.ENTITY.TraCuuResultWrapper;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.service.TraCuuService;
@@ -11,8 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 
 @Controller
 public class TraCuuController {

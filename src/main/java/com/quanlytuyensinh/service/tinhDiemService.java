@@ -576,22 +576,34 @@ dto.setcongthucDiemDia(diemThiGiaLap.getDi() != null ?
 
         BigDecimal diemThiDGNL = new BigDecimal(diemThi);
 
-        XtBangQuyDoi quyDoi = listQuyDoi.stream().filter(q -> (q.getDDiema().compareTo(diemThiDGNL) < 0 && q.getDDiemb().compareTo(diemThiDGNL) > 0))
+        XtBangQuyDoi quyDoi = listQuyDoi.stream().filter(q -> (q.getDDiema().compareTo(diemThiDGNL) <= 0 && q.getDDiemb().compareTo(diemThiDGNL) >= 0 && q.getDPhuongthuc().equals("DGNL")))
                                                 .findAny()
                                                 .orElse(null);
+
+        String ctQuyDoi;
+        BigDecimal diemThiQuyDoi;
+        BigDecimal diemCongVal;
+        BigDecimal diemUuTien;
+        BigDecimal diemXetTuyen;
         if (quyDoi == null) {
-            System.out.println("Không tìm thấy phân vị quy đổi");
-            return null;
+            ctQuyDoi = "Lỗi điểm nhập không nằm trong phân vị nào";
+            diemThiQuyDoi = new BigDecimal("0.00");
+        } else {
+            ctQuyDoi = quyDoi.getDDiemc() + " + (" + diemThiDGNL + " - " + quyDoi.getDDiema() + ") / (" + quyDoi.getDDiemb() + " - " + quyDoi.getDDiema() + ") * (" + quyDoi.getDDiemd() + " - " + quyDoi.getDDiemc() + ")";
+            diemThiQuyDoi = quyDoi.getDDiemc().add(diemThiDGNL.subtract(quyDoi.getDDiema()).divide(quyDoi.getDDiemb().subtract(quyDoi.getDDiema()), MathContext.DECIMAL128).multiply(quyDoi.getDDiemd().subtract(quyDoi.getDDiemc())));    
+            diemThiQuyDoi = diemThiQuyDoi.setScale(2, RoundingMode.HALF_UP);
         }
-
-        String ctQuyDoi = quyDoi.getDDiemc() + " + (" + diemThiDGNL + " - " + quyDoi.getDDiema() + ") / (" + quyDoi.getDDiemb() + " - " + quyDoi.getDDiema() + ") * (" + quyDoi.getDDiemd() + " - " + quyDoi.getDDiemc() + ")";
-        BigDecimal diemThiQuyDoi = quyDoi.getDDiemc().add(diemThiDGNL.subtract(quyDoi.getDDiema()).divide(quyDoi.getDDiemb().subtract(quyDoi.getDDiema()), MathContext.DECIMAL128).multiply(quyDoi.getDDiemd().subtract(quyDoi.getDDiemc())));    
-        diemThiQuyDoi = diemThiQuyDoi.setScale(2, RoundingMode.HALF_UP);
-        BigDecimal diemCongVal = new BigDecimal(diemCong);
-        BigDecimal diemUuTien = DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong));
-        BigDecimal diemXetTuyen = diemThiQuyDoi.add(diemCongVal).add(diemUuTien);
+        diemCongVal = new BigDecimal(diemCong);
+        if ((diemThiQuyDoi.add(diemCongVal)).compareTo(new BigDecimal("22.50")) < 0) {
+            diemUuTien = DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong));
+        } else {
+            diemUuTien = ((new BigDecimal("30").subtract(diemThiQuyDoi).subtract(diemCongVal)).divide(new BigDecimal("7.5"), 2, RoundingMode.HALF_UP)).multiply(DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong)));
+            diemUuTien = diemUuTien.setScale(2, RoundingMode.HALF_UP);
+        }
+        diemXetTuyen = diemThiQuyDoi.add(diemCongVal).add(diemUuTien);
         diemXetTuyen = diemXetTuyen.setScale(2, RoundingMode.HALF_UP);
-
-        return new TinhDiemDGNL(tenNganh, toHopGoc, diemThiDGNL, ctQuyDoi, diemThiQuyDoi, diemCongVal, diemUuTien, diemXetTuyen);
+        TinhDiemDGNL result = new TinhDiemDGNL(tenNganh, toHopGoc, diemThiDGNL, ctQuyDoi, diemThiQuyDoi, diemCongVal, diemUuTien, diemXetTuyen);
+        System.out.println(result.toString());
+        return result;
     }
 }

@@ -194,7 +194,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
            functionBar.setBackground(Color.WHITE);
 
-           String[] action = { "create", "approve", "undo","update", "delete", "detail", "import" };
+           String[] action = {"approve", "undo","update", "delete", "detail", "import" };
            mainFunction = new MainFunction(1, "nguyenVong", action); // Sửa khi có nhóm quyền
            for (String ac : action) {
                mainFunction.btn.get(ac).addActionListener(this);

@@ -282,38 +282,37 @@ public class XtNguyenVongXetTuyenDAO {
     
     public List<XtNguyenVongXetTuyen> filterNguyenVong(String maNganh, String phuongThuc, String ketQua) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            StringBuilder hql = new StringBuilder("FROM XtNguyenVongXetTuyen n WHERE 1=1");
 
-            
-            boolean locKetQua = ketQua != null && !"Tất cả".equals(ketQua);
-            if (!locKetQua) {
-                hql.append(" AND n.nvKetqua = 'Trúng tuyển'");
-            } else {
-                hql.append(" AND n.nvKetqua = :ketQua");
-            }
+            StringBuilder hql = new StringBuilder("FROM XtNguyenVongXetTuyen n WHERE 1=1");
 
             if (maNganh != null && !"Tất cả".equals(maNganh)) {
                 hql.append(" AND n.nvManganh = :maNganh");
             }
+
             if (phuongThuc != null && !"Tất cả".equals(phuongThuc)) {
                 hql.append(" AND n.ttPhuongthuc = :phuongThuc");
+            }
+
+            if (ketQua != null && !"Tất cả".equals(ketQua)) {
+                hql.append(" AND n.nvKetqua = :ketQua");
             }
 
             hql.append(" ORDER BY n.nvManganh ASC, n.nvTt ASC");
 
             var query = session.createQuery(hql.toString(), XtNguyenVongXetTuyen.class);
 
-            if (locKetQua) {
-                query.setParameter("ketQua", ketQua);
-            }
             if (maNganh != null && !"Tất cả".equals(maNganh)) {
                 query.setParameter("maNganh", maNganh);
             }
             if (phuongThuc != null && !"Tất cả".equals(phuongThuc)) {
                 query.setParameter("phuongThuc", phuongThuc);
             }
+            if (ketQua != null && !"Tất cả".equals(ketQua)) {
+                query.setParameter("ketQua", ketQua);
+            }
 
             return query.list();
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();

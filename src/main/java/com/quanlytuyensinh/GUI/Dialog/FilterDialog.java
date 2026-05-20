@@ -31,7 +31,7 @@ public class FilterDialog extends JDialog {
         Font comboFont = new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 14);
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 15, 30));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 10, 30));
         mainPanel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();

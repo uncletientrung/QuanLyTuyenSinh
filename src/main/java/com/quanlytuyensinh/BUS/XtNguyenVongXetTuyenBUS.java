@@ -345,4 +345,8 @@ public class XtNguyenVongXetTuyenBUS {
         }
             return false;
     }
+    
+    public List<XtNguyenVongXetTuyen> filterNguyenVong(String maNganh, String phuongThuc, String ketQua) {
+        return nvDAO.filterNguyenVong(maNganh, phuongThuc, ketQua);
+    }
 }

@@ -42,7 +42,7 @@ public final class MainFunction extends JToolBar {
         btn.put("import", new ButtonToolBar("NHẬP EXCEL", "import_excel.svg", "create"));
         btn.put("export", new ButtonToolBar("XUẤT EXCEL", "export_excel.svg", "view"));
         btn.put("import_cert", new ButtonToolBar("NHẬP CHỨNG CHỈ", "certificate.svg", "import_cert"));
-
+        btn.put("filter", new ButtonToolBar("BỘ LỌC", "filter.svg", "filter"));
         for (String s : listBtn) {
             if (btn.containsKey(s)) {
                 this.add(btn.get(s)); // Nếu có thì add vào ToolBar

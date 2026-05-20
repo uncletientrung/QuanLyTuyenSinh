@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 50 50" version="1.1">
+  <defs>
+    <linearGradient id="filterGradient" x1="24" y1="8" x2="24" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#32bdef"/>
+      <stop offset="1" stop-color="#1ea2e4"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <!-- Circle background -->
+    <path style="stroke:none;fill-rule:nonzero;fill:url(#filterGradient);fill-opacity:1;"
+      d="M 45.832031 25 C 45.832031 36.507812 36.507812 45.832031 25 45.832031 C 13.496094 45.832031 4.167969 36.507812 4.167969 25 C 4.167969 13.496094 13.496094 4.167969 25 4.167969 C 36.507812 4.167969 45.832031 13.496094 45.832031 25 Z"/>
+    <!-- Filter funnel icon (white) -->
+    <path style="stroke:none;fill-rule:nonzero;fill:#FFFFFF;fill-opacity:1;"
+      d="M 13 15 L 37 15 L 28 25 L 28 35 L 22 38 L 22 25 Z"/>
+  </g>
+</svg>

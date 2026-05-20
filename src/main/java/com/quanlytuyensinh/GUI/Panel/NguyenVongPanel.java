@@ -19,12 +19,13 @@ import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Component.CustomRowRenderer;
-import com.quanlytuyensinh.GUI.Component.IntegratedSearch;
+import com.quanlytuyensinh.GUI.Component.IntegratedSearchNguyenVong;
 import com.quanlytuyensinh.GUI.Component.MainFunction;
 import com.quanlytuyensinh.GUI.Component.PaginatedTable;
 import javax.swing.*;
 import com.quanlytuyensinh.GUI.Component.PanelBorderRadius;
 import com.quanlytuyensinh.GUI.Component.TableSorter;
+import com.quanlytuyensinh.GUI.Dialog.FilterDialog;
 import com.quanlytuyensinh.GUI.Dialog.NguyenVongDialog;
 import com.quanlytuyensinh.GUI.Main;
 import com.quanlytuyensinh.UTIL.ExcelImportUtil;
@@ -59,7 +60,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
     Main mainFrame;
     JPanel pnlBorder1, pnlBorder2, pnlBorder3, pnlBorder4, contentCenter;
     MainFunction mainFunction; // Thanh function
-    IntegratedSearch search; // Thanh Search
+    IntegratedSearchNguyenVong search; // Thanh Search
     private PaginatedTable paginatedTable;
     
     XtNguyenVongXetTuyenBUS NVBUS;
@@ -190,18 +191,18 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
 
            functionBar = new PanelBorderRadius();
            functionBar.setPreferredSize(new Dimension(0, 100));
-           functionBar.setLayout(new GridLayout(1, 2, 50, 0));
+           functionBar.setLayout(new BorderLayout(0, 0));
            functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
            functionBar.setBackground(Color.WHITE);
 
-           String[] action = {"approve", "undo","update", "delete", "detail", "import" };
+           String[] action = {"approve", "undo","update", "delete", "detail", "import", "filter" };
            mainFunction = new MainFunction(1, "nguyenVong", action); // Sửa khi có nhóm quyền
            for (String ac : action) {
                mainFunction.btn.get(ac).addActionListener(this);
            }
-           functionBar.add(mainFunction);
+           functionBar.add(mainFunction, BorderLayout.WEST);
 
-           search = new IntegratedSearch(new String[] { "Tất cả", "Mã", "Căn cước CD", "Mã ngành", "Phương thức", "Tổ hợp" });
+           search = new IntegratedSearchNguyenVong(new String[] { "Tất cả", "Mã", "Căn cước CD", "Mã ngành", "Phương thức", "Tổ hợp" });
            search.txtSearchForm.addKeyListener(new KeyAdapter() {
                @Override
                public void keyReleased(KeyEvent e) {
@@ -213,7 +214,8 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
               resetSearch();
            });
 
-           functionBar.add(search);
+           search.setPreferredSize(new Dimension(380, 0));
+           functionBar.add(search, BorderLayout.EAST);
            contentCenter.add(functionBar, BorderLayout.NORTH);
 
            pnlMain = new PanelBorderRadius();
@@ -461,7 +463,11 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
             }
         }
         else if (source == mainFunction.btn.get("detail") || source == mainFunction.btn.get("update") || 
-                            source == mainFunction.btn.get("delete") || source == mainFunction.btn.get("approve") || source == mainFunction.btn.get("undo")){
+                            source == mainFunction.btn.get("delete") || source == mainFunction.btn.get("approve") || source == mainFunction.btn.get("undo") || source == mainFunction.btn.get("filter")){
+            if (source == mainFunction.btn.get("filter")) {
+                new FilterDialog(this, owner, "BỘ LỌC");
+                return;   
+            }
             XtNguyenVongXetTuyen NguyenVongDuocChon = getSelectedNguyenVong();
              if (NguyenVongDuocChon == null) return;
                 
@@ -615,6 +621,11 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
 
     public void setListBQD(List<XtBangQuyDoi> listBQD) {
         this.listBQD = listBQD;
+    }
+    
+    public void applyFilter(String maNganh, String phuongThuc, String ketQua) {
+        listNV = NVBUS.filterNguyenVong(maNganh, phuongThuc, ketQua);
+        loadDataTable(listNV);
     }
     private void importExcel() { // Excel
        JFileChooser fileChooser = new JFileChooser();

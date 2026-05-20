@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.quanlytuyensinh.ENTITY.TinhDiemDGNL;
 import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.service.tinhDiemService;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 
 /**
  *
@@ -24,7 +26,6 @@ import com.quanlytuyensinh.service.tinhDiemService;
 @Controller
 public class TinhDiemDGNLController {
     // Running on http://localhost:8080/tinhdiemDGNL-view
-    @Autowired
     tinhDiemService service  = new tinhDiemService();
     @RequestMapping(value = "/tinhdiemDGNL-view", method = RequestMethod.GET)
     public String viewForm(Model model) {
@@ -43,10 +44,24 @@ public class TinhDiemDGNLController {
         @RequestParam("diem-thi-input") String diemThi,
         Model model
     ) {
+        List<TinhDiemDGNL> listKQDGNL= new ArrayList<>();
+        listKQDGNL = service.TinhDiemDGNLTatCaToHop(nganh, diemCong, khuVuc, doiTuong, diemThi);
+        String THGoc = this.service.getTHGoc(nganh);
+        TinhDiemDGNL ThCaoNhat = listKQDGNL.get(0);
+        BigDecimal NguongDauVao = this.service.getDiemSan(nganh);
+        String tenNganh = this.service.getTenNganhByMaNganh(nganh);
+        BigDecimal diemUuTienKhuVuc = this.service.DiemUuTienKhuVuc(khuVuc);
+        BigDecimal diemUuTienDoiTuong = this.service.DiemUuTienDoiTuong(doiTuong);
         
-        TinhDiemDGNL diemDGNL = service.tinhDiemDGNL(nganh, diemCong, khuVuc, doiTuong, diemThi);
-        model.addAttribute("ketqua", diemDGNL);
-        model.addAttribute("nganh", nganh);
+        model.addAttribute("doiTuong", doiTuong.equals("0") ? "Không có" : doiTuong);
+        model.addAttribute("diemUuTienDoiTuong", diemUuTienDoiTuong);
+        model.addAttribute("khuVuc", khuVuc.equals("0") ? "Không có" : khuVuc);
+        model.addAttribute("diemUuTienKhuVuc", diemUuTienKhuVuc);
+        model.addAttribute("tenNganh", tenNganh + " (" + nganh + ")"); 
+        model.addAttribute("listKQDGNL", listKQDGNL);
+        model.addAttribute("THGoc", THGoc);
+        model.addAttribute("ThCaoNhat", ThCaoNhat);
+        model.addAttribute("NguongDauVao", NguongDauVao == null || NguongDauVao.compareTo(BigDecimal.ZERO) == 0 ? "Chưa công bố" : NguongDauVao);
         return "tinhdiemDGNL";
     }
 }

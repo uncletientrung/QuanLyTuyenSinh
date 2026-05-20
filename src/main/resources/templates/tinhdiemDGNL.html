@@ -18,65 +18,98 @@
                     <div class="block block-rounded">
                         <div class="block-header block-header-default">
                             <h3 class="block-title">Tính quy đổi điểm xét tuyển ĐGNL:
-                                <span class="fw-bold text-primary" th:text="|${ketqua.tenNganh} (${nganh})|"></span>
+                                <span class="fw-bold text-primary" th:text="${tenNganh}"></span>
                             </h3>
                         </div>
                         <div class="block-content">
                             <p>
-                                Tổ hợp gốc quy đổi theo ngành:
-                                <span class="fw-bold text-primary" th:text="${ketqua.toHopGoc}"></span>,
-                                Ngưỡng đầu vào:
+                                Tổ hợp có điểm xét tuyển cao nhất:
+                                <code th:text="${ThCaoNhat.maToHop + ', ' + ThCaoNhat.diemXetTuyen}"></code>.
+                                Tổ hợp gốc <span class="fw-bold text-primary" th:text="${THGoc}"></span>.
+                                Ngưỡng đầu vào: <span class="fw-bold text-primary" th:text="${NguongDauVao}"></span>
                             </p>
-
-                            <!--
-                              Separate your table content with multiple tbody sections. Add one row and add the class .js-table-sections-header to a
-                              tbody section to make it clickable. It will then toggle the next tbody section which can have multiple rows. Eg:
-                  
-                              <tbody class="js-table-sections-header">One row</tbody>
-                              <tbody>Multiple rows</tbody>
-                              <tbody class="js-table-sections-header">One row</tbody>
-                              <tbody>Multiple rows</tbody>
-                              <tbody class="js-table-sections-header">One row</tbody>
-                              <tbody>Multiple rows</tbody>
-                  
-                              You can also add the class .show in your tbody.js-table-sections-header to make the next tbody section visible by default
-                            -->
                             <div class="table-responsive">
                                 <table class="js-table-sections table table-hover table-vcenter table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Nội dung</th>
-                                            <th>Chi tiết điểm</th>
+                                            <th style="width: 30px;"></th>
+                                            <th style="width: 50%;">Nội dung</th>
+                                            <th style="width: 50%;">Chi tiết điểm</th>
                                         </tr>
                                     </thead>
 
                                     <tbody class="fs-sm">
                                         <tr>
-                                            <td>Điểm thi ĐGNL</td>
-                                            <td th:text="${ketqua.diemThi}"></td>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold" th:text="'Khu vực ưu tiên: '+ ${khuVuc}"></td>
+                                            <td th:text="${diemUuTienKhuVuc}"></td>
                                         </tr>
                                         <tr>
-                                            <td>Công thức quy đổi về thang 30 <span class="fw-bold text-primary" th:text="|(THXT gốc: ${ketqua.toHopGoc})|"></span>
-                                            </td>
-                                            <td th:text="${ketqua.ctQuyDoi}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Điểm thi quy đổi</td>
-                                            <td th:text="${ketqua.diemThiQuyDoi}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Điểm cộng</td>
-                                            <td th:text="${ketqua.diemCong}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Điểm ưu tiên quy đổi</td>
-                                            <td th:text="${ketqua.diemUuTien}"></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Điểm xét tuyển = <code>Điểm quy đổi + Điểm cộng + Điểm ưu tiên quy đổi</code></td>
-                                            <td th:text="${ketqua.diemXetTuyen}"></td>
+                                            <td class="text-center"></td>
+                                            <td class="fw-semibold" th:text="'Đối tượng ưu tiên: ' + ${doiTuong}"></td>
+                                            <td th:text="${diemUuTienDoiTuong}"></td>
                                         </tr>
                                     </tbody>
+
+                                    <th:block th:each="tohop : ${listKQDGNL}">
+                                       <tbody class="js-table-sections-header show table-active" th:classappend="${tohop.toHopGoc} ? 'show table-active' : ''">
+                                          <tr>
+                                             <td class="text-center">
+                                                   <i class="fa fa-angle-right text-muted"></i>
+                                             </td>
+                                             <td class="fw-semibold">
+                                                   <div class="py-1">
+                                                      <span class="fw-bold text-primary" th:text="'Tổ hợp ' + ${tohop.maToHop}"></span>
+                                                   </div>
+                                             </td>
+                                             <td></td>
+                                          </tr>
+                                       </tbody>
+
+                                        <tbody class="fs-sm">
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold">Điểm thi ĐGNL</td>
+                                                <td th:text="${tohop.diemThi}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold">Công thức quy đổi về thang 30 <span class="fw-bold text-primary" th:text="|(THXT gốc: ${THGoc})|"></span>
+                                                </td>
+                                                <td 
+                                                    th:text="${tohop.ctQuyDoi}"
+                                                    th:classappend="${tohop.ctQuyDoi.contains('Lỗi')} ? 'text-danger fw-bold' : ''">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold" >Điểm thi quy đổi</td>
+                                                <td th:text="${tohop.diemThiQuyDoi}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold">Điểm cộng<span class="fw-bold text-primary">(<= 3.0)</span> </td>
+                                                <td th:text="${tohop.diemCong}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold">Điểm ưu tiên quy đổi (ĐƯT)</td>
+                                                <td th:text="${tohop.diemUuTien}"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold">Độ lệch với tổ hợp gốc <span class="fw-bold text-primary" th:text="${THGoc}"></span></td>
+                                                <td th:text="${tohop.doLech}"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="text-center"></td>
+                                                <td class="fw-semibold">Điểm xét tuyển (ĐXT) = ĐTHXT + ĐC + ĐƯT - Độ lệch (<=30) </td>
+                                                <td th:text="${tohop.diemXetTuyen}"></td>
+                                            </tr>
+                                        </tbody>
+                                    </th:block>
                                 </table>
                             </div>
                         </div>

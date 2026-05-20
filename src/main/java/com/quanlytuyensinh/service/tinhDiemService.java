@@ -52,6 +52,7 @@ public class tinhDiemService {
     private List<XtThisinhXetTuyen25> listThiSinh;
     private final XtDiemCongXetTuyenDAO diemCongDAO = XtDiemCongXetTuyenDAO.getInstance(); // Điểm cộng
     private List<XtDiemCongXetTuyen> listDiemCong;
+    private XtBangQuyDoiBUS BQDBUS = new XtBangQuyDoiBUS();
     private final XtBangQuyDoiDAO xtbangquydoiDAO = XtBangQuyDoiDAO.getInstance(); // Bảng quy đổi
     private List<XtBangQuyDoi> listQuyDoi;
         private final XtToHopMonThiDAO tohopDAO = XtToHopMonThiDAO.getInstance(); // Tổ hợp môn thi
@@ -80,6 +81,7 @@ public class tinhDiemService {
         }
         return rs;
     }
+   
     
     public String getTenNganhByMaNganh(String maNganh){
         return this.nganhDAO.getNganhByMaNganh(maNganh).getTennganh();
@@ -562,48 +564,110 @@ dto.setcongthucDiemDia(diemThiGiaLap.getDi() != null ?
            return chuoiCongThuc;
         }
 
-    public TinhDiemDGNL tinhDiemDGNL(String nganh, String diemCong, String khuVuc, String doiTuong, String diemThi) {
-        XtNganh nganhXet = listNganh.stream().filter(n -> nganh.equals(n.getManganh()))
-                                            .findAny()
-                                            .orElse(null);
-        
-        if (nganhXet == null) {
-            System.out.println("Không tìm thấy mã ngành" + nganh);
-            return null;
-        } 
-        String tenNganh = nganhXet.getTennganh();
-        String toHopGoc = nganhXet.getNTohopgoc();
-
+//    public TinhDiemDGNL tinhDiemDGNL(String nganh, String diemCong, String khuVuc, String doiTuong, String diemThi) {
+//        XtNganh nganhXet = listNganh.stream().filter(n -> nganh.equals(n.getManganh()))
+//                                            .findAny()
+//                                            .orElse(null);
+//        
+//        if (nganhXet == null) {
+//            System.out.println("Không tìm thấy mã ngành" + nganh);
+//            return null;
+//        } 
+//        String tenNganh = nganhXet.getTennganh();
+//        String toHopGoc = nganhXet.getNTohopgoc();
+//
+//        BigDecimal diemThiDGNL = new BigDecimal(diemThi);
+//
+//        XtBangQuyDoi quyDoi = listQuyDoi.stream().filter(q -> (q.getDDiema().compareTo(diemThiDGNL) <= 0 && q.getDDiemb().compareTo(diemThiDGNL) >= 0 && q.getDPhuongthuc().equals("DGNL")))
+//                                                .findAny()
+//                                                .orElse(null);
+//
+//        String ctQuyDoi;
+//        BigDecimal diemThiQuyDoi;
+//        BigDecimal diemCongVal;
+//        BigDecimal diemUuTien;
+//        BigDecimal diemXetTuyen;
+//        if (quyDoi == null) {
+//            ctQuyDoi = "Lỗi điểm nhập không nằm trong phân vị nào";
+//            diemThiQuyDoi = new BigDecimal("0.00");
+//        } else {
+//            ctQuyDoi = quyDoi.getDDiemc() + " + (" + diemThiDGNL + " - " + quyDoi.getDDiema() + ") / (" + quyDoi.getDDiemb() + " - " + quyDoi.getDDiema() + ") * (" + quyDoi.getDDiemd() + " - " + quyDoi.getDDiemc() + ")";
+//            diemThiQuyDoi = quyDoi.getDDiemc().add(diemThiDGNL.subtract(quyDoi.getDDiema()).divide(quyDoi.getDDiemb().subtract(quyDoi.getDDiema()), MathContext.DECIMAL128).multiply(quyDoi.getDDiemd().subtract(quyDoi.getDDiemc())));    
+//            diemThiQuyDoi = diemThiQuyDoi.setScale(2, RoundingMode.HALF_UP);
+//        }
+//        diemCongVal = new BigDecimal(diemCong);
+//        if ((diemThiQuyDoi.add(diemCongVal)).compareTo(new BigDecimal("22.50")) < 0) {
+//            diemUuTien = DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong));
+//        } else {
+//            diemUuTien = ((new BigDecimal("30").subtract(diemThiQuyDoi).subtract(diemCongVal)).divide(new BigDecimal("7.5"), 2, RoundingMode.HALF_UP)).multiply(DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong)));
+//            diemUuTien = diemUuTien.setScale(2, RoundingMode.HALF_UP);
+//        }
+//        diemXetTuyen = diemThiQuyDoi.add(diemCongVal).add(diemUuTien);
+//        diemXetTuyen = diemXetTuyen.setScale(2, RoundingMode.HALF_UP);
+//        TinhDiemDGNL result = new TinhDiemDGNL(tenNganh, toHopGoc, diemThiDGNL, ctQuyDoi, diemThiQuyDoi, diemCongVal, diemUuTien, diemXetTuyen);
+//        System.out.println(result.toString());
+//        return result;
+//    }
+    
+    public List<TinhDiemDGNL> TinhDiemDGNLTatCaToHop(String nganh, String diemCong, String khuVuc, String doiTuong, String diemThi){
+        List<TinhDiemDGNL> listKQDGNL = new ArrayList<>();
+         List<XtNganhToHop> listTH =this.getNTHByMaNganh(nganh);
         BigDecimal diemThiDGNL = new BigDecimal(diemThi);
+//        XtBangQuyDoi quyDoi = listQuyDoi.stream().filter(q -> (q.getDDiema().compareTo(diemThiDGNL) <= 0 && q.getDDiemb().compareTo(diemThiDGNL) >= 0 && q.getDPhuongthuc().equals("DGNL")))
+//                                       .findAny()
+//                                       .orElse(null);
+        String THGoc = getTHGoc(nganh);
+        // Tạo điểm thi Entity giả lập
+        
+        for (XtNganhToHop nth : listTH) {
+            BigDecimal tong = BigDecimal.ZERO;
+            
+            // Bảng quy đổi
+            XtBangQuyDoi quyDoi = this.xtbangquydoiDAO.getBQDDGNLByPhuongThucVaMonVaDiemDAO("DGNL",nth.getMatohop(), diemThiDGNL);
 
-        XtBangQuyDoi quyDoi = listQuyDoi.stream().filter(q -> (q.getDDiema().compareTo(diemThiDGNL) <= 0 && q.getDDiemb().compareTo(diemThiDGNL) >= 0 && q.getDPhuongthuc().equals("DGNL")))
-                                                .findAny()
-                                                .orElse(null);
-
-        String ctQuyDoi;
-        BigDecimal diemThiQuyDoi;
-        BigDecimal diemCongVal;
-        BigDecimal diemUuTien;
-        BigDecimal diemXetTuyen;
-        if (quyDoi == null) {
-            ctQuyDoi = "Lỗi điểm nhập không nằm trong phân vị nào";
-            diemThiQuyDoi = new BigDecimal("0.00");
-        } else {
-            ctQuyDoi = quyDoi.getDDiemc() + " + (" + diemThiDGNL + " - " + quyDoi.getDDiema() + ") / (" + quyDoi.getDDiemb() + " - " + quyDoi.getDDiema() + ") * (" + quyDoi.getDDiemd() + " - " + quyDoi.getDDiemc() + ")";
-            diemThiQuyDoi = quyDoi.getDDiemc().add(diemThiDGNL.subtract(quyDoi.getDDiema()).divide(quyDoi.getDDiemb().subtract(quyDoi.getDDiema()), MathContext.DECIMAL128).multiply(quyDoi.getDDiemd().subtract(quyDoi.getDDiemc())));    
-            diemThiQuyDoi = diemThiQuyDoi.setScale(2, RoundingMode.HALF_UP);
+             // Điểm quy đổi DGNL
+            BigDecimal diemThiDGNLQuyDoi = this.BQDBUS.getDiemThiDGNLQuyDoi(nth.getMatohop(), diemThiDGNL);
+            
+            // Độ lệch
+            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+        
+            // Điểm cộng 
+           BigDecimal diemCongXT= diemCong != null ? new BigDecimal(diemCong) : BigDecimal.ZERO;
+           
+           // Điểm ưu tiên
+             BigDecimal diemUT = BigDecimal.ZERO;
+             diemUT = this.getDiemUuTien(khuVuc, doiTuong, tong, diemCongXT); // Điểm ưu tiên đã if else 22.5 rồi
+             
+             // Điểm xét tuyển
+            BigDecimal diemTH = tong.add(diemThiDGNLQuyDoi);
+            BigDecimal diemXT = diemTH.add(diemCongXT).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+            if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
+                diemXT = new BigDecimal("30");
+            }
+            
+            // Tạo Tính điểm Tổ hợp DTO
+            TinhDiemDGNL diemTHDTO = new TinhDiemDGNL();
+            diemTHDTO.setMaToHop(nth.getMatohop());
+            String ctQuyDoi  = "Lỗi điểm nhập không nằm trong phân vị nào = 0";
+            if(quyDoi != null){
+                ctQuyDoi = quyDoi.getDDiemc() + " + (" + diemThiDGNL + " - " + quyDoi.getDDiema() + ") / (" + quyDoi.getDDiemb() + " - " + quyDoi.getDDiema() + ") * (" + quyDoi.getDDiemd() + " - " + quyDoi.getDDiemc() + ")";
+            }
+            
+            diemTHDTO.setCtQuyDoi(ctQuyDoi);
+            // Set điểm thi
+            diemTHDTO.setDiemThi(diemThiDGNL);
+            // Set các điểm cuối
+            diemTHDTO.setDiemThiQuyDoi(diemTH.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemUuTien(diemUT.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemCong(diemCongXT.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDoLech(doLech.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setDiemXetTuyen(diemXT.setScale(2, RoundingMode.HALF_UP));
+            diemTHDTO.setToHopGoc(nth.getMatohop().equals(THGoc));
+            
+            listKQDGNL.add(diemTHDTO);
         }
-        diemCongVal = new BigDecimal(diemCong);
-        if ((diemThiQuyDoi.add(diemCongVal)).compareTo(new BigDecimal("22.50")) < 0) {
-            diemUuTien = DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong));
-        } else {
-            diemUuTien = ((new BigDecimal("30").subtract(diemThiQuyDoi).subtract(diemCongVal)).divide(new BigDecimal("7.5"), 2, RoundingMode.HALF_UP)).multiply(DiemUuTienKhuVuc(khuVuc).add(DiemUuTienDoiTuong(doiTuong)));
-            diemUuTien = diemUuTien.setScale(2, RoundingMode.HALF_UP);
-        }
-        diemXetTuyen = diemThiQuyDoi.add(diemCongVal).add(diemUuTien);
-        diemXetTuyen = diemXetTuyen.setScale(2, RoundingMode.HALF_UP);
-        TinhDiemDGNL result = new TinhDiemDGNL(tenNganh, toHopGoc, diemThiDGNL, ctQuyDoi, diemThiQuyDoi, diemCongVal, diemUuTien, diemXetTuyen);
-        System.out.println(result.toString());
-        return result;
+        listKQDGNL.sort((a, b) -> b.getDiemXetTuyen().compareTo(a.getDiemXetTuyen()));
+        return listKQDGNL;
     }
+    
 }

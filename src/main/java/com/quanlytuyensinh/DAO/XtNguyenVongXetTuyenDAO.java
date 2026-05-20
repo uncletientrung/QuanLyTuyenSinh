@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -279,7 +280,80 @@ public class XtNguyenVongXetTuyenDAO {
             return false;
         }
     }
-    
+    public HashMap<String, Integer> thongKeSoLuongNguyenVongDAO() {
+        HashMap<String, Integer> result = new HashMap<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            result.putIfAbsent("Trúng tuyển", 0); // Nếu crash cái nào đó là null
+            result.putIfAbsent("Rớt điểm sàn", 0);
+            result.putIfAbsent("Không trúng tuyển", 0);
+            result.putIfAbsent("Đang xét", 0);
+            result.putIfAbsent("Chưa có điểm", 0);
+            String hql = """
+                SELECT nv.nvKetqua, COUNT(nv)
+                FROM XtNguyenVongXetTuyen nv
+                GROUP BY nv.nvKetqua
+            """;
+            List<Object[]> list = session.createQuery(hql, Object[].class).getResultList();
+            for (Object[] row : list) {
+                String ketQua = (String) row[0];
+                Long countLong = (Long) row[1];
+                int count = countLong.intValue();
+                result.put(ketQua, count);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+    public HashMap<String, Integer> thongKeTheoNguyenVongNganhDAO() {
+        HashMap<String, Integer> result = new HashMap<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = """
+                SELECT nv.nvManganh, COUNT(nv)
+                FROM XtNguyenVongXetTuyen nv
+                GROUP BY nv.nvManganh
+            """;
+            List<Object[]> list = session.createQuery(hql, Object[].class)  .getResultList();
+            for (Object[] row : list) {
+                String maNganh = (String) row[0];
+                Long countLong = (Long) row[1];
+                result.put(maNganh, countLong.intValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+        public HashMap<String, Integer> thongKeTheoNguyenVongPhuongThucDAO() {
+        HashMap<String, Integer> result = new HashMap<>();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            result.putIfAbsent("Tuyển thẳng", 0);
+            result.putIfAbsent("THPT", 0);
+            result.putIfAbsent("VSAT", 0);
+            result.putIfAbsent("DGNL", 0);
+            result.putIfAbsent("Không xác định", 0);
+            String hql = """
+                SELECT nv.ttPhuongthuc, COUNT(nv)
+                FROM XtNguyenVongXetTuyen nv
+                GROUP BY nv.ttPhuongthuc
+            """;
+            List<Object[]> list = session.createQuery(hql, Object[].class)  .getResultList();
+            for (Object[] row : list) {
+                String PhuongThuc = (String) row[0];
+                Long countLong = (Long) row[1];
+                if (PhuongThuc == null || PhuongThuc.trim().isEmpty()) {
+                    PhuongThuc = "Không xác định";
+                }
+                result.put(PhuongThuc, countLong.intValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
     public List<XtNguyenVongXetTuyen> filterNguyenVong(String maNganh, String phuongThuc, String ketQua) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 

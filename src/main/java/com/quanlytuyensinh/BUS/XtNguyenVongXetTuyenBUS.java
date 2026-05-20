@@ -47,6 +47,16 @@ public class XtNguyenVongXetTuyenBUS {
         return false;
     }
     
+    public HashMap<String, Integer> thongKeSoLuongNguyenVong(){
+        return nvDAO.thongKeSoLuongNguyenVongDAO();
+    }
+    public HashMap<String, Integer> thongKeSoLuongNguyenVongNganh(){
+        return nvDAO.thongKeTheoNguyenVongNganhDAO();
+    }
+    public HashMap<String, Integer> thongKeSoLuongNguyenVongPhuongThuc(){
+        return nvDAO.thongKeTheoNguyenVongPhuongThucDAO();
+    }
+    
     public boolean updateNguyenVong(XtNguyenVongXetTuyen nvUpdate){
         if (nvUpdate == null) return false;
         boolean rs = nvDAO.update(nvUpdate);

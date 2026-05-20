@@ -39,6 +39,7 @@ import com.quanlytuyensinh.ENTITY.XtNganhToHop;
 import com.quanlytuyensinh.ENTITY.XtNguyenVongXetTuyen;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Login;
+import com.quanlytuyensinh.GUI.Panel.MainNguyenVongPanel;
 /**
  *
  * @author DELL
@@ -200,7 +201,7 @@ public class MenuTaskbar extends JPanel {
                             main.setPanel(new DiemThiPanel(main));
                             break;
                         case 3:
-                            main.setPanel(new NguyenVongPanel(main,
+                            main.setPanel(new MainNguyenVongPanel(main,
                                     NVBUS, listNV,
                                     NganhBUS, listNganh,
                                     NganhTHBUS, listNganhTH,

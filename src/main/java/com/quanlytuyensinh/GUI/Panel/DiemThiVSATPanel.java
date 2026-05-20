@@ -180,7 +180,7 @@ public class DiemThiVSATPanel extends JPanel implements ActionListener {
 
         String lowerKeyword = keyword.trim().toLowerCase();
         loadDataTable(listDiem.stream()
-                .filter(qd -> String.valueOf(qd.getCccd()).contains(lowerKeyword))
+                .filter(qd -> String.valueOf(qd.getCccd().toLowerCase()).contains(lowerKeyword))
                 .collect(Collectors.toList()));
     }
 

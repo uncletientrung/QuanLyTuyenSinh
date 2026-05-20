@@ -47,7 +47,7 @@ public class IntegratedSearchNguyenVong extends JPanel {
         btnReset = new JButton("Làm mới");
         btnReset.setFont(new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 12));
         btnReset.setIcon(new FlatSVGIcon(getClass().getResource("/static/icons/refresh.svg")));
-        btnReset.setPreferredSize(new Dimension(105, 0));    // Giảm từ 125 → 105
+        btnReset.setPreferredSize(new Dimension(110, 0));    // Giảm từ 125 → 105
         btnReset.addActionListener(this::btnResetActionPerformed);
         jpSearch.add(btnReset, BorderLayout.EAST);
 

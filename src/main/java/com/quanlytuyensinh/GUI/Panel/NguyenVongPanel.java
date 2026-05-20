@@ -35,6 +35,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -191,7 +193,7 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
 
            functionBar = new PanelBorderRadius();
            functionBar.setPreferredSize(new Dimension(0, 100));
-           functionBar.setLayout(new BorderLayout(0, 0));
+           functionBar.setLayout(new GridBagLayout());
            functionBar.setBorder(new EmptyBorder(10, 10, 10, 10));
            functionBar.setBackground(Color.WHITE);
 
@@ -200,7 +202,11 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
            for (String ac : action) {
                mainFunction.btn.get(ac).addActionListener(this);
            }
-           functionBar.add(mainFunction, BorderLayout.WEST);
+           GridBagConstraints gbcMain = new GridBagConstraints();
+           gbcMain.gridx = 0; gbcMain.gridy = 0;
+           gbcMain.weightx = 0.6;
+           gbcMain.fill = GridBagConstraints.BOTH;
+           functionBar.add(mainFunction, gbcMain);
 
            search = new IntegratedSearchNguyenVong(new String[] { "Tất cả", "Mã", "Căn cước CD", "Mã ngành", "Phương thức", "Tổ hợp" });
            search.txtSearchForm.addKeyListener(new KeyAdapter() {
@@ -214,8 +220,11 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
               resetSearch();
            });
 
-           search.setPreferredSize(new Dimension(380, 0));
-           functionBar.add(search, BorderLayout.EAST);
+           GridBagConstraints gbcSearch = new GridBagConstraints();
+           gbcSearch.gridx = 1; gbcSearch.gridy = 0;
+           gbcSearch.weightx = 0.4;
+           gbcSearch.fill = GridBagConstraints.BOTH;
+           functionBar.add(search, gbcSearch);
            contentCenter.add(functionBar, BorderLayout.NORTH);
 
            pnlMain = new PanelBorderRadius();

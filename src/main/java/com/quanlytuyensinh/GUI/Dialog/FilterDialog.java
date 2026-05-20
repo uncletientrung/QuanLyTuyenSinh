@@ -155,7 +155,7 @@ public class FilterDialog extends JDialog {
     private void resetFilter() {
         cbMaNganh.setSelectedIndex(0);
         cbPhuongThuc.setSelectedIndex(0);
-        cbKetQua.setSelectedIndex(1);
-        parent.applyFilter("Tất cả", "Tất cả", "Trúng tuyển");
+        cbKetQua.setSelectedIndex(0);
+        parent.applyFilter("Tất cả", "Tất cả", "Tất cả");
     }
 }

@@ -497,7 +497,8 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                     JOptionPane.showMessageDialog(this, "Kết quả nguyện vọng đã công bố không thể sửa", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 }
             }else if(source == mainFunction.btn.get("delete") ){
-                int confirm = JOptionPane.showConfirmDialog(this,
+                if(NguyenVongDuocChon.getNvKetqua() == null  || NguyenVongDuocChon.getNvKetqua().trim().equals("Đang xét") ){
+                        int confirm = JOptionPane.showConfirmDialog(this,
                         "<html>"
                             + "<h3 style='color:red;'>Xác nhận xóa nguyện vọng</h3>"
                             + "<hr>"
@@ -517,6 +518,10 @@ public class NguyenVongPanel extends JPanel implements ActionListener, ItemListe
                             JOptionPane.showMessageDialog(this, "Xóa thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
                     }
+                }else{
+                    JOptionPane.showMessageDialog(this, "Kết quả nguyện vọng đã công bố không thể xóa", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                }
+
             }
         }
     }

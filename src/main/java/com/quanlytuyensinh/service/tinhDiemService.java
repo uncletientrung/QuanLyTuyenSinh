@@ -433,8 +433,8 @@ public class tinhDiemService {
 
              //Công thức đổi THPT sang THPT hệ 30,  Chia cho tổng hệ số rồi x3
              BigDecimal tongHeSo = BigDecimal.valueOf(  thxt.getHsMon1() + thxt.getHsMon2() + thxt.getHsMon3());
-             tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
-             
+            tong = tong.multiply(new BigDecimal("3"))
+           .divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 2, RoundingMode.HALF_UP);             
            
               // Độ lệch
             BigDecimal doLech =thxt.getDolech() == null ? BigDecimal.ZERO : thxt.getDolech();

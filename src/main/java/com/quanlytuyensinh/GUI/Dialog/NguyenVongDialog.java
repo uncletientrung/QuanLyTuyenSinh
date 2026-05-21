@@ -156,7 +156,7 @@ public class NguyenVongDialog extends JDialog{
         this.txtDanhSachTH =  new VerticalInputForm("Danh sách tổ hợp");
 
         this.txtTHXet = new VerticalInputForm("Tổ hợp xét tuyển (Cao nhất)"); 
-        this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển (Đã thêm độ lệch)");
+        this.txtDiemTHXT = new VerticalInputForm("Điểm tổ hợp xét tuyển");
         this.txtDiemUT =  new VerticalInputForm("Điểm ưu tiên");
         this.txtDiemCong = new VerticalInputForm("Điểm cộng"); 
         this.txtDiemXetTuyen = new VerticalInputForm("Điểm xét tuyển"); 
@@ -513,7 +513,7 @@ public class NguyenVongDialog extends JDialog{
             BigDecimal diemThiDGNLQuyDoi = this.BQDBUS.getDiemThiDGNLQuyDoi(nth.getMatohop(), diemThiDGNL);
 
             // Độ lệch
-            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+//            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
         
             // Điểm cộng 
             XtDiemCongXetTuyen dc = DiemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
@@ -524,11 +524,11 @@ public class NguyenVongDialog extends JDialog{
             
             // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong, diemCong);
+             diemUT = TSBUS.getDiemUuTienByCCCD(cccd, tong.add(diemThiDGNLQuyDoi), diemCong);
 
            // Điểm xét tuyển
             BigDecimal diemTH = tong.add(diemThiDGNLQuyDoi);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
                 diemXT = new BigDecimal("30");
             }
@@ -540,7 +540,7 @@ public class NguyenVongDialog extends JDialog{
                 bestDiemTH = diemTH.setScale(5, RoundingMode.HALF_UP);
                 bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
                 bestDiemUT = diemUT.setScale(5, RoundingMode.HALF_UP);
-                diemDoLech = doLech;
+                diemDoLech = new BigDecimal("0");
                 bestPhuongThuc = "DGNL";
             }
         }

@@ -305,7 +305,7 @@ public class NguyenVongDialog extends JDialog{
             return;
         }
         this.txtDanhSachTH.setText(getDanhSachToHop(maNganh));
-        if(!maNganh.startsWith("7140")){ // Nếu không phải ngành sư phạm thì chạy
+        if(!maNganh.startsWith("7140") && !maNganh.equals("7140114")){ // Nếu không phải ngành sư phạm thì chạy
             tinhDiemDGNL(maNganh, cccd);
             tinhDiemVSAT(maNganh, cccd);
         }

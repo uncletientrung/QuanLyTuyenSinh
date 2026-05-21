@@ -29,7 +29,7 @@ public class TinhDiemDGNLController {
     tinhDiemService service  = new tinhDiemService();
     @RequestMapping(value = "/tinhdiemDGNL-view", method = RequestMethod.GET)
     public String viewForm(Model model) {
-        List<XtNganh> listNganh = service.getListNganh();
+        List<XtNganh> listNganh = service.getListNganhKhongSuPham();
         model.addAttribute("listNganh", listNganh);
         return "tinhdiemDGNL-view";
     }

@@ -101,7 +101,7 @@ public class XtNguyenVongXetTuyenBUS {
             if(nvDuocChon.getNvKetqua().equals("Trúng tuyển")){
                 this.NganhBUS.TruSoLuongPhuongThucNganh(nvDuocChon.getTtPhuongthuc(), nvDuocChon.getNvManganh());
             }
-            
+                
             if(nvDuocChon.getTtPhuongthuc().equals("Tuyển thẳng")){
                nvDuocChon.setNvKetqua("Trúng tuyển");
                this.NganhBUS.TangSoLuongPhuongThucNganh("Tuyển thẳng", nvDuocChon.getNvManganh());

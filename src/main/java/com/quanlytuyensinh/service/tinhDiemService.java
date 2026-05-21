@@ -71,6 +71,9 @@ public class tinhDiemService {
     public List<XtNganh> getListNganh(){
         return listNganh;
     }
+    public List<XtNganh> getListNganhKhongSuPham(){
+        return nganhDAO.getListNganhKhongSuPhamDAO();
+    }
     
     public List<XtNganhToHop> getNTHByMaNganh(String maNganh){
         List<XtNganhToHop> rs = new ArrayList<>();

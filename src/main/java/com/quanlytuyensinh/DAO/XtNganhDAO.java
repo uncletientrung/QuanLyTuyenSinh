@@ -47,6 +47,20 @@ public class XtNganhDAO {
         }
     }
     
+    public List<XtNganh> getListNganhKhongSuPhamDAO() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = """
+                FROM XtNganh
+                WHERE manganh NOT LIKE '7140%'
+                   OR manganh = '7140114'
+            """;
+            return session.createQuery(hql, XtNganh.class).list();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
     public boolean update(XtNganh nganh){
         Transaction transaction = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){

@@ -34,7 +34,7 @@ public class TinhDiemVSATController {
     // Running on http://localhost:8080/tinhdiemVSAT-view
     @RequestMapping(value = "/tinhdiemVSAT-view", method = RequestMethod.GET)
     public String viewForm(Model model) {
-       List<XtNganh> listNganh = tinhDiemSV.getListNganh();
+       List<XtNganh> listNganh = tinhDiemSV.getListNganhKhongSuPham();
         model.addAttribute("listNganh", listNganh);  // truyền vào method   
         return "tinhdiemVSAT-view";
     }

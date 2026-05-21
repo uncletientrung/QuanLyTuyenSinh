@@ -312,10 +312,10 @@ public class NguyenVongDialog extends JDialog{
         tinhDiemTHPT(maNganh, cccd);
         
         txtTHXet.setText(bestToHop);
-        txtDiemTHXT.setText(bestDiemTH.setScale(5).toString());
+        txtDiemTHXT.setText(bestDiemTH.setScale(2).toString());
         txtDiemCong.setText(bestDiemCong.setScale(2).toString());
-        txtDiemUT.setText(bestDiemUT.setScale(5).toString());
-        txtDiemXetTuyen.setText(maxDiemXT.setScale(5).toString());
+        txtDiemUT.setText(bestDiemUT.setScale(2).toString());
+        txtDiemXetTuyen.setText(maxDiemXT.setScale(2).toString());
         txtDoLech.setText(diemDoLech.setScale(2).toString());   
         if(this.cbTuyenThang.isSelected()){
             this.cbbPhuongThuc.setSelectedValue("Tuyển thẳng");
@@ -404,7 +404,7 @@ public class NguyenVongDialog extends JDialog{
                     + nth.getHsMon2()
                     + nth.getHsMon3()
             );
-            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE,5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE,2, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
@@ -431,9 +431,9 @@ public class NguyenVongDialog extends JDialog{
             if (diemXT.compareTo(maxDiemXT) > 0) {
                 maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);
                 bestToHop = nth.getMatohop();
-                bestDiemTH = diemTH.setScale(5, RoundingMode.HALF_UP);
-                bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
-                bestDiemUT = diemUT.setScale(5, RoundingMode.HALF_UP);
+                bestDiemTH = diemTH.setScale(2, RoundingMode.HALF_UP);
+                bestDiemCong = diemCong.setScale(2, RoundingMode.HALF_UP);
+                bestDiemUT = diemUT.setScale(2, RoundingMode.HALF_UP);
                 diemDoLech = doLech;
                 bestPhuongThuc = "THPT";
             }
@@ -466,7 +466,7 @@ public class NguyenVongDialog extends JDialog{
                     + nth.getHsMon2()
                     + nth.getHsMon3()
             );
-            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 2, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
 
             // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
@@ -493,9 +493,9 @@ public class NguyenVongDialog extends JDialog{
             if (diemXT.compareTo(maxDiemXT) > 0) {
                 maxDiemXT = diemXT.setScale(2, RoundingMode.HALF_UP);
                 bestToHop = nth.getMatohop();
-                bestDiemTH = diemTH.setScale(5, RoundingMode.HALF_UP);
-                bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
-                bestDiemUT = diemUT.setScale(5, RoundingMode.HALF_UP);
+                bestDiemTH = diemTH.setScale(2, RoundingMode.HALF_UP);
+                bestDiemCong = diemCong.setScale(2, RoundingMode.HALF_UP);
+                bestDiemUT = diemUT.setScale(2, RoundingMode.HALF_UP);
                 diemDoLech = doLech;
                 bestPhuongThuc = "VSAT";
             }

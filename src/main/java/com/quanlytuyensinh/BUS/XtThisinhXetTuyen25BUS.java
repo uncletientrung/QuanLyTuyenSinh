@@ -292,9 +292,9 @@ public class XtThisinhXetTuyen25BUS {
         
         BigDecimal heSo = new BigDecimal("30")
                 .subtract(tong)
-                .divide(new BigDecimal("7.5"), 5, RoundingMode.HALF_UP);
+                .divide(new BigDecimal("7.5"), 2, RoundingMode.HALF_UP);
 
-        return heSo.multiply(MucDiemUuTien).setScale(5, RoundingMode.HALF_UP);
+        return heSo.multiply(MucDiemUuTien).setScale(2, RoundingMode.HALF_UP);
     }
 
 }

@@ -153,8 +153,8 @@ public class tinhDiemService {
 
         BigDecimal heSo = new BigDecimal("30")
                 .subtract(tong)
-                .divide(new BigDecimal("7.5"), 5, RoundingMode.HALF_UP);
-        return heSo.multiply(MucDiemUuTien).setScale(5, RoundingMode.HALF_UP);
+                .divide(new BigDecimal("7.5"), 2, RoundingMode.HALF_UP);
+        return heSo.multiply(MucDiemUuTien).setScale(2, RoundingMode.HALF_UP);
     }
     
 //    // Tính điểm xét ngưỡng
@@ -313,7 +313,7 @@ public class tinhDiemService {
 
              //Công thức đổi THPT sang THPT hệ 30,  Chia cho tổng hệ số rồi x3
              BigDecimal tongHeSo = BigDecimal.valueOf(  nth.getHsMon1() + nth.getHsMon2() + nth.getHsMon3());
-             tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+             tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 2, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
              
              // Độ lệch
             BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
@@ -559,7 +559,7 @@ dto.setcongthucDiemDia(diemThiGiaLap.getDi() != null ?
             BigDecimal  x= Diem;
             BigDecimal y = c.add(
                 (x.subtract(a))
-                .divide(b.subtract(a), 5, RoundingMode.HALF_UP)
+                .divide(b.subtract(a), 2, RoundingMode.HALF_UP)
                 .multiply(d.subtract(c))
             );
             BigDecimal ketQuaCuoi = y.setScale(2, RoundingMode.HALF_UP); 

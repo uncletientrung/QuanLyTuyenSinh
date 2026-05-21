@@ -98,7 +98,7 @@ public class NguyenVongImportHelper {
             tong = tong.add(getDiemByMon(nth.getThMon2(), diemTHPT).multiply(BigDecimal.valueOf(nth.getHsMon2())));
             tong = tong.add(getDiemByMon(nth.getThMon3(), diemTHPT).multiply(BigDecimal.valueOf(nth.getHsMon3())));
             BigDecimal tongHeSo = BigDecimal.valueOf(nth.getHsMon1() + nth.getHsMon2() + nth.getHsMon3());
-            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE,5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE,2, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
             
             BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
             
@@ -126,7 +126,7 @@ public class NguyenVongImportHelper {
             tong = tong.add(getDiemByMon(nth.getThMon2(), diemVSATQD).multiply(BigDecimal.valueOf(nth.getHsMon2())));
             tong = tong.add(getDiemByMon(nth.getThMon3(), diemVSATQD).multiply(BigDecimal.valueOf(nth.getHsMon3())));
             BigDecimal tongHeSo = BigDecimal.valueOf(nth.getHsMon1() + nth.getHsMon2() + nth.getHsMon3());
-            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 5, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
+            tong = tong.divide(tongHeSo != BigDecimal.ZERO ? tongHeSo : BigDecimal.ONE, 2, RoundingMode.HALF_UP).multiply(new BigDecimal("3"));
             
             BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
             
@@ -173,9 +173,9 @@ public class NguyenVongImportHelper {
         if (diemXT.compareTo(maxDiemXT) > 0) {
             maxDiemXT    = diemXT.setScale(2, RoundingMode.HALF_UP);
             bestToHop    = toHop;
-            bestDiemTH   = diemTH.setScale(5, RoundingMode.HALF_UP);
-            bestDiemCong = diemCong.setScale(5, RoundingMode.HALF_UP);
-            bestDiemUT   = diemUT.setScale(5, RoundingMode.HALF_UP);
+            bestDiemTH   = diemTH.setScale(2, RoundingMode.HALF_UP);
+            bestDiemCong = diemCong.setScale(2, RoundingMode.HALF_UP);
+            bestDiemUT   = diemUT.setScale(2, RoundingMode.HALF_UP);
             diemDoLech   = doLech;
             bestPhuongThuc = phuongThuc;
         }

@@ -5,165 +5,165 @@
 package com.quanlytuyensinh.GUI.Dialog.ThiSinh;
 
 import com.quanlytuyensinh.GUI.Component.ButtonCustom;
-import com.quanlytuyensinh.GUI.Component.InputForm;
-import com.quanlytuyensinh.GUI.Component.SelectForm;
+import com.quanlytuyensinh.GUI.Component.VerticalInputForm;
+import com.quanlytuyensinh.GUI.Component.VerticalComboBoxForm;
 import com.quanlytuyensinh.GUI.Panel.ThiSinhPanel;
 import com.quanlytuyensinh.BUS.XtThisinhXetTuyen25BUS;
 import com.quanlytuyensinh.ENTITY.XtThisinhXetTuyen25;
 import com.quanlytuyensinh.GUI.Component.InputDate;
 import com.quanlytuyensinh.helper.convertDateFormat;
+import com.quanlytuyensinh.GUI.Component.NumericDocumentFilter;
 import com.quanlytuyensinh.helper.Validation;
-
 import java.awt.*;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.PlainDocument;
 
 public class ThiSinhDialog extends JDialog {
 
     private ThiSinhPanel parent;
     private XtThisinhXetTuyen25BUS bus;
     private XtThisinhXetTuyen25 currentThiSinh;
-    private String type; // "create" | "update" | "detail"
-    private Runnable onSuccess;
+    private String type; // "create" hoặc "edit"
+    private Runnable onSuccess; // Lưu hàm chạy sau khi xong
 
-    private InputForm txtCCCD, txtSBD, txtHo, txtTen,
-            txtSDT, txtEmail, txtNoiSinh, txtPassword;
-    private InputDate txtNgaySinh;
-    private SelectForm cbbGioiTinh, cbbKhuVuc, cbbDoiTuong;
-
-    // Chỉ dùng khi detail
-    private InputForm txtDiemTHPT, txtDiemDGNL, txtDiemVSAT;
-
+    // Form fields
+    private VerticalInputForm txtCCCD, txtSBD, txtHo, txtTen,
+            txtSDT, txtEmail, txtNoiSinh, txtPassword, txtPasswordConfirm;
+    private InputDate txtNgaySinh, txtUpdateAt;
+    private VerticalComboBoxForm cbbGioiTinh, cbbKhuVuc, cbbDoiTuong;
     private ButtonCustom btnLuu, btnHuy;
-    private JPanel pnlMain, pnlButtons;
 
-    public ThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title,
-            String type, boolean modal, Runnable onSuccess, XtThisinhXetTuyen25 ts) {
+    public ThiSinhDialog(ThiSinhPanel parent, JFrame owner, String title, String type, boolean modal, Runnable onSuccess, XtThisinhXetTuyen25 ts) {
         super(owner, title, modal);
-        this.parent     = parent;
-        this.bus        = parent.getBUS();
-        this.type       = type;
-        this.onSuccess  = onSuccess;
+        this.parent = parent;
+        this.bus = parent.getBUS(); // Dùng chung 1 BUS với cha
+        this.type = type;
+        this.onSuccess = onSuccess;
         this.currentThiSinh = ts;
         this.setTitle(title);
+
         initComponents();
     }
 
     private void initComponents() {
-        boolean isDetail = "detail".equals(type);
-        int width  = isDetail ? 1200 : 1000;
-        int height = 480;
-
-        this.setSize(width, height);
+        this.setSize(800, 750);
         this.setLayout(new BorderLayout());
         this.setLocationRelativeTo(null);
         this.getContentPane().setBackground(Color.WHITE);
 
-        initFields();
         initMainPanel();
         initButtonPanel();
-
-        if ("detail".equals(type)) {
-            setAllFieldsDisable();
+        if(this.type.equals("create")){
+            setFakeData(); // Set dữ liệu giả
+        }else if(this.type.equals("detail")){
+            setAllFieldsDisable(); // Chặn chỉnh sửa
             setThiSinhData(currentThiSinh);
-        } else if ("update".equals(type)) {
+        }else if(this.type.equals("update")){
             setThiSinhData(currentThiSinh);
         }
 
+        this.add(pnlMain, BorderLayout.CENTER);
+        this.add(pnlButtons, BorderLayout.SOUTH);
         this.setVisible(true);
     }
 
-    private void initFields() {
-        txtCCCD     = new InputForm("CCCD *");
-        txtSBD      = new InputForm("Số báo danh");
-        txtSBD.setText("Hệ thống tự sinh");
-        txtSBD.setEditable(false);
-        txtHo       = new InputForm("Họ *");
-        txtTen      = new InputForm("Tên *");
-        txtNgaySinh = new InputDate("Ngày sinh (dd/MM/yyyy) *", 300, 40);
-        txtNoiSinh  = new InputForm("Nơi sinh *");
-        txtSDT      = new InputForm("Số điện thoại");
-        txtEmail    = new InputForm("Email");
-        txtPassword = new InputForm("Mật khẩu *");
-
-        cbbGioiTinh = new SelectForm("Giới tính *",  new String[]{"Nam", "Nữ"});
-        cbbKhuVuc   = new SelectForm("Khu vực *",    new String[]{"1", "2", "2NT", "3"});
-        cbbDoiTuong = new SelectForm("Đối tượng ưu tiên",
-                new String[]{"Không ưu tiên","01","02","03","04","05","06a","06b","07a","07b"});
-
-        if ("detail".equals(type)) {
-            txtDiemTHPT = new InputForm("Điểm THPT");
-            txtDiemDGNL = new InputForm("Điểm ĐGNL");
-            txtDiemVSAT = new InputForm("Điểm VSAT");
-        }
-    }
+    private JPanel pnlMain, pnlButtons;
 
     private void initMainPanel() {
-        boolean isDetail = "detail".equals(type);
-        int cols = isDetail ? 5 : 4;
-
-        pnlMain = new JPanel(new GridLayout(3, cols, 20, 0));
-        pnlMain.setBorder(new EmptyBorder(20, 20, 20, 20));
+        pnlMain = new JPanel(new GridLayout(1, 2, 40, 0));
+        pnlMain.setBorder(new EmptyBorder(25, 40, 25, 40));
         pnlMain.setBackground(Color.WHITE);
 
-        // Hàng 1
-        pnlMain.add(txtCCCD);
-        pnlMain.add(txtHo);
-        pnlMain.add(txtTen);
-        pnlMain.add(cbbGioiTinh);
-        if (isDetail) pnlMain.add(txtDiemTHPT);
+        JPanel left = new JPanel(new GridLayout(7, 1, 0, 15));
+        JPanel right = new JPanel(new GridLayout(7, 1, 0, 15));
+        left.setBackground(Color.WHITE);
+        right.setBackground(Color.WHITE);
+        // ==================== ĐỊNH NGHĨA CÁC THUỘC TÍNH ====================
+        
+        txtCCCD = new VerticalInputForm("CCCD*");
+        txtSBD = new VerticalInputForm("Số báo danh (SBD)*");
+        txtSBD.setText("Hệ thống tự sinh");
+        txtSBD.setDisable();
+        txtHo = new VerticalInputForm("Họ*");
+        txtTen = new VerticalInputForm("Tên*");
+        txtNgaySinh = new InputDate("Ngày sinh (dd/MM/yyyy)*", 300, 40);
+        txtSDT = new VerticalInputForm("Số điện thoại");
+        txtPassword = new VerticalInputForm("Mật khẩu*");
+        txtPasswordConfirm = new VerticalInputForm("Xác nhận mật khẩu*");
+        txtUpdateAt =  new InputDate("Cập nhật lần cuối", 300, 40);
+        cbbGioiTinh = new VerticalComboBoxForm("Giới tính*",new String[]{"Nam", "Nữ"});
+        txtEmail = new VerticalInputForm("Email");
+        txtNoiSinh = new VerticalInputForm("Nơi sinh*");
+        cbbKhuVuc = new VerticalComboBoxForm("Khu vực*", 
+            new String[]{"1", "2", "2NT", "3"});
+        cbbDoiTuong = new VerticalComboBoxForm("Đối tượng ưu tiên", 
+            new String[]{"Không ưu tiên","01", "02", "03", "04","05","06a","06b","07a","07b"});
+        
+        Label lbHide = new Label();
+        
+        // ==================== LEFT COLUMN ====================
+        left.add(txtCCCD);
+        left.add(txtHo);
+        left.add(txtNgaySinh);
+        left.add(txtNoiSinh);
+        left.add(txtSDT);
+        left.add(txtPassword);
+        left.add(cbbDoiTuong);
 
-        // Hàng 2
-        pnlMain.add(txtSBD);
-        pnlMain.add(wrapDate(txtNgaySinh));
-        pnlMain.add(txtNoiSinh);
-        pnlMain.add(cbbKhuVuc);
-        if (isDetail) pnlMain.add(txtDiemDGNL);
-
-        // Hàng 3
-        pnlMain.add(txtSDT);
-        pnlMain.add(txtEmail);
-        pnlMain.add(txtPassword);
-        pnlMain.add(cbbDoiTuong);
-        if (isDetail) pnlMain.add(txtDiemVSAT);
-
-        this.add(pnlMain, BorderLayout.CENTER);
-    }
-
-    /** Bọc InputDate vào JPanel để hoà hợp với GridLayout */
-    private JPanel wrapDate(InputDate d) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(Color.WHITE);
-        p.add(d, BorderLayout.CENTER);
-        return p;
-    }
-
-    private void initButtonPanel() {
-        pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        pnlButtons.setBackground(Color.WHITE);
-        pnlButtons.setBorder(new EmptyBorder(0, 0, 20, 0));
-
-        int idTS = currentThiSinh != null ? currentThiSinh.getIdthisinh() : -1;
-
-        if ("detail".equals(type)) {
-            btnHuy = new ButtonCustom("Đóng", "danger", 14);
-            btnHuy.addActionListener(e -> dispose());
-            pnlButtons.add(btnHuy);
-        } else {
-            String btnText = "create".equals(type) ? "Thêm thí sinh" : "Lưu chỉnh sửa";
-            btnLuu = new ButtonCustom(btnText, "success", 14);
-            btnHuy = new ButtonCustom("Huỷ bỏ",   "danger",  14);
-            btnLuu.addActionListener(e -> { if (validateInput(idTS)) saveThiSinh(); });
-            btnHuy.addActionListener(e -> dispose());
-            pnlButtons.add(btnLuu);
-            pnlButtons.add(btnHuy);
+        // ==================== RIGHT COLUMN ====================
+        right.add(txtSBD);
+        right.add(txtTen);
+        right.add(cbbGioiTinh);
+        right.add(cbbKhuVuc);
+        right.add(txtEmail);
+        if(this.type.equals("detail")){
+            right.add(lbHide);
+            right.add(txtUpdateAt);
+        }else{
+            right.add(txtPasswordConfirm);
         }
+        
+        
+        // =======================
+        pnlMain.add(left);
+        pnlMain.add(right);
+    }
 
-        this.add(pnlButtons, BorderLayout.SOUTH);
+    // Khởi tạo nút
+    private void initButtonPanel() {
+        pnlButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
+        pnlButtons.setBackground(Color.WHITE);
+        pnlButtons.setBorder(new EmptyBorder(15, 0, 25, 0));
+
+        String btnText = "create".equals(type) ? "Thêm thí sinh" : "Lưu chỉnh sửa";
+
+        btnLuu = new ButtonCustom(btnText, "success", 15);
+        btnHuy = new ButtonCustom("Hủy bỏ", "danger", 15);
+
+        btnLuu.setPreferredSize(new Dimension(160, 48));
+        btnHuy.setPreferredSize(new Dimension(160, 48));
+
+        int idTS = this.currentThiSinh != null ? this.currentThiSinh.getIdthisinh() : -1; // Truyền id vào để kiểm tra trùng CCCD
+        btnLuu.addActionListener(e -> {
+            if (validateInput(idTS)) {
+                 saveThiSinh();
+            }
+        });
+
+        btnHuy.addActionListener(e -> dispose());
+
+        if (!this.type.equals("detail")) {
+            pnlButtons.add(btnLuu);
+        }
+        pnlButtons.add(btnHuy);
     }
 
     private void saveThiSinh() {
@@ -174,7 +174,7 @@ public class ThiSinhDialog extends JDialog {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Lỗi định dạng ngày khi save");
         }
-
+        
         XtThisinhXetTuyen25 ts = new XtThisinhXetTuyen25();
         ts.setCccd(txtCCCD.getText().trim());
         ts.setSobaodanh(txtSBD.getText().trim());
@@ -184,26 +184,32 @@ public class ThiSinhDialog extends JDialog {
         ts.setDienThoai(txtSDT.getText().trim());
         ts.setEmail(txtEmail.getText().trim());
         ts.setNoiSinh(txtNoiSinh.getText().trim());
-        ts.setGioiTinh((String) cbbGioiTinh.getCbb().getSelectedItem());
-        ts.setKhuVuc((String) cbbKhuVuc.getCbb().getSelectedItem());
-        String doiTuong = (String) cbbDoiTuong.getCbb().getSelectedItem();
-        ts.setDoiTuong("Không ưu tiên".equals(doiTuong) ? null : doiTuong);
-        ts.setPassword(txtPassword.getText().trim());
-        ts.setUpdatedAt(LocalDate.now());
-
+        ts.setGioiTinh((String) cbbGioiTinh.getSelectedValue());
+        ts.setKhuVuc((String) cbbKhuVuc.getSelectedValue());
+        String doiTuong = (String) cbbDoiTuong.getSelectedValue();
+        ts.setDoiTuong(
+            "Không ưu tiên".equals(doiTuong) ?  null : doiTuong
+        );
+        ts.setPassword(txtPassword.getText().trim()); 
+         ts.setUpdatedAt(LocalDate.now()); // Cập nhật trạng thái chỉnh sửa
+       
         try {
             if ("create".equals(type)) {
                 if (bus.insertThiSinh(ts)) {
                     JOptionPane.showMessageDialog(this, "Thêm thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                    if (onSuccess != null) onSuccess.run();
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
                     dispose();
                 }
-            } else if ("update".equals(type)) {
-                ts.setIdthisinh(currentThiSinh.getIdthisinh());
-                if (bus.updateThiSinh(ts)) {
+            } else if (this.type.equals("update")) {
+                ts.setIdthisinh(this.currentThiSinh.getIdthisinh());
+                if(bus.updateThiSinh(ts)){
                     JOptionPane.showMessageDialog(this, "Sửa thí sinh thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                    if (onSuccess != null) onSuccess.run();
-                    dispose();
+                        if (onSuccess != null) {
+                            onSuccess.run();
+                        }
+                        dispose();
                 }
             }
         } catch (Exception ex) {
@@ -211,53 +217,112 @@ public class ThiSinhDialog extends JDialog {
             ex.printStackTrace();
         }
     }
-
-    // validate
+    
+    // Kiểm tra dữ liệu nhập
     private boolean validateInput(int idTS) {
+
+        // ===== CCCD =====
         String cccd = txtCCCD.getText().trim();
         if (Validation.isEmpty(cccd)) {
             JOptionPane.showMessageDialog(this, "CCCD không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtCCCD.getTxtForm().requestFocus();
             return false;
         }
+//        if (!cccd.matches("\\d{12}")) {
+//            JOptionPane.showMessageDialog(this, "CCCD phải gồm đúng 12 chữ số!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtCCCD.getTxtForm().requestFocus();
+//            return false;
+//        }
         if (!bus.checkCCCD(cccd, idTS)) {
-            JOptionPane.showMessageDialog(this, "CCCD đã tồn tại trong hệ thống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "CCCD đã tồn tại trong hệ thống", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtCCCD.getTxtForm().requestFocus();
             return false;
         }
-        if (Validation.isEmpty(txtHo.getText()) && Validation.isEmpty(txtTen.getText())) {
-            JOptionPane.showMessageDialog(this, "Họ Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+
+        // ===== Họ =====
+//        if (Validation.isEmpty(txtHo.getText())) {
+//            JOptionPane.showMessageDialog(this, "Họ không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtHo.getTxtForm().requestFocus();
+//            return false;
+//        }
+
+
+        // ===== Tên =====
+//        if (Validation.isEmpty(txtTen.getText())) {
+//            JOptionPane.showMessageDialog(this, "Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtTen.getTxtForm().requestFocus();
+//            return false;
+//        }
+        if (Validation.isEmpty(txtHo.getText()) && Validation.isEmpty(txtHo.getText())) {
+              JOptionPane.showMessageDialog(this, "Họ Tên không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtHo.getTxtForm().requestFocus();
             return false;
-        }
+         }
 
+        // ===== Ngày sinh =====
         Date ngaySinh = txtNgaySinh.getDateChooser().getDate();
         if (ngaySinh == null) {
-            JOptionPane.showMessageDialog(this, "Ngày sinh không hợp lệ!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Ngày sinh không hợp lệ", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtNgaySinh.getDateChooser().requestFocus();
             return false;
         }
+
+        // Optional: kiểm tra không được chọn ngày tương lai
         if (ngaySinh.after(new Date())) {
             JOptionPane.showMessageDialog(this, "Ngày sinh không được là ngày tương lai!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtNgaySinh.getDateChooser().requestFocus();
             return false;
         }
 
-        if (cbbGioiTinh.getCbb().getSelectedItem() == null) {
+        // ===== Giới tính =====
+        if (cbbGioiTinh.getSelectedValue() == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn giới tính!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             return false;
         }
+
+        // ===== Nơi sinh =====
         if (Validation.isEmpty(txtNoiSinh.getText())) {
             JOptionPane.showMessageDialog(this, "Nơi sinh không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtNoiSinh.getTxtForm().requestFocus();
             return false;
         }
-        if (cbbKhuVuc.getCbb().getSelectedItem() == null) {
+
+        // ===== Khu vực =====
+        if (cbbKhuVuc.getSelectedValue() == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn khu vực!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             return false;
         }
 
+//        // ===== SĐT =====
+//        String sdt = txtSDT.getText().trim();
+//        if (Validation.isEmpty(sdt)) {
+//            JOptionPane.showMessageDialog(this, "Số điện thoại không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSDT.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (!sdt.matches("0\\d{9}")) {
+//            JOptionPane.showMessageDialog(this, "SĐT phải gồm 10 số và bắt đầu bằng 0!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtSDT.getTxtForm().requestFocus();
+//            return false;
+//        }
+//
+//        // ===== Email =====
+//        String email = txtEmail.getText().trim();
+//        if (Validation.isEmpty(email)) {
+//            JOptionPane.showMessageDialog(this, "Email không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtEmail.getTxtForm().requestFocus();
+//            return false;
+//        }
+//        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+//            JOptionPane.showMessageDialog(this, "Email không hợp lệ!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+//            txtEmail.getTxtForm().requestFocus();
+//            return false;
+//        }
+
+        // ===== Password =====
         String pass = txtPassword.getText().trim();
+        String confirm = txtPasswordConfirm.getText().trim();
+
         if (Validation.isEmpty(pass)) {
             JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống!", "Lỗi", JOptionPane.WARNING_MESSAGE);
             txtPassword.getTxtForm().requestFocus();
@@ -268,45 +333,86 @@ public class ThiSinhDialog extends JDialog {
             txtPassword.getTxtForm().requestFocus();
             return false;
         }
+        if (!pass.equals(confirm)) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu xác nhận không khớp!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            txtPasswordConfirm.getTxtForm().requestFocus();
+            return false;
+        }
+
         return true;
     }
-
-    private void setAllFieldsDisable() {
-        txtCCCD.setDisable();   txtSBD.setDisable();
-        txtHo.setDisable();     txtTen.setDisable();
-        txtSDT.setDisable();    txtEmail.setDisable();
-        txtNoiSinh.setDisable(); txtPassword.setDisable();
-        txtNgaySinh.setDisable();
-        cbbGioiTinh.setDisable(); cbbKhuVuc.setDisable(); cbbDoiTuong.setDisable();
-        if (txtDiemTHPT != null) {
-            txtDiemTHPT.setDisable();
-            txtDiemDGNL.setDisable();
-            txtDiemVSAT.setDisable();
+   
+    private void setAllFieldsDisable(){
+        VerticalInputForm[] listInput = {txtCCCD, txtSBD, txtHo, txtTen, txtSDT, txtEmail, txtNoiSinh, txtPassword,
+                txtPasswordConfirm};
+        for (VerticalInputForm f : listInput) {
+            f.setDisable();
         }
+        txtNgaySinh.setDisable();
+        txtUpdateAt.setDisable();
+        cbbGioiTinh.setDisable();
+        cbbKhuVuc.setDisable();
+        cbbDoiTuong.setDisable();
     }
-
-    private void setThiSinhData(XtThisinhXetTuyen25 ts) {
+    
+    private void setThiSinhData(XtThisinhXetTuyen25 ts){
         txtCCCD.setText(ts.getCccd());
         txtHo.setText(ts.getHo());
         txtTen.setText(ts.getTen());
         txtSBD.setText(ts.getSobaodanh());
-        try {
-            DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate localDate = LocalDate.parse(ts.getNgaySinh(), fmt1);
+       try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse(ts.getNgaySinh(), fmt);
             Date date = java.sql.Date.valueOf(localDate);
             txtNgaySinh.getDateChooser().setDate(date);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        txtNoiSinh.setText(ts.getNoiSinh());
-        txtSDT.setText(ts.getDienThoai());
-        txtEmail.setText(ts.getEmail());
-        txtPassword.setText(ts.getPassword());
-
-        cbbGioiTinh.getCbb().setSelectedItem(ts.getGioiTinh());
-        cbbKhuVuc.getCbb().setSelectedItem(ts.getKhuVuc());
+       txtNoiSinh.setText(ts.getNoiSinh());
+       txtSDT.setText(ts.getDienThoai());
+       txtEmail.setText(ts.getEmail());
+       txtPassword.setText(ts.getPassword());
+       if(this.type.equals("detail")){
+           Date dateUpdateAt = Date.from( ts.getUpdatedAt().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            txtUpdateAt.setDate(dateUpdateAt);
+       }
+       if(this.type.equals("update")){
+           txtPasswordConfirm.setText(ts.getPassword());
+       }
+        // ComboBox
+        cbbGioiTinh.getComboBox().setSelectedItem(ts.getGioiTinh());
+        cbbKhuVuc.getComboBox().setSelectedItem(ts.getKhuVuc());
         String doiTuong = ts.getDoiTuong() == null ? "Không ưu tiên" : ts.getDoiTuong();
-        cbbDoiTuong.getCbb().setSelectedItem(doiTuong);
-        // txtDiemTHPT / ĐGNL / VSAT
+        cbbDoiTuong.getComboBox().setSelectedItem(doiTuong);
+       
     }
+    // Làm dữ liệu giả 
+    private void setFakeData() {
+        txtCCCD.setText("012345678901");
+        txtHo.setText("Nguyen");
+        txtTen.setText("An");
+
+
+        try {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse("05/05/2005", fmt);
+            Date date = java.sql.Date.valueOf(localDate);
+            txtNgaySinh.getDateChooser().setDate(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        txtNoiSinh.setText("TP.HCM");
+        txtSDT.setText("0912345678");
+        txtEmail.setText("test@gmail.com");
+
+        txtPassword.setText("123456");
+        txtPasswordConfirm.setText("123456");
+
+        // ComboBox
+        cbbGioiTinh.getComboBox().setSelectedItem("Nam");
+        cbbKhuVuc.getComboBox().setSelectedItem("1");
+        cbbDoiTuong.getComboBox().setSelectedItem("Không ưu tiên");
+    }
+
 }

@@ -51,6 +51,7 @@ public class VSATDialog extends JDialog implements ActionListener{
         this.main = main;
         this.selectedRow = selectedRow;
         initComponent();
+        this.setLocationRelativeTo(main);
     }
 
     public VSATDialog() {}
@@ -58,7 +59,6 @@ public class VSATDialog extends JDialog implements ActionListener{
     private void initComponent() {
         this.setLayout(new BorderLayout(0, 0));
         this.setBackground(Color.WHITE);
-        this.setLocationRelativeTo(main);
 
         pmain = new JPanel(new GridBagLayout());
         pmain.setBorder(new EmptyBorder(10, 10, 10, 10));

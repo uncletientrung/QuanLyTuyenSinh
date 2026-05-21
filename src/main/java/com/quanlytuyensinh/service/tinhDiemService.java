@@ -632,18 +632,18 @@ dto.setcongthucDiemDia(diemThiGiaLap.getDi() != null ?
             BigDecimal diemThiDGNLQuyDoi = this.BQDBUS.getDiemThiDGNLQuyDoi(nth.getMatohop(), diemThiDGNL);
             
             // Độ lệch
-            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+//            BigDecimal doLech =nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
         
             // Điểm cộng 
            BigDecimal diemCongXT= diemCong != null ? new BigDecimal(diemCong) : BigDecimal.ZERO;
            
            // Điểm ưu tiên
              BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = this.getDiemUuTien(khuVuc, doiTuong, tong, diemCongXT); // Điểm ưu tiên đã if else 22.5 rồi
+             diemUT = this.getDiemUuTien(khuVuc, doiTuong, tong.add(diemThiDGNLQuyDoi), diemCongXT); // Điểm ưu tiên đã if else 22.5 rồi
              
              // Điểm xét tuyển
             BigDecimal diemTH = tong.add(diemThiDGNLQuyDoi);
-            BigDecimal diemXT = diemTH.add(diemCongXT).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal diemXT = diemTH.add(diemCongXT).add(diemUT).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) {
                 diemXT = new BigDecimal("30");
             }
@@ -663,7 +663,7 @@ dto.setcongthucDiemDia(diemThiGiaLap.getDi() != null ?
             diemTHDTO.setDiemThiQuyDoi(diemTH.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemUuTien(diemUT.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemCong(diemCongXT.setScale(2, RoundingMode.HALF_UP));
-            diemTHDTO.setDoLech(doLech.setScale(2, RoundingMode.HALF_UP));
+//            diemTHDTO.setDoLech(doLech.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setDiemXetTuyen(diemXT.setScale(2, RoundingMode.HALF_UP));
             diemTHDTO.setToHopGoc(nth.getMatohop().equals(THGoc));
             

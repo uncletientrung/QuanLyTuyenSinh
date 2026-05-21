@@ -150,7 +150,7 @@ public class NguyenVongImportHelper {
         for (XtNganhToHop nth : listTH) {
             BigDecimal diemQD = bqdBUS.getDiemThiDGNLQuyDoi(nth.getMatohop(), diemDGNL);
             
-            BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
+//            BigDecimal doLech = nth.getDolech() == null ? BigDecimal.ZERO : nth.getDolech();
             
             XtDiemCongXetTuyen dc = diemCongBUS.getDiemCongByKey(cccd, maNganh, nth.getMatohop());
             BigDecimal diemCong = dc != null && dc.getDiemTong() != null ? dc.getDiemTong() : BigDecimal.ZERO;
@@ -158,12 +158,12 @@ public class NguyenVongImportHelper {
             BigDecimal tong = BigDecimal.ZERO;
             
             BigDecimal diemUT = BigDecimal.ZERO;
-             diemUT = tsBUS.getDiemUuTienByCCCD(cccd, tong, diemCong);
+             diemUT = tsBUS.getDiemUuTienByCCCD(cccd, tong.add(diemQD), diemCong);
              
             BigDecimal diemTH = tong.add(diemQD);
-            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).subtract(doLech).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal diemXT = diemTH.add(diemCong).add(diemUT).setScale(2, RoundingMode.HALF_UP);
             if (diemXT.compareTo(new BigDecimal("30")) >= 0) diemXT = new BigDecimal("30");
-            updateBest(diemXT, nth.getMatohop(), diemTH, diemCong, diemUT, doLech, "DGNL");
+            updateBest(diemXT, nth.getMatohop(), diemTH, diemCong, diemUT, BigDecimal.ZERO, "DGNL");
         }
     }
 

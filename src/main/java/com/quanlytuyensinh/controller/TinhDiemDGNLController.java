@@ -4,6 +4,7 @@
  */
 package com.quanlytuyensinh.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.quanlytuyensinh.ENTITY.TinhDiemDGNL;
 import com.quanlytuyensinh.ENTITY.XtNganh;
 import com.quanlytuyensinh.service.tinhDiemService;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 
 /**
  *
@@ -26,6 +25,7 @@ import java.util.ArrayList;
 @Controller
 public class TinhDiemDGNLController {
     // Running on http://localhost:8080/tinhdiemDGNL-view
+    @Autowired
     tinhDiemService service  = new tinhDiemService();
     @RequestMapping(value = "/tinhdiemDGNL-view", method = RequestMethod.GET)
     public String viewForm(Model model) {
@@ -44,24 +44,37 @@ public class TinhDiemDGNLController {
         @RequestParam("diem-thi-input") String diemThi,
         Model model
     ) {
-        List<TinhDiemDGNL> listKQDGNL= new ArrayList<>();
-        listKQDGNL = service.TinhDiemDGNLTatCaToHop(nganh, diemCong, khuVuc, doiTuong, diemThi);
-        String THGoc = this.service.getTHGoc(nganh);
-        TinhDiemDGNL ThCaoNhat = listKQDGNL.get(0);
-        BigDecimal NguongDauVao = this.service.getDiemSan(nganh);
-        String tenNganh = this.service.getTenNganhByMaNganh(nganh);
-        BigDecimal diemUuTienKhuVuc = this.service.DiemUuTienKhuVuc(khuVuc);
-        BigDecimal diemUuTienDoiTuong = this.service.DiemUuTienDoiTuong(doiTuong);
         
-        model.addAttribute("doiTuong", doiTuong.equals("0") ? "Không có" : doiTuong);
-        model.addAttribute("diemUuTienDoiTuong", diemUuTienDoiTuong);
-        model.addAttribute("khuVuc", khuVuc.equals("0") ? "Không có" : khuVuc);
-        model.addAttribute("diemUuTienKhuVuc", diemUuTienKhuVuc);
-        model.addAttribute("tenNganh", tenNganh + " (" + nganh + ")"); 
-        model.addAttribute("listKQDGNL", listKQDGNL);
-        model.addAttribute("THGoc", THGoc);
-        model.addAttribute("ThCaoNhat", ThCaoNhat);
-        model.addAttribute("NguongDauVao", NguongDauVao == null || NguongDauVao.compareTo(BigDecimal.ZERO) == 0 ? "Chưa công bố" : NguongDauVao);
+        TinhDiemDGNL diemDGNL = service.tinhDiemDGNL(nganh, diemCong, khuVuc, doiTuong, diemThi);
+        BigDecimal diemTrungTuyen = service.getDiemTT(nganh) == null ? new BigDecimal("0.00") : service.getDiemTT(nganh);
+        BigDecimal diemSan = service.getDiemSan(nganh) == null ? new BigDecimal("0.00") : service.getDiemSan(nganh);
+        model.addAttribute("diemSan", diemSan);
+        model.addAttribute("diemTrungTuyen", diemTrungTuyen);
+        model.addAttribute("ketqua", diemDGNL);
+        model.addAttribute("nganh", nganh);
+        
+        String kqDiemSan = "", kqDiemTT = "";
+
+        if (diemSan.compareTo(BigDecimal.ZERO) == 0) {
+            kqDiemSan = "Ngành chưa có điểm sàn được công bố";
+        } else if (diemDGNL.getDiemXetTuyen().compareTo(diemSan) > 0) {
+            kqDiemSan = "ĐẠT";
+        }
+        else if (diemDGNL.getDiemXetTuyen().compareTo(diemSan) < 0) {
+            kqDiemSan = "KHÔNG ĐẠT";
+        }
+
+        if (diemTrungTuyen.compareTo(BigDecimal.ZERO) == 0) {
+            kqDiemTT = "Ngành chưa có điểm sàn được công bố";
+        } else if (diemDGNL.getDiemXetTuyen().compareTo(diemTrungTuyen) > 0) {
+            kqDiemTT = "ĐẠT";
+        }
+        else if (diemDGNL.getDiemXetTuyen().compareTo(diemTrungTuyen) < 0) {
+            kqDiemTT = "KHÔNG ĐẠT";
+        }
+
+        model.addAttribute("kqDiemSan", kqDiemSan);
+        model.addAttribute("kqDiemTT", kqDiemTT);
         return "tinhdiemDGNL";
     }
 }

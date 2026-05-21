@@ -38,7 +38,7 @@ public class ThongKeThiSinhPanel extends JPanel {
     private final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
     private final Font FONT_REGULAR = new Font("Segoe UI", Font.PLAIN, 14);
     private final Font FONT_STAT = new Font("Segoe UI", Font.BOLD, 28);
-    
+
     public ThongKeThiSinhPanel() {
         TSBUS = new XtThisinhXetTuyen25BUS();
         listThiSinh = TSBUS.getAllThiSinh();
@@ -146,9 +146,9 @@ public class ThongKeThiSinhPanel extends JPanel {
 
         // Table
         String[] columns;
-        if(title.equals("Thống kê theo ĐỐI TƯỢNG")){
+        if (title.equals("Thống kê theo ĐỐI TƯỢNG")) {
             columns = new String[]{"Đối tượng", "Số lượng", "Tỷ lệ"};
-        }else{
+        } else {
             columns = new String[]{"Khu vực", "Số lượng", "Tỷ lệ"};
         }
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
@@ -162,9 +162,9 @@ public class ThongKeThiSinhPanel extends JPanel {
             int count = entry.getValue();
             double percent = total == 0 ? 0 : count * 100.0 / total;
             model.addRow(new Object[]{
-                    entry.getKey(),
-                    count,
-                    String.format("%.3f%%", percent)
+                entry.getKey(),
+                count,
+                String.format("%.3f%%", percent)
             });
         }
 
@@ -175,8 +175,22 @@ public class ThongKeThiSinhPanel extends JPanel {
         table.getTableHeader().setBackground(TABLE_HEADER);
         table.getTableHeader().setForeground(Color.WHITE);
 
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    setBackground(new Color(220, 220, 220));
+                    setForeground(Color.BLACK);
+                } else {
+                    setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 245, 245));
+                    setForeground(Color.BLACK);
+                }
+                setHorizontalAlignment(JLabel.CENTER);
+                return this;
+            }
+        };
         table.setDefaultRenderer(Object.class, centerRenderer);
 
         JScrollPane scroll = new JScrollPane(table);

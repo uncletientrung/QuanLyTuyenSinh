@@ -10,6 +10,7 @@ import com.quanlytuyensinh.GUI.ThongKe.Support.ModelChart;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -195,8 +196,22 @@ public class ThongKeNguyenVongPanel extends JPanel{
         table.getTableHeader().setBackground(TABLE_HEADER);
         table.getTableHeader().setForeground(Color.WHITE);
 
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    setBackground(new Color(220, 220, 220));
+                    setForeground(Color.BLACK);
+                } else {
+                    setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 245, 245));
+                    setForeground(Color.BLACK);
+                }
+                setHorizontalAlignment(JLabel.CENTER);
+                return this;
+            }
+        };
         table.setDefaultRenderer(Object.class, centerRenderer);
 
         JScrollPane scroll = new JScrollPane(table);

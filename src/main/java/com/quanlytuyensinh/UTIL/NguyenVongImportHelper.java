@@ -46,7 +46,7 @@ public class NguyenVongImportHelper {
 
     /** Chạy tính điểm — giống upadateField() trong Dialog */
     public void tinhDiem() {
-        if (!maNganh.startsWith("7140")) {
+        if (!maNganh.startsWith("7140") && !maNganh.equals("7140114")) {
             tinhDiemDGNL();
             tinhDiemVSAT();
         }

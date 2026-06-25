@@ -24,18 +24,18 @@
 - Java Swing
 - Java AWT
 
+### Web Application
+- Thymeleaf
+- HTML/CSS
+- JavaScript
+- Bootstrap
+
 ### Backend
 - Java
 - Spring Boot
 - Spring MVC
 - Spring Data JPA
 - Hibernate ORM
-
-### Web Application
-- Thymeleaf
-- HTML/CSS
-- JavaScript
-- Bootstrap
 
 ### Database
 - MySQL
@@ -64,7 +64,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/home.png" width="300">
+      <img src="./documentation/images/home.png" width="600">
     </td>
   </tr>
 </table>
@@ -73,7 +73,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/ts.png" width="300">
+      <img src="./documentation/images/ts.png" width="600">
     </td>
   </tr>
 </table>
@@ -82,7 +82,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/tkts.png" width="300">
+      <img src="./documentation/images/tkts.png" width="600">
     </td>
   </tr>
 </table>
@@ -91,7 +91,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/dt.png" width="300">
+      <img src="./documentation/images/dt.png" width="600">
     </td>
   </tr>
 </table>
@@ -100,7 +100,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/nv.png" width="300">
+      <img src="./documentation/images/nv.png" width="600">
     </td>
   </tr>
 </table>
@@ -109,7 +109,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/tknv.png" width="300">
+      <img src="./documentation/images/tknv.png" width="600">
     </td>
   </tr>
 </table>
@@ -118,7 +118,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/mon.png" width="300">
+      <img src="./documentation/images/mon.png" width="600">
     </td>
   </tr>
 </table>
@@ -127,7 +127,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/nganh.png" width="300">
+      <img src="./documentation/images/nganh.png" width="600">
     </td>
   </tr>
 </table>
@@ -136,7 +136,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/nth.png" width="300">
+      <img src="./documentation/images/nth.png" width="600">
     </td>
   </tr>
 </table>
@@ -145,7 +145,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/bqd.png" width="300">
+      <img src="./documentation/images/bqd.png" width="600">
     </td>
   </tr>
 </table>
@@ -154,7 +154,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/dc.png" width="300">
+      <img src="./documentation/images/dc.png" width="600">
     </td>
   </tr>
 </table>
@@ -163,7 +163,7 @@
 <table align="center" border="5" cellpadding="10" cellspacing="0">
   <tr>
     <td>
-      <img src="./documentation/images/tk.png" width="300">
+      <img src="./documentation/images/tk.png" width="600">
     </td>
   </tr>
 </table>
